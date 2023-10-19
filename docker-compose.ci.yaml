@@ -8,13 +8,13 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
 
-  maildev:
-    build:
-      context: .
-      dockerfile: maildev.Dockerfile
-    expose:
-      - 1080
-      - 1025
+  # maildev:
+  #   build:
+  #     context: .
+  #     dockerfile: maildev.Dockerfile
+  #   expose:
+  #     - 1080
+  #     - 1025
 
   # Uncomment to use redis
   # redis:
