@@ -12,9 +12,81 @@ datasource db {
 
 // Here goes models
 
-//dummy user model
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+enum ProviderStatus {
+  pending
+  verified
+  rejected
+}
+
+enum CourseVerificationStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum CourseStatus {
+  active
+  inactive
+  archived
+}
+
+enum CourseProgressStatus {
+  inProgress
+  completed
+}
+
+
+model Admin {
+  id        Int     @id @default(autoincrement())
+  name      String  
+  email     String  @unique
+  password  String 
+  walletId  Int
+}
+
+model Provider {
+  id          Int             @id @default(autoincrement())
+  name        String  
+  email       String          @unique
+  password    String 
+  walletId    Int
+  paymentInfo Json?
+  status      ProviderStatus  @default(pending)
+  courses     Course[]        
+}
+
+model Course {
+  id                  Int                       @id @default(autoincrement())
+  providerId          Int
+  title               String
+  description         String
+  courseLink          String
+  imgLink             String
+  credits             Int
+  noOfLessons         Int
+  language            String
+  duration            Int
+  competency          Json[] 
+  competencyIDs       Int[]
+  author              String
+  avgRating           Float?
+  status              CourseStatus
+  availabilityTime    DateTime?
+  verificationStatus  CourseVerificationStatus  @default(pending)
+  cqfScore            Int?
+  impactScore         Float?
+  provider            Provider                  @relation(fields: [providerId], references: [id])
+  userCourses         UserCourse[]              
+}
+
+model UserCourse {
+  id                        Int                       @id @default(autoincrement())
+  userId                    String
+  courseId                  Int
+  purchasedAt               DateTime
+  status                    CourseProgressStatus
+  courseCompletionScore     Float?
+  rating                    Int?
+  feedback                  String?
+  course                    Course                    @relation(fields: [courseId], references: [id])
 }
