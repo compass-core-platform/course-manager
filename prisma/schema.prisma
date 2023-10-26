@@ -35,13 +35,12 @@ enum CourseProgressStatus {
   completed
 }
 
-
 model Admin {
   id        Int     @id @default(autoincrement())
   name      String  
   email     String  @unique
   password  String 
-  walletId  Int
+  walletId  Int     @unique
 }
 
 model Provider {
@@ -49,10 +48,34 @@ model Provider {
   name        String  
   email       String          @unique
   password    String 
-  walletId    Int
+  walletId    Int             @unique
   paymentInfo Json?
   status      ProviderStatus  @default(pending)
-  courses     Course[]        
+  courses     Course[]
+  wallet      Wallet          @relation(fields: [walletId], references: [walletId])
+}
+
+// dummy wallet model
+model Wallet {
+  walletId   Int              @id @default(autoincrement())
+  type       WalletType
+  status     WalletStatus     @default(active)
+  credits    Int              @default(0)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  provider   Provider? 
+}
+
+enum WalletType {
+  admin
+  provider
+  consumer
+}
+
+enum WalletStatus {
+  active
+  inactive
+  frozen
 }
 
 model Course {
@@ -63,11 +86,10 @@ model Course {
   courseLink          String
   imgLink             String
   credits             Int
-  noOfLessons         Int
+  noOfLessons         Int?
   language            String
   duration            Int
-  competency          Json[] 
-  competencyIDs       Int[]
+  competency          Json[]
   author              String
   avgRating           Float?
   status              CourseStatus
@@ -81,12 +103,14 @@ model Course {
 
 model UserCourse {
   id                        Int                       @id @default(autoincrement())
-  userId                    String
+  userId                    String                    
   courseId                  Int
-  purchasedAt               DateTime
-  status                    CourseProgressStatus
+  purchasedAt               DateTime                  @default(now())
+  status                    CourseProgressStatus      @default(inProgress)
   courseCompletionScore     Float?
   rating                    Int?
   feedback                  String?
   course                    Course                    @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
 }
