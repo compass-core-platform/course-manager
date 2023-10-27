@@ -4,9 +4,11 @@ import { AdminService } from './admin.service';
 import { PrismaModule } from 'nestjs-prisma';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
+import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 
 describe('AdminController', () => {
   let controller: AdminController;
+  let adminService: AdminService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,6 +18,7 @@ describe('AdminController', () => {
     }).compile();
 
     controller = module.get<AdminController>(AdminController);
+    adminService = module.get<AdminService>(AdminService);
   });
 
   it('should be defined', () => {

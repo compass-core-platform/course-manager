@@ -1,6 +1,7 @@
 import { CourseStatus, CourseVerificationStatus } from "@prisma/client";
 
 export class CourseResponse {
+    
     readonly id: number;
     readonly providerId: number;
     readonly title: string;

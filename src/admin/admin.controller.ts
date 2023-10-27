@@ -1,15 +1,17 @@
 import { Controller, Body, Get, Post, Patch, Res, Delete, HttpStatus, Param, ParseIntPipe, Logger} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
-import { ProviderProfileResponse } from './dto/ProviderProfileResponse.dto';
+import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { getPrismaErrorStatusAndMessage } from '../utils/utils';
-import { EditProvider } from './dto/EditProvider.dto';
-import { Course } from '@prisma/client';
-import { CourseResponse } from './dto/CourseResponse.dto';
-import { CourseVerify } from './dto/VerifyCourse.dto';
-import { TransactionResponse } from './dto/TransactionResponse.dto';
+import { EditProvider } from './dto/edit-provider.dto';
+import { CourseResponse } from './dto/course-response.dto';
+import { CourseVerify } from './dto/verify-course.dto';
+import { TransactionResponse } from './dto/transaction-response.dto';
+import { Response } from 'express';
+import { CreditRequest } from './dto/credit-request.dto';
+import { json } from 'stream/consumers';
 
-@Controller('/api/admin')
+@Controller('admin')
 @ApiTags('admin')
 export class AdminController {
     private readonly logger = new Logger(AdminController.name);
@@ -19,7 +21,7 @@ export class AdminController {
     @ApiOperation({ summary: "Get all providers" })
     @ApiResponse({ status: HttpStatus.OK, type: ProviderProfileResponse, isArray: true})
     @Get('/providers')
-    async getAllProviders(@Res() res): Promise<ProviderProfileResponse[]> {
+    async getAllProviders(@Res() res : Response) {
         try {
             this.logger.log(`Getting information of all the providers`);
 
@@ -27,7 +29,7 @@ export class AdminController {
 
             this.logger.log(`Successfully retrieved all the providers`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "All providers fetched",
                 data: providers
             });
@@ -35,7 +37,7 @@ export class AdminController {
             this.logger.error(`Failed to retreive all the providers' information`);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode, 
                 message: errorMessage || "Failed to fetch all the providers' information",
             });
@@ -46,8 +48,8 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: ProviderProfileResponse})
     @Get('/providers/:providerId')
     async getProviderProfile (
-        @Param("providerId", ParseIntPipe) providerId: number, @Res() res
-    ) : Promise<ProviderProfileResponse>{
+        @Param("providerId", ParseIntPipe) providerId: number, @Res() res: Response
+    ) {
         try {
             this.logger.log(`Getting provider information for id ${providerId}`);
 
@@ -55,7 +57,7 @@ export class AdminController {
 
             this.logger.log(`Successfully retrieved the provider profile information`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "Provider profile retrieved successfully",
                 data: provider
             });
@@ -63,7 +65,7 @@ export class AdminController {
             this.logger.error(`Failed to retrieve the provider profile information`);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode,
                 message: errorMessage || "Failed to retrieve the profile information for the given providerId",
             });
@@ -76,7 +78,7 @@ export class AdminController {
     @Patch('/providers/:providerId')
     async editProviderProfile (
         @Param("providerId", ParseIntPipe) providerId: number, @Body() providerDto: EditProvider ,@Res() res
-    ) : Promise<ProviderProfileResponse>{
+    ){
         try {
             this.logger.log(`Getting provider information for id ${providerId}`);
             
@@ -93,7 +95,7 @@ export class AdminController {
 
             this.logger.log(`Successfully retrieved the provider profile information`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "Provider profile retrieved successfully",
                 data: updatedProfile
             });
@@ -101,7 +103,7 @@ export class AdminController {
             this.logger.error(`Failed to retrieve the provider profile information`);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode,
                 message: errorMessage || "Failed to retrieve the profile information for the given providerId",
             });
@@ -110,8 +112,8 @@ export class AdminController {
 
     @ApiOperation({ summary: "Get all the courses"})
     @ApiResponse({ status: HttpStatus.OK, type: CourseResponse, isArray: true})
-    @Patch('/courses/')
-    async getAllCoursess(@Res() res) : Promise<Course[]>{
+    @Get('/courses/')
+    async getAllCourses(@Res() res){
         try {
             this.logger.log(`Fetching all courses on marketplace (verified, pending & rejected)`);
 
@@ -119,7 +121,7 @@ export class AdminController {
 
             this.logger.log(`Successfully retrieved all the courses`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "All courses retrieved successfully",
                 data: courses
             });
@@ -127,7 +129,7 @@ export class AdminController {
             this.logger.error(`Failed to retrieve all courses`);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode,
                 message: errorMessage || "Failed to retrieve all courses",
             });
@@ -139,7 +141,7 @@ export class AdminController {
     @Get('/course/:courseId')
     async getCourseById (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res
-    ) : Promise<CourseResponse>{
+    ){
         try {
             this.logger.log(`Getting course information for id ${courseId}`);
             
@@ -147,7 +149,7 @@ export class AdminController {
 
             this.logger.log(`Successfully retrieved the course`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "Course retrieved successfully",
                 data: course
             });
@@ -155,7 +157,7 @@ export class AdminController {
             this.logger.error(`Failed to retrieve the course for the courseId ${courseId}`);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode,
                 message: errorMessage || `Failed to retrieve the course with id ${courseId}`,
             });
@@ -168,7 +170,7 @@ export class AdminController {
     @Patch('/course/:courseId/accept')
     async acceptCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Body() verifyBody: CourseVerify, @Res() res
-    ) : Promise<CourseResponse>{
+    ) {
         try {
             this.logger.log(`Verifying the course with id ${courseId}`);
             
@@ -176,7 +178,7 @@ export class AdminController {
 
             this.logger.log(`Successfully accepted the course`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "Course accepted successfully",
                 data: course
             });
@@ -184,7 +186,7 @@ export class AdminController {
             this.logger.error(`Failed to accept the course for the courseId ${courseId}`);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode,
                 message: errorMessage || `Failed to accept the course with id ${courseId}`,
             });
@@ -196,7 +198,7 @@ export class AdminController {
     @Patch('/course/:courseId/reject')
     async rejectCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res
-    ) : Promise<CourseResponse>{
+    ) {
         try {
             this.logger.log(`Processing reject request of course with id ${courseId}`);
             
@@ -204,7 +206,7 @@ export class AdminController {
 
             this.logger.log(`Successfully rejected the course`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "Course rejected successfully",
                 data: course
             });
@@ -212,7 +214,7 @@ export class AdminController {
             this.logger.error(`Failed to reject the course with the courseId ${courseId}`);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode,
                 message: errorMessage || `Failed to reject the course with id ${courseId}`,
             });
@@ -224,7 +226,7 @@ export class AdminController {
     @Delete('/course/:courseId')
     async removeCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res
-    ) : Promise<CourseResponse>{
+    ) {
         try {
             this.logger.log(`Processing removal request of course with id ${courseId}`);
             
@@ -232,7 +234,7 @@ export class AdminController {
 
             this.logger.log(`Successfully deleted the course`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "Course deleted successfully",
                 data: course
             });
@@ -240,7 +242,7 @@ export class AdminController {
             this.logger.error(`Failed to delete the course with the courseId ${courseId}`);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode,
                 message: errorMessage || `Failed to delete the course with id ${courseId}`,
             });
@@ -253,7 +255,7 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: TransactionResponse, isArray: true})
     @Get('/:adminId/transactions/consumers')
     async getTransactions (@Param("adminId") adminId: number, @Res() res
-    ) : Promise<TransactionResponse[]>{
+    ){
         try {
             this.logger.log(`Getting all transactions between admin and consumers.`);
             
@@ -261,7 +263,7 @@ export class AdminController {
 
             this.logger.log(`Successfully fetched all the transactions between admin and consumers`);
 
-            return res.status(HttpStatus.OK).json({
+            res.status(HttpStatus.OK).json({
                 message: "Fetched admin-consumers transactions",
                 data: transactions
             });
@@ -269,11 +271,70 @@ export class AdminController {
             this.logger.error(`Failed to fetch the transactions between admin and consumers`);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
-            return res.status(statusCode).json({
+            res.status(statusCode).json({
                 statusCode,
                 message: errorMessage || `Failed to fetch the transactions between admin and consumers`,
             });
         }
     }
 
+    @ApiOperation({ summary: "Add credits to a Provider"})
+    @ApiResponse({ status: HttpStatus.OK, type: json})
+    @Post('/:adminId/providers/credits/addCredits')
+    async addCredits (@Param("adminId") adminId: number, @Body() reqBody: CreditRequest, @Res() res
+    ){
+        try {
+            this.logger.log(`Adding credits to providers' wallet`);
+
+            const providerId = reqBody.providerId;
+            const credits = reqBody.credits;
+            
+            const provider = this.adminService.addOrRemoveCreditsToProvider(adminId, providerId, credits);
+
+            this.logger.log(`Succesfully Added credits to providers' wallet.`);
+
+            res.status(HttpStatus.OK).json({
+                message: "Added credits to provider",
+                data: provider
+            });
+        } catch (err) {
+            this.logger.error(`Failed to add credits to the provider`);
+            
+            const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode,
+                message: errorMessage || `Failed to add credits to the provider`,
+            });
+        }
+    }
+    
+    @ApiOperation({ summary: "Remove credits from a Provider"})
+    @ApiResponse({ status: HttpStatus.OK, type: json })
+    @Post('/:adminId/providers/credits/reduceCredits')
+    async reduceCredits (@Param("adminId") adminId: number, @Body() reqBody: CreditRequest, @Res() res
+    ){
+        try {
+            this.logger.log(`Reducing credits from providers' wallet`);
+
+            const providerId = reqBody.providerId;
+            const credits = reqBody.credits;
+            
+            const provider = this.adminService.addOrRemoveCreditsToProvider(adminId, providerId, credits);
+
+            this.logger.log(`Succesfully reduced credits from providers' wallet.`);
+
+            res.status(HttpStatus.OK).json({
+                message: "Removed credits from provider",
+                data: provider
+            });
+        } catch (err) {
+            this.logger.error(`Failed to remove credits from the provider`);
+            
+            const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode,
+                message: errorMessage || `Failed to remove credits from the provider`,
+            });
+        }
+    }
 }

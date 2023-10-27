@@ -3,6 +3,8 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { PrismaService } from '../prisma/prisma.service';
 import { Provider, ProviderStatus, Course, CourseVerificationStatus } from '@prisma/client';
+import { omit } from 'lodash';
+import { EditProvider } from './dto/edit-provider.dto';
 
 @Injectable()
 export class AdminService {
@@ -29,8 +31,10 @@ export class AdminService {
         return updatedRecord;
     }
 
-    async findAllProviders(): Promise<Provider[]> {
-        let providers = await this.prisma.provider.findMany();
+    async findAllProviders(): Promise<Partial<Provider>[]> {
+        let providers = await this.prisma.provider.findMany({
+            select: { id: true, name: true, email: true, walletId: true, paymentInfo: true, courses: true, status: true}
+        });
         return providers;
     }
 
@@ -109,7 +113,7 @@ export class AdminService {
 
     async getTransactions(adminId: number): Promise<any> {
 
-        const walletService = process.env.WALLET_SERVICE_URL;
+        const walletService = process.env.MOCK_WALLET_SERVICE_URL;
         const endpoint = `${adminId}/transactions/consumers`;
         const url = walletService + endpoint;
 
@@ -123,7 +127,7 @@ export class AdminService {
     }
 
     async addOrRemoveCreditsToProvider(adminId: number, providerId: number, credits: number) {
-        const walletService = process.env.WALLET_SERVICE_URL;
+        const walletService = process.env.MOCK_WALLET_SERVICE_URL;
         let endpoint: string;
         if(credits >= 0) {
             endpoint = `${adminId}/add-credits`;
@@ -137,12 +141,13 @@ export class AdminService {
         };
         try {
             const response = await axios.post(url, requestBody);
+            return response;
         } catch (err) {
             throw new Error(`Failed to send POST request to walletService.`);
         }
     }
 
-    async editProviderProfile(profileInfo: any) {
+    async editProviderProfile(profileInfo: EditProvider) {
         
         const updatedProfile = await this.prisma.provider.update({
             where: { id: profileInfo.id },
