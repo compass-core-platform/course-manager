@@ -3,13 +3,13 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { PrismaService } from '../prisma/prisma.service';
 import { Provider, ProviderStatus, Course, CourseVerificationStatus } from '@prisma/client';
-import { omit } from 'lodash';
 import { EditProvider } from './dto/edit-provider.dto';
+import { MockWalletService } from '../mock-wallet/mock-wallet.service';
 
 @Injectable()
 export class AdminService {
 
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService, private wallet: MockWalletService) {}
 
     async verifyProvider(providerId: number) {
         let providerInfo = await this.prisma.provider.findUnique({
@@ -111,15 +111,16 @@ export class AdminService {
         });
     }
 
-    async getTransactions(adminId: number): Promise<any> {
+    async getTransactions(adminId: number) {
 
-        const walletService = process.env.MOCK_WALLET_SERVICE_URL;
-        const endpoint = `${adminId}/transactions/consumers`;
-        const url = walletService + endpoint;
+        // const walletService = process.env.WALLET_SERVICE_URL;
+        // const endpoint = `/admin/${adminId}/transactions/consumers`;
+        // const url = walletService + endpoint;
 
         try {
-            const response: AxiosResponse = await axios.get(url);
-            return response.data;
+            // const response: AxiosResponse = await axios.get(url);
+            const transactions =  this.wallet.getTransactions(adminId);
+            return transactions.data;
     
         } catch (err) {
             throw new Error(`Failed to fetch data: ${err.message}`);
@@ -127,20 +128,26 @@ export class AdminService {
     }
 
     async addOrRemoveCreditsToProvider(adminId: number, providerId: number, credits: number) {
-        const walletService = process.env.MOCK_WALLET_SERVICE_URL;
-        let endpoint: string;
-        if(credits >= 0) {
-            endpoint = `${adminId}/add-credits`;
-        } else {
-            endpoint = `${adminId}/reduce-credits`;
-        }
-        const url = walletService + endpoint;
-        const requestBody = {
-            consumerId: providerId,
-            credits: credits
-        };
+        // const walletService = process.env.WALLET_SERVICE_URL;
+        // let endpoint: string;
+        // if(credits >= 0) {
+        //     endpoint = `/admin/${adminId}/add-credits`;
+        // } else {
+        //     endpoint = `/admin/${adminId}/reduce-credits`;
+        // }
+        // const url = walletService + endpoint;
+        // const requestBody = {
+        //     consumerId: providerId,
+        //     credits: credits
+        // };
         try {
-            const response = await axios.post(url, requestBody);
+            // const response = await axios.post(url, requestBody);
+            let response;
+            if(credits >= 0) {
+                response = this.wallet.addCredits(adminId, providerId, credits);
+            } else {
+                response = this.wallet.reduceCredits(adminId, providerId, credits);
+            }
             return response;
         } catch (err) {
             throw new Error(`Failed to send POST request to walletService.`);

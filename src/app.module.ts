@@ -5,6 +5,7 @@ import { AppService } from "./app.service";
 import { PrismaModule } from "./prisma/prisma.module";
 import { PrismaService } from "./prisma/prisma.service";
 import { AdminModule } from './admin/admin.module';
+import { MockWalletModule } from './mock-wallet/mock-wallet.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AdminModule } from './admin/admin.module';
     }),
     PrismaModule,
     AdminModule,
+    MockWalletModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

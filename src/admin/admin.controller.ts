@@ -86,6 +86,7 @@ export class AdminController {
                 id: providerDto.id,
                 name: providerDto.name,
                 email: providerDto.email,
+                password: providerDto.password,
                 paymentInfo: providerDto.paymentInfo,
                 walletId: providerDto.walletId,
                 status: providerDto.status
@@ -145,7 +146,7 @@ export class AdminController {
         try {
             this.logger.log(`Getting course information for id ${courseId}`);
             
-            const course = this.adminService.findCourseById(courseId);
+            const course = await this.adminService.findCourseById(courseId);
 
             this.logger.log(`Successfully retrieved the course`);
 
@@ -174,7 +175,7 @@ export class AdminController {
         try {
             this.logger.log(`Verifying the course with id ${courseId}`);
             
-            const course = this.adminService.acceptCourse(courseId, verifyBody.cqf_score);
+            const course = await this.adminService.acceptCourse(courseId, verifyBody.cqf_score);
 
             this.logger.log(`Successfully accepted the course`);
 
@@ -202,7 +203,7 @@ export class AdminController {
         try {
             this.logger.log(`Processing reject request of course with id ${courseId}`);
             
-            const course = this.adminService.rejectCourse(courseId);
+            const course = await this.adminService.rejectCourse(courseId);
 
             this.logger.log(`Successfully rejected the course`);
 
@@ -230,7 +231,7 @@ export class AdminController {
         try {
             this.logger.log(`Processing removal request of course with id ${courseId}`);
             
-            const course = this.adminService.removeCourse(courseId);
+            const course = await this.adminService.removeCourse(courseId);
 
             this.logger.log(`Successfully deleted the course`);
 
@@ -259,8 +260,7 @@ export class AdminController {
         try {
             this.logger.log(`Getting all transactions between admin and consumers.`);
             
-            const transactions = this.adminService.getTransactions(adminId);
-
+            const transactions = await this.adminService.getTransactions(adminId);
             this.logger.log(`Successfully fetched all the transactions between admin and consumers`);
 
             res.status(HttpStatus.OK).json({
@@ -289,7 +289,7 @@ export class AdminController {
             const providerId = reqBody.providerId;
             const credits = reqBody.credits;
             
-            const provider = this.adminService.addOrRemoveCreditsToProvider(adminId, providerId, credits);
+            const provider = await this.adminService.addOrRemoveCreditsToProvider(adminId, providerId, credits);
 
             this.logger.log(`Succesfully Added credits to providers' wallet.`);
 
@@ -319,7 +319,7 @@ export class AdminController {
             const providerId = reqBody.providerId;
             const credits = reqBody.credits;
             
-            const provider = this.adminService.addOrRemoveCreditsToProvider(adminId, providerId, credits);
+            const provider = await this.adminService.addOrRemoveCreditsToProvider(adminId, providerId, credits);
 
             this.logger.log(`Succesfully reduced credits from providers' wallet.`);
 

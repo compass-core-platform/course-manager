@@ -1,4 +1,4 @@
-import { CourseProgressStatus, CourseStatus, CourseVerificationStatus, PrismaClient } from '@prisma/client';
+import { CourseStatus, CourseVerificationStatus, PrismaClient } from '@prisma/client';
 
 // initialize Prisma Client
 const prisma = new PrismaClient();
@@ -70,7 +70,7 @@ async function main() {
     }
   });
 
-  const course1 = prisma.course.create({
+  const course1 = await prisma.course.create({
     data: {
         id: 1,
         providerId: 1,
@@ -89,7 +89,7 @@ async function main() {
         },
         author: "Jason Frig",
         status: CourseStatus.active,
-        availabilityTime: new Date("2023-26-01T12:00:00"),
+        availabilityTime: new Date("2023-06-01"),
         verificationStatus: CourseVerificationStatus.accepted,
         cqfScore: 10,
     }

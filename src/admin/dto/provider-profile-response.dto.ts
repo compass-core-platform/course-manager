@@ -1,11 +1,26 @@
-import { Course, ProviderStatus } from "@prisma/client";
+import { ApiProperty } from "@nestjs/swagger";
+import { ProviderStatus } from "@prisma/client";
 
 export class ProviderProfileResponse {
-    readonly id: number;
-    readonly name: string;
-    readonly email: string;
-    readonly walletId: number;
-    readonly paymentInfo: any;
-    readonly status: ProviderStatus;
+    @ApiProperty({required: false})
+    id: number;
+
+    @ApiProperty()
+    name: string;
+
+    @ApiProperty({format: 'email'})
+    email: string;
+    
+    @ApiProperty()
+    password: string;
+
+    @ApiProperty()
+    walletId: number;
+
+    @ApiProperty()
+    paymentInfo: any;
+
+    @ApiProperty()
+    status: ProviderStatus;
     // readonly courses: Course[];
 }

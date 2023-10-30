@@ -74,9 +74,9 @@ model Course {
   competency         Json
   author             String
   avgRating          Float?
-  status             CourseStatus             @default(pending)
+  status             CourseStatus             
   availabilityTime   DateTime?
-  verificationStatus CourseVerificationStatus @default(pending)
+  verificationStatus CourseVerificationStatus 
   cqfScore           Int?
   impactScore        Float?
   provider           Provider                 @relation(fields: [providerId], references: [id])

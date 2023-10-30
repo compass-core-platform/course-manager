@@ -1,10 +1,5 @@
-import { ProviderStatus } from "@prisma/client";
+import { PartialType } from "@nestjs/swagger";
+import { ProviderProfileResponse } from "./provider-profile-response.dto";
 
-export class EditProvider {
-    readonly id: number;
-    readonly name: string;
-    readonly email: string;
-    readonly walletId: number;
-    readonly paymentInfo: any;
-    readonly status: ProviderStatus;
+export class EditProvider extends PartialType(ProviderProfileResponse){
 }
