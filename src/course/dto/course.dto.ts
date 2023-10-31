@@ -12,7 +12,7 @@ export class CourseResponseDto {
     readonly noOfLessons: number | null;
     readonly language: string[];
     readonly duration: number;
-    readonly competency: Prisma.JsonValue[];
+    readonly competency: Prisma.JsonValue;
     readonly author: string;
     readonly avgRating: number | null;
     readonly status: $Enums.CourseStatus;

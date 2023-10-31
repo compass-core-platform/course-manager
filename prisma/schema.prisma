@@ -89,7 +89,7 @@ model Course {
   noOfLessons         Int?
   language            String[]
   duration            Int
-  competency          Json[]
+  competency          Json
   author              String
   avgRating           Float?
   status              CourseStatus
@@ -113,4 +113,10 @@ model UserCourse {
   course                    Course                    @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
+}
+
+enum TransactionType {
+  purchase
+  creditRequest
+  settlement
 }
