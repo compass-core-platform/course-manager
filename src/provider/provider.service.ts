@@ -9,6 +9,7 @@ import { CourseService } from 'src/course/course.service';
 import { Feedback, FeedbackResponseDto } from './dto/feedback.dto';
 import { PurchaseResponseDto } from './dto/purchase.dto';
 import { CourseResponseDto } from 'src/course/dto/course.dto';
+import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 
 @Injectable()
 export class ProviderService {
@@ -91,7 +92,7 @@ export class ProviderService {
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
         
-        return this.courseService.deleteCourse(courseId);
+        await this.courseService.deleteCourse(courseId);
     }
 
     async getCourses(providerId: number): Promise<CourseResponseDto[]> {
@@ -146,9 +147,9 @@ export class ProviderService {
 
     }
 
-    async markCourseComplete(providerId: number, courseId: number, userId: string) {
+    async markCourseComplete(providerId: number, completeCourseDto: CompleteCourseDto) {
 
-        const course = await this.courseService.getCourse(courseId);
+        const course = await this.courseService.getCourse(completeCourseDto.courseId);
         if(!course)
             throw new NotFoundException("Course does not exist");
         
@@ -156,7 +157,7 @@ export class ProviderService {
             throw new BadRequestException("Course does not belong to this provider");
 
         try {
-            await this.courseService.markCourseComplete(courseId, userId);
+            await this.courseService.markCourseComplete(completeCourseDto);
         } catch {
             throw new NotFoundException("This user has not subscribed to this course");
         }

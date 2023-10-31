@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { CourseStatus, CourseVerificationStatus } from "@prisma/client";
-import { IsDate, IsInt, IsJSON, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
+import { IsArray, IsDate, IsInt, IsJSON, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
 
 export class AddCourseDto {
 
@@ -44,8 +44,8 @@ export class AddCourseDto {
     // language
     @ApiProperty()
     @IsNotEmpty()
-    @IsString()
-    language: string;
+    @IsArray()
+    language: string[];
 
     // course duration
     @ApiProperty()

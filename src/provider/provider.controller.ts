@@ -9,6 +9,7 @@ import { ViewProfileResponseDto } from './dto/view-profile.dto';
 import { FeedbackResponseDto } from './dto/feedback.dto';
 import { PurchaseResponseDto } from './dto/purchase.dto';
 import { CourseResponseDto } from 'src/course/dto/course.dto';
+import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 
 @Controller('provider')
 export class ProviderController {
@@ -173,11 +174,10 @@ export class ProviderController {
     // Mark course as complete for a user
     async markCourseComplete(
         @Param("providerId", ParseIntPipe) providerId: number,
-        @Param("courseId", ParseIntPipe) courseId: number,
-        @Param("userId") userId: string,
+        @Body() completeCourseDto: CompleteCourseDto,
         @Res() res
     ) {
-        await this.providerService.markCourseComplete(providerId, courseId, userId);
+        await this.providerService.markCourseComplete(providerId, completeCourseDto);
 
         res.status(HttpStatus.OK).json({
             message: "course marked complete",

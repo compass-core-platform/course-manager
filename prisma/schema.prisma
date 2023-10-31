@@ -87,7 +87,7 @@ model Course {
   imgLink             String
   credits             Int
   noOfLessons         Int?
-  language            String
+  language            String[]
   duration            Int
   competency          Json[]
   author              String
@@ -110,7 +110,7 @@ model UserCourse {
   courseCompletionScore     Float?
   rating                    Int?
   feedback                  String?
-  course                    Course                    @relation(fields: [courseId], references: [id])
+  course                    Course                    @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }

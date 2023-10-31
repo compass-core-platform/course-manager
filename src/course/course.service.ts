@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AddCourseDto } from "./dto/add-course.dto";
 import { CourseProgressStatus } from "@prisma/client";
+import { CompleteCourseDto } from "./dto/completion.dto";
 
 @Injectable()
 export class CourseService {
@@ -28,7 +29,7 @@ export class CourseService {
 
     async deleteCourse(courseId: number) {
         
-        this.prisma.course.delete({
+        await this.prisma.course.delete({
             where: {
                 id: courseId
             }
@@ -53,13 +54,12 @@ export class CourseService {
         })
     }
 
-    async markCourseComplete(courseId: number, userId: string) {
+    async markCourseComplete(completeCourseDto: CompleteCourseDto) {
 
         await this.prisma.userCourse.update({
             where: {
                 userId_courseId: {
-                    courseId,
-                    userId
+                    ...completeCourseDto
                 }
             },
             data: {
