@@ -1,6 +1,10 @@
-import { CourseVerificationStatus } from "@prisma/client";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsNumber } from 'class-validator';
+
 
 export class CourseVerify {
-    readonly cqf_score: number;
-    readonly verificationStatus: CourseVerificationStatus;
+    @ApiProperty()
+    @IsNumber()
+    @IsNotEmpty()
+    cqf_score: number;
 }

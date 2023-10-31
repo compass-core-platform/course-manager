@@ -30,6 +30,18 @@ async function main() {
     },
   });
 
+  const admin3 = await prisma.admin.upsert({
+    where: { id: 3 },
+    update: {},
+    create: {
+      id: 3,
+      name: 'admin3',
+      email: "admin3@gmail.com",
+      password: "admin3",
+      walletId: 4
+    },
+  });
+
   const provider1 = await prisma.provider.upsert({
     where: { id: 1 },
     update: {},
@@ -70,6 +82,26 @@ async function main() {
     }
   });
 
+  const provider3 = await prisma.provider.upsert({
+    where: { id: 3 },
+    update: {},
+    create: {
+        id: 3,
+        name: "lern",
+        email: "lern@gmail.in",
+        password: "lern@999",
+        walletId: 6,
+        paymentInfo: {
+            bankAccNo: "1111111116",
+            otherDetails: {
+
+            }
+        },
+        status: 'rejected',
+        // courses: []
+    }
+  });
+
   const course1 = await prisma.course.create({
     data: {
         id: 1,
@@ -95,10 +127,56 @@ async function main() {
     }
   });
 
+  const course2 = await prisma.course.create({
+    data: {
+        id: 2,
+        providerId: 1,
+        title: "Introduction to Programming",
+        description: "This course covers all the fundamentals of programming",
+        courseLink: "https://udemy.com/courses/jQKsLpm",
+        imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
+        credits: 160,
+        noOfLessons: 100,
+        language: ["english", "hindi"],
+        duration: 50,
+        competency: {
+            6: ["Level5", "Level4"],
+            10: [ "Level1", "Level2" ]
+        },
+        author: "James Franco",
+        status: CourseStatus.active,
+        availabilityTime: new Date("2023-08-10"),
+        verificationStatus: CourseVerificationStatus.pending,
+    }
+  });
+
+  const course3 = await prisma.course.create({
+    data: {
+        id: 3,
+        providerId: 1,
+        title: "Introduction to Compiler Engineering",
+        description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
+        courseLink: "https://udemy.com/courses/jQKsLpm",
+        imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
+        credits: 160,
+        noOfLessons: 100,
+        language: ["english", "hindi"],
+        duration: 50,
+        competency: {
+            3: ["Level2", "Level3"],
+            5: [ "Level4" ]
+        },
+        author: "Ramakrishna Upadrasta",
+        status: CourseStatus.active,
+        availabilityTime: new Date("2023-10-10"),
+        verificationStatus: CourseVerificationStatus.rejected,
+    }
+  });
+
   const resp = await prisma.course.findMany({});
   console.log("All courses: ", resp);
 
-  console.log({ admin1, admin2, provider1, provider2, course1 });
+  console.log({ admin1, admin2, admin3, provider1, provider2, provider3, course1, course2, course3 });
 }
 
 // execute the main function

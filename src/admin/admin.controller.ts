@@ -83,7 +83,7 @@ export class AdminController {
             this.logger.log(`Getting provider information for id ${providerId}`);
             
             const updatedProviderInfo = {
-                id: providerDto.id,
+                id: providerId,
                 name: providerDto.name,
                 email: providerDto.email,
                 password: providerDto.password,
@@ -139,7 +139,7 @@ export class AdminController {
 
     @ApiOperation({ summary: "Get a course, given its courseId"})
     @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
-    @Get('/course/:courseId')
+    @Get('/courses/:courseId')
     async getCourseById (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res
     ){
@@ -168,7 +168,7 @@ export class AdminController {
 
     @ApiOperation({ summary: "Accept course and assign a cqf_score"})
     @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
-    @Patch('/course/:courseId/accept')
+    @Patch('/courses/:courseId/accept')
     async acceptCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Body() verifyBody: CourseVerify, @Res() res
     ) {
@@ -196,7 +196,7 @@ export class AdminController {
 
     @ApiOperation({ summary: "Reject a course given its courseId"})
     @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
-    @Patch('/course/:courseId/reject')
+    @Patch('/courses/:courseId/reject')
     async rejectCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res
     ) {
@@ -224,7 +224,7 @@ export class AdminController {
 
     @ApiOperation({ summary: "Remove a course given its courseId"})
     @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
-    @Delete('/course/:courseId')
+    @Delete('/courses/:courseId')
     async removeCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res
     ) {
