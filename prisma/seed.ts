@@ -4,9 +4,9 @@ async function main() {
 
   const response = await prisma.provider.create({
     data: {
-        name: "provider 1",
-        email: "provider1@xyz.com",
-        password: "abc",
+        name: "Vijay Salgaonkar",
+        email: "vijaysalgaonkar@gmail.com",
+        password: "9d209aacaed4088d68c41bd8dfb20de39cbd8339",
         wallet: {
             create: {
                 type: 'provider',
@@ -18,58 +18,58 @@ async function main() {
   const response1 = await prisma.course.createMany({
     data: [{
         providerId: response.id,
-        title: "course1",
-        description: "course1",
-        courseLink: "abc1",
-        imgLink: "qwe1",
+        title: "NestJS Complete",
+        description: "Build full featured backend APIs incredibly quickly with Nest, TypeORM, and Typescript. Includes testing and deployment!",
+        courseLink: "https://www.udemy.com/course/nestjs-the-complete-developers-guide/",
+        imgLink: "https://courses.nestjs.com/img/logo.svg",
         credits: 4,
         noOfLessons: 3,
         language: ["en"],
         duration: 4,
         competency: [],
-        author: "abcd1",
+        author: "Stephen Grider",
         status: "active",
         availabilityTime: new Date("2024-05-01").toISOString()
     }, {
         providerId: response.id,
-        title: "course2",
-        description: "course2",
-        courseLink: "abc2",
-        imgLink: "qwe2",
+        title: "Graphic Design Masterclass",
+        description: "The Ultimate Graphic Design Course Which Covers Photoshop, Illustrator, InDesign, Design Theory, Branding & Logo Design",
+        courseLink: "https://www.udemy.com/course/graphic-design-masterclass-everything-you-need-to-know/",
+        imgLink: "https://www.unite.ai/wp-content/uploads/2023/05/emily-bernal-v9vII5gV8Lw-unsplash.jpg",
         credits: 5,
         noOfLessons: 3,
         language: ["en"],
         duration: 4,
         competency: [],
-        author: "abcd2",
+        author: "Lindsay Marsh",
         status: "active",
         availabilityTime: new Date("2024-05-01").toISOString()
     }, {
         providerId: response.id,
-        title: "course3",
-        description: "course3",
-        courseLink: "abc3",
-        imgLink: "qwe3",
+        title: "Python for Data Science",
+        description: "Learn how to use NumPy, Pandas, Seaborn , Matplotlib , Plotly , Scikit-Learn , Machine Learning, Tensorflow , and more",
+        courseLink: "https://www.udemy.com/course/python-for-data-science-and-machine-learning-bootcamp/",
+        imgLink: "https://blog.imarticus.org/wp-content/uploads/2021/12/learn-Python-for-data-science.jpg",
         credits: 2,
         noOfLessons: 3,
         language: ["en"],
         duration: 4,
         competency: [],
-        author: "abcd3",
+        author: "Jose Portilla",
         status: "active",
         availabilityTime: new Date("2024-05-01").toISOString()
     }, {
         providerId: response.id,
-        title: "course4",
-        description: "course4",
-        courseLink: "abc4",
-        imgLink: "qwe4",
+        title: "Microsoft Excel",
+        description: "Excel with this A-Z Microsoft Excel Course. Microsoft Excel 2010, 2013, 2016, Excel 2019 and Microsoft/Office 365/2023",
+        courseLink: "https://www.udemy.com/course/microsoft-excel-2013-from-beginner-to-advanced-and-beyond/",
+        imgLink: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Microsoft_Excel_2013-2019_logo.svg/587px-Microsoft_Excel_2013-2019_logo.svg.png",
         credits: 4,
         noOfLessons: 3,
         language: ["en"],
         duration: 4,
         competency: [],
-        author: "abcd4",
+        author: "Kyle Pew",
         status: "active",
         availabilityTime: new Date("2024-05-01").toISOString()
     }]
@@ -77,24 +77,24 @@ async function main() {
 
   const response3 = await prisma.userCourse.createMany({
     data: [{
-      userId: "xyz1",
-      feedback: "sample feedback 1",
-      rating: 2,
+      userId: "56e2b",
+      feedback: "Great course",
+      rating: 4,
       courseId: 1
     }, {
-      userId: "xyz2",
-      feedback: "sample feedback 2",
+      userId: "c8200",
+      feedback: "Instructor is very friendly",
       rating: 4,
       courseId: 2
     }, {
-      userId: "xyz3",
-      feedback: "sample feedback 3",
+      userId: "f9464",
+      feedback: "Some more real world applications could be discussed",
       rating: 3,
       courseId: 2
     }, {
-      userId: "xyz4",
-      feedback: "sample feedback 4",
-      rating: 3,
+      userId: "91e61",
+      feedback: "Not satisfied with the content",
+      rating: 2,
       courseId: 3
     }]
   })

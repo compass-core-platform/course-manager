@@ -23,7 +23,6 @@ export class UpdateProfileDto {
 
     // payment info
     @ApiProperty()
-    @IsJSON()
     @IsOptional()
     paymentInfo?: any
 }

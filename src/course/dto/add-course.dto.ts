@@ -57,7 +57,6 @@ export class AddCourseDto {
     // competency
     @ApiProperty()
     @IsNotEmpty()
-    // @IsJSON()
     competency: any[];
 
     // author

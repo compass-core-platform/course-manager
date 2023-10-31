@@ -24,7 +24,6 @@ export class SignupDto {
     // payment info
     @ApiProperty()
     @IsOptional()
-    @IsJSON()
     paymentInfo?: any
 }
 
