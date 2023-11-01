@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { WalletType } from '@prisma/client';
+import { ProviderStatus, WalletType } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto } from 'src/course/dto/add-course.dto';
@@ -55,11 +55,11 @@ export class ProviderService {
             where: {
                 id: providerId
             }
-        })
+        });
         if(!provider)
             throw new NotFoundException("provider does not exist");
         
-        return provider
+        return provider;
     }
 
     async updateProfileInfo(providerId: number, updateProfileDto: UpdateProfileDto) {
@@ -78,7 +78,10 @@ export class ProviderService {
 
     async addNewCourse(providerId: number, addCourseDto: AddCourseDto) {
 
-        await this.getProvider(providerId);
+        const provider = await this.getProvider(providerId);
+
+        if(provider.status != ProviderStatus.verified)
+            throw new UnauthorizedException("Provider account is not verified");
 
         return this.courseService.addCourse(providerId, addCourseDto);
     }

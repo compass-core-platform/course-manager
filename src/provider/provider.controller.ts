@@ -64,7 +64,7 @@ export class ProviderController {
         const provider = await this.providerService.getProvider(providerId);
 
          res.status(HttpStatus.OK).json({
-            message: "fetched successful",
+            message: "fetch successful",
             data : provider
         })
     }
@@ -170,7 +170,7 @@ export class ProviderController {
 
     @ApiOperation({ summary: 'Mark course as complete' })
     @ApiResponse({ status: HttpStatus.OK })
-    @Patch("/:providerId/course/:courseId/completion/:userId")
+    @Patch("/:providerId/course/completion")
     // Mark course as complete for a user
     async markCourseComplete(
         @Param("providerId", ParseIntPipe) providerId: number,
