@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { SearchDto } from "./dto/search.dto";
-import { CourseDto } from "./dto/course.dto";
 import { FeedbackDto } from "./dto/feedback.dto";
+import { CourseDto } from "./dto/course.dto";
+import { AddCourseDto } from "./dto/add-course.dto";
+import { CompleteCourseDto } from "./dto/completion.dto";
+import { CourseProgressStatus } from "@prisma/client";
 
 @Injectable()
 export class CourseService {
@@ -24,8 +26,18 @@ export class CourseService {
 
         return courses;
     }
+  
+    async addCourse(providerId: number, addCourseDto: AddCourseDto) {
 
-    async getOneCourse(courseId: number): Promise<CourseDto> {
+        return this.prisma.course.create({
+            data: {
+                providerId,
+                ...addCourseDto
+            }
+        })
+    }
+
+    async getCourse(courseId: number): Promise<CourseDto> {
 
         const course = await this.prisma.course.findUnique({
             where: {
@@ -40,7 +52,7 @@ export class CourseService {
 
     async insertUserCourse(courseId: number, userId: string) {
 
-        await this.getOneCourse(courseId);
+        await this.getCourse(courseId);
             
         await this.prisma.userCourse.create({
             data: {
@@ -52,7 +64,7 @@ export class CourseService {
 
     async giveCourseFeedback(courseId: number, userId: string, feedbackDto: FeedbackDto) {
 
-        await this.getOneCourse(courseId);
+        await this.getCourse(courseId);
         
         try {
             await this.prisma.userCourse.update({
@@ -70,4 +82,46 @@ export class CourseService {
             throw new NotFoundException("This user has not subscribed to this course");
         }
     }
+
+    async deleteCourse(courseId: number) {
+        
+        await this.prisma.course.delete({
+            where: {
+                id: courseId
+            }
+        })
+    }
+
+    async getProviderCourses(providerId: number) {
+
+        return this.prisma.course.findMany({
+            where: {
+                providerId
+            }
+        })
+    }
+
+    async getUserCourses(courseId: number) {
+
+        return this.prisma.userCourse.findMany({
+            where: {
+                courseId
+            },
+        })
+    }
+
+    async markCourseComplete(completeCourseDto: CompleteCourseDto) {
+
+        await this.prisma.userCourse.update({
+            where: {
+                userId_courseId: {
+                    ...completeCourseDto
+                }
+            },
+            data: {
+                status: CourseProgressStatus.completed
+            }
+        })
+    }
+
 }

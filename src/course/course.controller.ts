@@ -32,7 +32,7 @@ export class CourseController {
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
-        const course = await this.courseService.getOneCourse(courseId);
+        const course = await this.courseService.getCourse(courseId);
 
         res.status(HttpStatus.OK).json({
             message: "fetch successful",
