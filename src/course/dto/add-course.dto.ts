@@ -57,7 +57,7 @@ export class AddCourseDto {
     // competency
     @ApiProperty()
     @IsNotEmpty()
-    competency: any[];
+    competency: any;
 
     // author
     @ApiProperty()

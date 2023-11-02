@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ProviderStatus, WalletType } from '@prisma/client';
+import { Prisma, ProviderStatus, WalletType } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto } from 'src/course/dto/add-course.dto';
@@ -20,7 +20,15 @@ export class ProviderService {
 
     async createNewAccount(signupDto: SignupDto) {
 
-        const provider = await this.prisma.provider.create({
+        let provider = await this.prisma.provider.findUnique({
+            where : {
+                email: signupDto.email
+            }
+        })
+        if(provider)
+            throw new BadRequestException("Account with that email ID already exists");
+
+        provider = await this.prisma.provider.create({
             data: {
                 ...signupDto,
                 wallet: {
