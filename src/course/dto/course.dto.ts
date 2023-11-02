@@ -10,9 +10,9 @@ export class CourseDto {
     readonly imgLink: string;
     readonly credits: number;
     readonly noOfLessons: number | null;
-    readonly language: string;
+    readonly language: string[];
     readonly duration: number;
-    readonly competency: Prisma.JsonValue[];
+    readonly competency: any;
     readonly author: string;
     readonly avgRating: number | null;
     readonly status: $Enums.CourseStatus;

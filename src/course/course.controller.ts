@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, Res } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { CourseService } from "./course.service";
-import { SearchDto } from "./dto/search.dto";
 import { CourseDto } from "./dto/course.dto";
 import { FeedbackDto } from "./dto/feedback.dto";
 
@@ -11,13 +10,13 @@ export class CourseController {
 
     @ApiOperation({ summary: 'Search courses' })
     @ApiResponse({ status: HttpStatus.OK, type: [CourseDto] })
-    @Post("/search")
+    @Get("/search")
     // search courses
     async searchCourses(
-        @Body() searchDto: SearchDto,
+        // @Body() searchDto: SearchDto,
         @Res() res
     ) {
-        const courses = await this.courseService.searchCourses(searchDto);
+        const courses = await this.courseService.searchCourses();
 
         res.status(HttpStatus.OK).json({
             message: "search successful",

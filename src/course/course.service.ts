@@ -10,15 +10,15 @@ export class CourseService {
         private prisma: PrismaService,
     ) {}
 
-    async searchCourses(searchDto: SearchDto): Promise<CourseDto[]> {
+    async searchCourses(): Promise<CourseDto[]> {
 
         const courses = await this.prisma.course.findMany({
-            where: {
-                title: {
-                    contains: searchDto.searchInput,
-                    mode: "insensitive",
-                }
-            }
+            // where: {
+            //     title: {
+            //         contains: searchDto.searchInput,
+            //         mode: "insensitive",
+            //     }
+            // }
         })
 
 
