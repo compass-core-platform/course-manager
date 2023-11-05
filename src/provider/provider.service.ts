@@ -10,6 +10,7 @@ import { Feedback, FeedbackResponseDto } from './dto/feedback.dto';
 import { PurchaseResponseDto } from './dto/purchase.dto';
 import { CourseDto } from 'src/course/dto/course.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
+import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 
 @Injectable()
 export class ProviderService {
@@ -109,6 +110,15 @@ export class ProviderService {
     async getCourses(providerId: number): Promise<CourseDto[]> {
 
         return this.courseService.getProviderCourses(providerId);
+    }
+
+    async editCourse(providerId: number, courseId: number, editCourseDto: EditCourseDto) {
+        const course = await this.courseService.editCourse(providerId, courseId, editCourseDto);
+        return course;
+    }
+
+    async archiveCourse(providerId: number, courseId: number) {
+        return this.courseService.archiveCourse(providerId, courseId);
     }
 
     async getCourseFeedbacks(providerId: number, courseId: number): Promise<FeedbackResponseDto> {

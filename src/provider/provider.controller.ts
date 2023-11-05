@@ -10,6 +10,7 @@ import { FeedbackResponseDto } from './dto/feedback.dto';
 import { PurchaseResponseDto } from './dto/purchase.dto';
 import { CourseDto } from 'src/course/dto/course.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
+import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 
 @Controller('provider')
 export class ProviderController {
@@ -82,6 +83,39 @@ export class ProviderController {
 
         res.status(HttpStatus.OK).json({
             message: "account updated successfully",
+        })
+    }
+
+    @ApiOperation({ summary: 'edit course information' })
+    @ApiResponse({ status: HttpStatus.OK })
+    @Patch("/:providerId/course/:courseId")
+    // edit course information
+    async editCourse(
+        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("courseId", ParseIntPipe) courseId: number,
+        @Body() editCourseDto: EditCourseDto,
+        @Res() res
+    ) {
+        await this.providerService.editCourse(providerId, courseId, editCourseDto);
+
+        res.status(HttpStatus.OK).json({
+            message: "course edited successfully",
+        })
+    }
+
+    @ApiOperation({ summary: 'Archive course ' })
+    @ApiResponse({ status: HttpStatus.OK })
+    @Get("/:providerId/course/:courseId/archive")
+    // edit course information
+    async archiveCourse(
+        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("courseId", ParseIntPipe) courseId: number,
+        @Res() res
+    ) {
+        await this.providerService.archiveCourse(providerId, courseId);
+
+        res.status(HttpStatus.OK).json({
+            message: "course edited successfully",
         })
     }
     

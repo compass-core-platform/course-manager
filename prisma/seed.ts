@@ -1,4 +1,4 @@
-import { CourseStatus, CourseVerificationStatus, PrismaClient } from '@prisma/client'
+import { CourseStatus, CourseVerificationStatus, PrismaClient, ProviderStatus } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
@@ -12,7 +12,8 @@ async function main() {
             create: {
                 type: 'provider',
             }
-        }
+        },
+        status: ProviderStatus.verified
     }
   });
 
@@ -90,7 +91,11 @@ async function main() {
         noOfLessons: 3,
         language: ["en"],
         duration: 4,
-        competency: [],
+        competency: {
+          "API Development": ["Level1", "Level2"],
+          "Typescript": ["Level1"],
+          "Backend engineering": ["Level1"]
+        },
         author: "Stephen Grider",
         status: "active",
         availabilityTime: new Date("2024-05-01").toISOString()
@@ -104,7 +109,10 @@ async function main() {
         noOfLessons: 3,
         language: ["en"],
         duration: 4,
-        competency: [],
+        competency: {
+          "Photoshop": ["Level2", "Level3"],
+          "Understanding brand": ["Level1"]
+        },
         author: "Lindsay Marsh",
         status: "active",
         availabilityTime: new Date("2024-05-01").toISOString()
@@ -118,7 +126,11 @@ async function main() {
         noOfLessons: 3,
         language: ["en"],
         duration: 4,
-        competency: [],
+        competency: {
+          "Statistics": ["Level1"],
+          "Machine Learning": ["Level1", "Level2", "Level3"],
+          "MySQL": ["Level1"]
+        },
         author: "Jose Portilla",
         status: "active",
         availabilityTime: new Date("2024-05-01").toISOString()
@@ -132,7 +144,9 @@ async function main() {
         noOfLessons: 3,
         language: ["en"],
         duration: 4,
-        competency: [],
+        competency: {
+          "Excel": ["Level1", "Level2", "Level3", "Level4"]
+        },
         author: "Kyle Pew",
         status: "active",
         availabilityTime: new Date("2024-05-01").toISOString()
@@ -189,9 +203,9 @@ async function main() {
         language: ["english", "hindi"],
         duration: 48,
         competency: {
-            9: ["Level1", "Level3"],
-            11: ["Level1"],
-            14: [ "Level5" ]
+            "Docker": ["Level1", "Level3"],
+            "Kubernetes": ["Level1"],
+            "Orchestration": [ "Level5" ]
         },
         author: "Jason Frig",
         status: CourseStatus.active,
@@ -213,8 +227,8 @@ async function main() {
         language: ["english", "hindi"],
         duration: 50,
         competency: {
-            6: ["Level5", "Level4"],
-            10: [ "Level1", "Level2" ]
+            "Logical Thinking": ["Level5", "Level4"],
+            "Python": [ "Level1", "Level2" ]
         },
         author: "James Franco",
         status: CourseStatus.active,
@@ -235,8 +249,8 @@ async function main() {
         language: ["english", "hindi"],
         duration: 50,
         competency: {
-            3: ["Level2", "Level3"],
-            5: [ "Level4" ]
+            "Compiler Design": ["Level2", "Level3"],
+            "LLVM": [ "Level4" ]
         },
         author: "Ramakrishna Upadrasta",
         status: CourseStatus.active,
