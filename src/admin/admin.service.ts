@@ -163,5 +163,73 @@ export class AdminService {
         return updatedProfile;
     }
 
+    async getNoOfCoursePurchasesForProvider(providerId: number) {
+        return await this.prisma.userCourse.count({
+            where: { 
+                course: {
+                    providerId: providerId
+                }
+            }
+        });
+    }
+
+    async getNumberOfCoursesForProvider(providerId: number) {
+        return await this.prisma.course.count({
+            where: {
+                providerId: providerId
+            }
+        });
+    }
+
+    async getProviderWalletCredits(providerId: number) {
+        const providerWallet = await this.prisma.wallet.findFirst({
+            where: {
+                provider: {
+                    id: providerId
+                }
+            }
+        });
+
+        return providerWallet?.credits;
+    }
+
+    async getAllProviderInfoForSettlement() {
+        
+        const providers = await this.prisma.provider.findMany({});
+        const results = providers.map((provider) => {
+            const providerId = provider.id;
+            return {
+                id: providerId,
+                name: provider.name,
+                numberOfCourses: this.getNumberOfCoursesForProvider(providerId),
+                activeUsers: this.getNoOfCoursePurchasesForProvider(providerId),
+                totalCredits: this.getProviderWalletCredits(providerId)
+            }
+        });
+        return results;
+    }
+
+    async settleCredits(providerId: number) {
+        // Need to add transaction, add paymentReceipt additional settlement processing
+        // then set the credits of the provider to 0
+        const wallet = await this.prisma.wallet.findFirst({
+            where: {
+                provider: {
+                    id: providerId
+                }
+            }
+        });
+
+        const updatedWallet = await this.prisma.wallet.update({
+            where: {
+                walletId: wallet?.walletId
+            },
+            data: {
+                credits: 0
+            }
+        });
+        return updatedWallet;
+    }
+
 }
 

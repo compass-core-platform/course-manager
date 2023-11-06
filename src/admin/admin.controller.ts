@@ -10,6 +10,7 @@ import { TransactionResponse } from './dto/transaction-response.dto';
 import { Response } from 'express';
 import { CreditRequest } from './dto/credit-request.dto';
 import { json } from 'stream/consumers';
+import { ProviderSettlementDto } from './dto/provider-settlement.dto';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -40,6 +41,58 @@ export class AdminController {
             res.status(statusCode).json({
                 statusCode, 
                 message: errorMessage || "Failed to fetch all the providers' information",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: "Get all providers for settlement" })
+    @ApiResponse({ status: HttpStatus.OK, type: ProviderSettlementDto, isArray: true})
+    @Get('/providers/settlements')
+    async getAllProvidersForSettlement(@Res() res : Response) {
+        try {
+            this.logger.log(`Getting information of all the providers for settlement`);
+
+            const providers = await this.adminService.getAllProviderInfoForSettlement();
+
+            this.logger.log(`Successfully retrieved all the provider info for making settlement`);
+
+            res.status(HttpStatus.OK).json({
+                message: "All providers fetched",
+                data: providers
+            });
+        } catch (err) {
+            this.logger.error(`Failed to retreive all the providers' information for settlement`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to fetch all the providers' information for settlement",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: "Settle credits for a provider" })
+    @ApiResponse({ status: HttpStatus.OK, type: json})
+    @Post('/providers/settlements/settle')
+    async settleProvider(@Body() settleDto: ProviderSettlementDto, @Res() res : Response) {
+        try {
+            this.logger.log(`Settling the credits for the given provider`);
+
+            const updatedWallet = await this.adminService.settleCredits(settleDto.id);
+
+            this.logger.log(`Successfully settled the credits for the provider`);
+
+            res.status(HttpStatus.OK).json({
+                message: "Settlement done for the provider",
+                data: updatedWallet
+            });
+        } catch (err) {
+            this.logger.error(`Failed to retreive all the providers' information for settlement`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to fetch all the providers' information for settlement",
             });
         }
     }
@@ -361,5 +414,6 @@ export class AdminController {
                 message: errorMessage || `Failed to remove credits from the provider`,
             });
         }
+        
     }
 }
