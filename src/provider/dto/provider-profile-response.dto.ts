@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ProviderStatus } from "@prisma/client";
-import { IsEmail, IsEnum, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 
 export class ProviderProfileResponse {
@@ -22,7 +22,7 @@ export class ProviderProfileResponse {
     @ApiProperty()
     @IsString()
     @IsOptional()
-    password: string;
+    password?: string;
 
     @ApiProperty()
     @IsNumber()

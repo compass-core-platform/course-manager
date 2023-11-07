@@ -1,6 +1,6 @@
-import { $Enums, Prisma } from "@prisma/client";
+import { CourseStatus, CourseVerificationStatus } from "@prisma/client";
 
-export class CourseDto {
+export class CourseResponse {
 
     readonly id: number;
     readonly providerId: number;
@@ -15,7 +15,13 @@ export class CourseDto {
     readonly competency: any;
     readonly author: string;
     readonly avgRating: number | null;
-    readonly status: $Enums.CourseStatus;
+    readonly status: CourseStatus;
     readonly availabilityTime: Date | null;
-    readonly verificationStatus: $Enums.CourseVerificationStatus;
+    readonly verificationStatus: CourseVerificationStatus;
+}
+
+export class AdminCourseResponse extends CourseResponse {
+
+    readonly cqfScore: number | null;
+    readonly impactScore: number | null;
 }

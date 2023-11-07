@@ -5,12 +5,12 @@ import { SignupDto, SignupResponseDto } from './dto/signup.dto';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto, AddCourseResponseDto } from 'src/course/dto/add-course.dto';
-import { ViewProfileResponseDto } from './dto/view-profile.dto';
 import { FeedbackResponseDto } from './dto/feedback.dto';
 import { PurchaseResponseDto } from './dto/purchase.dto';
-import { CourseDto } from 'src/course/dto/course.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
+import { CourseResponse } from 'src/course/dto/course-response.dto';
+import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 
 @Controller('provider')
 @ApiTags('provider')
@@ -56,7 +56,7 @@ export class ProviderController {
     }
 
     @ApiOperation({ summary: 'view provider profile' })
-    @ApiResponse({ status: HttpStatus.OK, type: ViewProfileResponseDto })
+    @ApiResponse({ status: HttpStatus.OK, type: ProviderProfileResponse })
     @Get("/:providerId/profile")
     // view provider profile information
     async viewProfile(
@@ -154,7 +154,7 @@ export class ProviderController {
     }
 
     @ApiOperation({ summary: 'View courses offered by self' })
-    @ApiResponse({ status: HttpStatus.OK, type: [CourseDto] })
+    @ApiResponse({ status: HttpStatus.OK, type: [CourseResponse] })
     @Get("/:providerId/course")
     // View courses offered by self
     async fetchProviderCourses(

@@ -4,110 +4,57 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Provider, ProviderStatus, Course, CourseVerificationStatus } from '@prisma/client';
 import { EditProvider } from './dto/edit-provider.dto';
 import { MockWalletService } from '../mock-wallet/mock-wallet.service';
+import { ProviderService } from 'src/provider/provider.service';
+import { CourseService } from 'src/course/course.service';
 
 @Injectable()
 export class AdminService {
 
-    constructor(private prisma: PrismaService, private wallet: MockWalletService) {}
+    constructor(
+        private prisma: PrismaService, 
+        private wallet: MockWalletService, 
+        private providerService: ProviderService,
+        private courseService: CourseService
+    ) {}
 
     async verifyProvider(providerId: number) {
-        let providerInfo = await this.prisma.provider.findUnique({
-            where: { id: providerId }
-        });
 
-        if(!providerInfo) {
-            throw new NotFoundException(`Provider with id ${providerId} does not exist`);
-        }
-
-        if(providerInfo.status != ProviderStatus.pending) {
-            throw new HttpException(`Provider is either verified or rejected.`, 406);
-        }
-
-        const updatedRecord = await this.prisma.provider.update({ 
-            where:    {id: providerId},
-            data:  {status: ProviderStatus.verified} 
-        });
-        return updatedRecord;
+        return this.providerService.verifyProvider(providerId);
     }
 
     async findAllProviders(): Promise<Partial<Provider>[]> {
-        let providers = await this.prisma.provider.findMany({
-            select: { id: true, name: true, email: true, walletId: true, paymentInfo: true, courses: true, status: true}
-        });
-        return providers;
+
+        return this.providerService.fetchAllProviders();
     }
 
     async findProviderById(providerId: number): Promise<Provider> {
-        let provider = await this.prisma.provider.findFirst({
-            where: {id: providerId}
-        });
 
-        if(!provider) {
-            throw new NotFoundException(`Provider with id ${providerId} does not exist`);
-        }
-
-        return provider;
+        return this.providerService.getProvider(providerId);
     }
 
     async findAllCourses() : Promise<Course[]> {
-        let courses = this.prisma.course.findMany();
-        return courses;
+
+        return this.courseService.fetchAllCourses();
     }
 
     async findCourseById(courseId: number) {
-        let course = await this.prisma.course.findUnique({
-            where: { id: courseId }
-        });
-        if(!course) {
-            throw new NotFoundException(`Course with id ${courseId} not found`);
-        }
-        return course;
+
+        return this.courseService.getCourse(courseId);
     }
 
     async acceptCourse(courseId: number, cqf_score: number) {
-        let course = await this.prisma.course.findUnique({
-            where: { id: courseId }
-        });
-        if(!course) {
-            throw new NotFoundException(`Course with id ${courseId} not found`);
-        }
-        if(course.verificationStatus != CourseVerificationStatus.pending) {
-            throw new HttpException(`Course is either rejected or is already accepted.`, 406);
-        }
-        let updatedCourse = await this.prisma.course.update({
-            where: { id: courseId },
-            data: {
-                verificationStatus: CourseVerificationStatus.accepted,
-                cqfScore: cqf_score
-            }
-        });
-        return updatedCourse;
+        
+        return this.courseService.acceptCourse(courseId, cqf_score);
     }
 
     async rejectCourse(courseId: number) {
-        let course = await this.prisma.course.findUnique({
-            where: { id: courseId }
-        });
-        if(!course) {
-            throw new NotFoundException(`Course with id ${courseId} not found`);
-        }
-        let updatedCourse = await this.prisma.course.update({
-            where: {id: courseId},
-            data: {verificationStatus: CourseVerificationStatus.rejected}
-        });
-        return updatedCourse;
+        
+        return this.courseService.rejectCourse(courseId);
     }
 
     async removeCourse(courseId: number) {
-        let course = await this.prisma.course.findUnique({
-            where: { id: courseId }
-        });
-        if(!course) {
-            throw new NotFoundException(`Course with id ${courseId} not found`);
-        }
-        await this.prisma.course.delete({
-            where: {id: courseId}
-        });
+        
+        return this.courseService.removeCourse(courseId);
     }
 
     async getTransactions(adminId: number) {
@@ -155,12 +102,7 @@ export class AdminService {
 
     async editProviderProfile(profileInfo: EditProvider) {
         
-        const updatedProfile = await this.prisma.provider.update({
-            where: { id: profileInfo.id },
-            data: profileInfo
-        });
-
-        return updatedProfile;
+        return this.providerService.editProviderProfileByAdmin(profileInfo);
     }
 
     async getNoOfCoursePurchasesForProvider(providerId: number) {
@@ -195,7 +137,7 @@ export class AdminService {
 
     async getAllProviderInfoForSettlement() {
         
-        const providers = await this.prisma.provider.findMany({});
+        const providers = await this.providerService.fetchAllProviders();
         const results = providers.map((provider) => {
             const providerId = provider.id;
             return {

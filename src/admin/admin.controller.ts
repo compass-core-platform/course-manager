@@ -1,16 +1,16 @@
 import { Controller, Body, Get, Post, Patch, Res, Delete, HttpStatus, Param, ParseIntPipe, Logger} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
-import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
+import { ProviderProfileResponse } from '../provider/dto/provider-profile-response.dto';
 import { getPrismaErrorStatusAndMessage } from '../utils/utils';
 import { EditProvider } from './dto/edit-provider.dto';
-import { CourseResponse } from './dto/course-response.dto';
-import { CourseVerify } from './dto/verify-course.dto';
+import { CourseResponse } from '../course/dto/course-response.dto';
 import { TransactionResponse } from './dto/transaction-response.dto';
 import { Response } from 'express';
 import { CreditRequest } from './dto/credit-request.dto';
 import { json } from 'stream/consumers';
 import { ProviderSettlementDto } from './dto/provider-settlement.dto';
+import { CourseVerify } from 'src/course/dto/verify-course.dto';
 
 @Controller('admin')
 @ApiTags('admin')

@@ -1,11 +1,11 @@
-import { NotFoundException, BadRequestException, Injectable } from "@nestjs/common";
+import { NotFoundException, BadRequestException, Injectable, HttpException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { FeedbackDto } from "./dto/feedback.dto";
-import { CourseDto } from "./dto/course.dto";
 import { AddCourseDto } from "./dto/add-course.dto";
-import { CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
+import { Course, CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
 import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
+import { AdminCourseResponse, CourseResponse } from "src/course/dto/course-response.dto";
 
 @Injectable()
 export class CourseService {
@@ -13,7 +13,7 @@ export class CourseService {
         private prisma: PrismaService,
     ) {}
 
-    async searchCourses(): Promise<CourseDto[]> {
+    async searchCourses(): Promise<CourseResponse[]> {
 
         const courses = await this.prisma.course.findMany({
             // where: {
@@ -87,7 +87,7 @@ export class CourseService {
         })
     }
 
-    async getCourse(courseId: number): Promise<CourseDto> {
+    async getCourse(courseId: number): Promise<AdminCourseResponse> {
 
         const course = await this.prisma.course.findUnique({
             where: {
@@ -185,4 +185,43 @@ export class CourseService {
         })
     }
 
+    async fetchAllCourses() : Promise<Course[]> {
+        
+        return this.prisma.course.findMany();
+    }
+
+    async acceptCourse(courseId: number, cqf_score: number) {
+
+        let course = await this.getCourse(courseId);
+
+        if(course.verificationStatus != CourseVerificationStatus.pending) {
+            throw new HttpException(`Course is either rejected or is already accepted.`, 406);
+        }
+        return this.prisma.course.update({
+            where: { id: courseId },
+            data: {
+                verificationStatus: CourseVerificationStatus.accepted,
+                cqfScore: cqf_score
+            }
+        });
+    }
+
+    async rejectCourse(courseId: number) {
+
+        await this.getCourse(courseId);
+
+        return this.prisma.course.update({
+            where: {id: courseId},
+            data: {verificationStatus: CourseVerificationStatus.rejected}
+        });
+    }
+
+    async removeCourse(courseId: number) {
+
+        await this.getCourse(courseId);
+
+        return this.prisma.course.delete({
+            where: {id: courseId}
+        });
+    }
 }

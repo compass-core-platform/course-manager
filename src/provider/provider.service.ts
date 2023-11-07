@@ -1,16 +1,18 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma, ProviderStatus, WalletType } from '@prisma/client';
+import { Prisma, Provider, ProviderStatus, WalletType } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto } from 'src/course/dto/add-course.dto';
 import { CourseService } from 'src/course/course.service';
 import { Feedback, FeedbackResponseDto } from './dto/feedback.dto';
 import { PurchaseResponseDto } from './dto/purchase.dto';
-import { CourseDto } from 'src/course/dto/course.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
+import { EditProvider } from 'src/admin/dto/edit-provider.dto';
+import { CourseResponse } from 'src/course/dto/course-response.dto';
+import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 
 @Injectable()
 export class ProviderService {
@@ -85,6 +87,14 @@ export class ProviderService {
         }
     }
 
+    async editProviderProfileByAdmin(profileInfo: EditProvider) {
+        
+        return this.prisma.provider.update({
+            where: { id: profileInfo.id },
+            data: profileInfo
+        });
+    }
+
     async addNewCourse(providerId: number, addCourseDto: AddCourseDto) {
 
         const provider = await this.getProvider(providerId);
@@ -107,7 +117,7 @@ export class ProviderService {
         await this.courseService.deleteCourse(courseId);
     }
 
-    async getCourses(providerId: number): Promise<CourseDto[]> {
+    async getCourses(providerId: number): Promise<CourseResponse[]> {
 
         return this.courseService.getProviderCourses(providerId);
     }
@@ -124,8 +134,6 @@ export class ProviderService {
     async getCourseFeedbacks(providerId: number, courseId: number): Promise<FeedbackResponseDto> {
 
         const course = await this.courseService.getCourse(courseId);
-        if(!course)
-            throw new NotFoundException("Course does not exist");
         
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
@@ -150,8 +158,6 @@ export class ProviderService {
     async getCoursePurchases(providerId: number, courseId: number): Promise<PurchaseResponseDto[]> {
 
         const course = await this.courseService.getCourse(courseId);
-        if(!course)
-            throw new NotFoundException("Course does not exist");
         
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
@@ -182,5 +188,24 @@ export class ProviderService {
         } catch {
             throw new NotFoundException("This user has not subscribed to this course");
         }
+    }
+
+    async fetchAllProviders(): Promise<ProviderProfileResponse[]> {
+
+        return this.prisma.provider.findMany({
+            select: { id: true, name: true, email: true, walletId: true, paymentInfo: true, courses: true, status: true}
+        });
+    }
+
+    async verifyProvider(providerId: number) {
+        let providerInfo = await this.getProvider(providerId);
+
+        if(providerInfo.status != ProviderStatus.pending) {
+            throw new HttpException(`Provider is either verified or rejected.`, 406);
+        }
+        return this.prisma.provider.update({ 
+            where:    {id: providerId},
+            data:  {status: ProviderStatus.verified} 
+        });
     }
 }

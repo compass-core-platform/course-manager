@@ -1,8 +1,8 @@
 import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, Res } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CourseService } from "./course.service";
-import { CourseDto } from "./dto/course.dto";
 import { FeedbackDto } from "./dto/feedback.dto";
+import { CourseResponse } from "./dto/course-response.dto";
 
 @Controller('course')
 @ApiTags('course')
@@ -10,7 +10,7 @@ export class CourseController {
     constructor(private readonly courseService: CourseService) {}
 
     @ApiOperation({ summary: 'Search courses' })
-    @ApiResponse({ status: HttpStatus.OK, type: [CourseDto] })
+    @ApiResponse({ status: HttpStatus.OK, type: [CourseResponse] })
     @Get("/search")
     // search courses
     async searchCourses(
@@ -26,14 +26,14 @@ export class CourseController {
     }
 
     @ApiOperation({ summary: 'Fetch details of one course' })
-    @ApiResponse({ status: HttpStatus.OK, type: CourseDto })
+    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse })
     @Get("/:courseId")
     // Fetch details of one course
     async getCourse(
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
-        const course = await this.courseService.getCourse(courseId);
+        const course: CourseResponse = await this.courseService.getCourse(courseId);
 
         res.status(HttpStatus.OK).json({
             message: "fetch successful",
