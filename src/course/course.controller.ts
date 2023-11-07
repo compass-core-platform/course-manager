@@ -1,10 +1,11 @@
 import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, Res } from "@nestjs/common";
-import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CourseService } from "./course.service";
 import { CourseDto } from "./dto/course.dto";
 import { FeedbackDto } from "./dto/feedback.dto";
 
 @Controller('course')
+@ApiTags('course')
 export class CourseController {
     constructor(private readonly courseService: CourseService) {}
 
@@ -58,7 +59,7 @@ export class CourseController {
 
     @ApiOperation({ summary: 'Give feedback and rating' })
     @ApiResponse({ status: HttpStatus.OK })
-    @Patch("/:courseId/purchase/:userId")
+    @Patch("/:courseId/feedback/:userId")
     // Give feedback and rating
     async feedback(
         @Param("courseId", ParseIntPipe) courseId: number,

@@ -115,22 +115,32 @@ export class CourseService {
     async giveCourseFeedback(courseId: number, userId: string, feedbackDto: FeedbackDto) {
 
         await this.getCourse(courseId);
-        
-        try {
-            await this.prisma.userCourse.update({
-                where: {
-                    userId_courseId: {
-                        courseId,
-                        userId
-                    }
-                },
-                data: {
-                    ...feedbackDto
+
+        const userCourse = await this.prisma.userCourse.findUnique({
+            where: {
+                userId_courseId: {
+                    userId,
+                    courseId: courseId
                 }
-            });
-        } catch {
+            },
+        });
+        if(!userCourse)
             throw new NotFoundException("This user has not subscribed to this course");
-        }
+        
+        if(userCourse.status != CourseProgressStatus.completed)
+            throw new BadRequestException("Course not complete");
+        
+        await this.prisma.userCourse.update({
+            where: {
+                userId_courseId: {
+                    courseId,
+                    userId
+                }
+            },
+            data: {
+                ...feedbackDto
+            }
+        });
     }
 
     async deleteCourse(courseId: number) {

@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, Put, Res } from '@nestjs/common';
 import { ProviderService } from './provider.service';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignupDto, SignupResponseDto } from './dto/signup.dto';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -13,6 +13,7 @@ import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 
 @Controller('provider')
+@ApiTags('provider')
 export class ProviderController {
     constructor(
         private providerService: ProviderService,
