@@ -28,7 +28,7 @@ export class CourseService {
         return courses;
     }
 
-    async addCourse(providerId: number, addCourseDto: AddCourseDto) {
+    async addCourse(providerId: string, addCourseDto: AddCourseDto) {
 
         return await this.prisma.course.create({
             data: {
@@ -56,7 +56,7 @@ export class CourseService {
         });
     }
 
-    async archiveCourse(providerId: number, courseId: number) {
+    async archiveCourse(providerId: string, courseId: number) {
 
         return this.prisma.course.update({
             where: { id: courseId },
@@ -65,7 +65,7 @@ export class CourseService {
 
     }
 
-    async editCourse(providerId: number, courseId: number, editCourseDto: EditCourseDto) {
+    async editCourse(providerId: string, courseId: number, editCourseDto: EditCourseDto) {
     
         return await this.prisma.course.update({
             where: { id: courseId },
@@ -152,7 +152,7 @@ export class CourseService {
         })
     }
 
-    async getProviderCourses(providerId: number) {
+    async getProviderCourses(providerId: string) {
 
         return this.prisma.course.findMany({
             where: {

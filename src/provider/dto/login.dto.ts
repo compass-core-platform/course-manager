@@ -19,5 +19,5 @@ export class LoginDto {
 export class LoginResponseDto {
 
     // provider ID
-    readonly providerId: number
+    readonly providerId: string
 }

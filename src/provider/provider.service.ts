@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma, Provider, ProviderStatus, WalletType } from '@prisma/client';
+import { Prisma, Provider, ProviderStatus } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto } from 'src/course/dto/add-course.dto';
@@ -13,6 +13,7 @@ import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 import { EditProvider } from 'src/admin/dto/edit-provider.dto';
 import { CourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
+import axios from 'axios';
 
 @Injectable()
 export class ProviderService {
@@ -31,14 +32,15 @@ export class ProviderService {
         if(provider)
             throw new BadRequestException("Account with that email ID already exists");
 
+        // update the endpoint 
+        const url = process.env.WALLET_SERVICE_URL;
+        const endpoint = url + `/admin/:adminId/providers/create`;
+        const resp = await axios.post(endpoint);
+
         provider = await this.prisma.provider.create({
             data: {
                 ...signupDto,
-                wallet: {
-                    create: {
-                        type: WalletType.provider,
-                    }
-                }
+                walletId: resp.data.walletId
             }
         })
         return provider.id
@@ -60,7 +62,7 @@ export class ProviderService {
         return provider.id
     }
 
-    async getProvider(providerId: number) {
+    async getProvider(providerId: string) {
 
         const provider = await this.prisma.provider.findUnique({
             where: {
@@ -73,7 +75,7 @@ export class ProviderService {
         return provider;
     }
 
-    async updateProfileInfo(providerId: number, updateProfileDto: UpdateProfileDto) {
+    async updateProfileInfo(providerId: string, updateProfileDto: UpdateProfileDto) {
 
         try {
             await this.prisma.provider.update({
@@ -95,7 +97,7 @@ export class ProviderService {
         });
     }
 
-    async addNewCourse(providerId: number, addCourseDto: AddCourseDto) {
+    async addNewCourse(providerId: string, addCourseDto: AddCourseDto) {
 
         const provider = await this.getProvider(providerId);
 
@@ -105,7 +107,7 @@ export class ProviderService {
         return this.courseService.addCourse(providerId, addCourseDto);
     }
 
-    async removeCourse(providerId: number, courseId: number) {
+    async removeCourse(providerId: string, courseId: number) {
 
         const course = await this.courseService.getCourse(courseId);
         if(!course)
@@ -117,21 +119,21 @@ export class ProviderService {
         await this.courseService.deleteCourse(courseId);
     }
 
-    async getCourses(providerId: number): Promise<CourseResponse[]> {
+    async getCourses(providerId: string): Promise<CourseResponse[]> {
 
         return this.courseService.getProviderCourses(providerId);
     }
 
-    async editCourse(providerId: number, courseId: number, editCourseDto: EditCourseDto) {
+    async editCourse(providerId: string, courseId: number, editCourseDto: EditCourseDto) {
         const course = await this.courseService.editCourse(providerId, courseId, editCourseDto);
         return course;
     }
 
-    async archiveCourse(providerId: number, courseId: number) {
+    async archiveCourse(providerId: string, courseId: number) {
         return this.courseService.archiveCourse(providerId, courseId);
     }
 
-    async getCourseFeedbacks(providerId: number, courseId: number): Promise<FeedbackResponseDto> {
+    async getCourseFeedbacks(providerId: string, courseId: number): Promise<FeedbackResponseDto> {
 
         const course = await this.courseService.getCourse(courseId);
         
@@ -155,7 +157,7 @@ export class ProviderService {
         };
     }
 
-    async getCoursePurchases(providerId: number, courseId: number): Promise<PurchaseResponseDto[]> {
+    async getCoursePurchases(providerId: string, courseId: number): Promise<PurchaseResponseDto[]> {
 
         const course = await this.courseService.getCourse(courseId);
         
@@ -174,7 +176,7 @@ export class ProviderService {
 
     }
 
-    async markCourseComplete(providerId: number, completeCourseDto: CompleteCourseDto) {
+    async markCourseComplete(providerId: string, completeCourseDto: CompleteCourseDto) {
 
         const course = await this.courseService.getCourse(completeCourseDto.courseId);
         if(!course)
@@ -197,7 +199,7 @@ export class ProviderService {
         });
     }
 
-    async verifyProvider(providerId: number) {
+    async verifyProvider(providerId: string) {
         let providerInfo = await this.getProvider(providerId);
 
         if(providerInfo.status != ProviderStatus.pending) {

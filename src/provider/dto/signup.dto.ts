@@ -30,5 +30,5 @@ export class SignupDto {
 export class SignupResponseDto {
 
     // provider ID
-    readonly providerId: number
+    readonly providerId: string
 }

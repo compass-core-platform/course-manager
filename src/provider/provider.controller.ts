@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Put, Res } from '@nestjs/common';
 import { ProviderService } from './provider.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignupDto, SignupResponseDto } from './dto/signup.dto';
@@ -60,7 +60,7 @@ export class ProviderController {
     @Get("/:providerId/profile")
     // view provider profile information
     async viewProfile(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Res() res
     ) {
         const provider = await this.providerService.getProvider(providerId);
@@ -76,7 +76,7 @@ export class ProviderController {
     @Put("/:providerId/profile")
     // update provider profile information
     async updateProfile(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Body() updateProfileDto: UpdateProfileDto,
         @Res() res
     ) {
@@ -92,7 +92,7 @@ export class ProviderController {
     @Patch("/:providerId/course/:courseId")
     // edit course information
     async editCourse(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Param("courseId", ParseIntPipe) courseId: number,
         @Body() editCourseDto: EditCourseDto,
         @Res() res
@@ -109,7 +109,7 @@ export class ProviderController {
     @Get("/:providerId/course/:courseId/archive")
     // edit course information
     async archiveCourse(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
@@ -125,7 +125,7 @@ export class ProviderController {
     @Post("/:providerId/course")
     // add new course
     async addCourse(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Body() addCourseDto: AddCourseDto,
         @Res() res
     ) {
@@ -142,7 +142,7 @@ export class ProviderController {
     @Delete("/:providerId/course/:courseId")
     // remove an existing course
     async removeCourse(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
@@ -158,7 +158,7 @@ export class ProviderController {
     @Get("/:providerId/course")
     // View courses offered by self
     async fetchProviderCourses(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Res() res
     ) {
         const courses = await this.providerService.getCourses(providerId);
@@ -174,7 +174,7 @@ export class ProviderController {
     @Get("/:providerId/course/:courseId/feedback")
     // View Course Feedback & ratings, numberOfPurchases
     async getCourseFeedback(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
@@ -191,7 +191,7 @@ export class ProviderController {
     @Get("/:providerId/course/:courseId/purchases")
     // Get all the transactions for course purchase user wise
     async getCoursePurchases(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
@@ -208,7 +208,7 @@ export class ProviderController {
     @Patch("/:providerId/course/completion")
     // Mark course as complete for a user
     async markCourseComplete(
-        @Param("providerId", ParseIntPipe) providerId: number,
+        @Param("providerId", ParseUUIDPipe) providerId: string,
         @Body() completeCourseDto: CompleteCourseDto,
         @Res() res
     ) {

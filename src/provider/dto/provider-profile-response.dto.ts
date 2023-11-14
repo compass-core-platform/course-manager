@@ -7,7 +7,7 @@ export class ProviderProfileResponse {
     @ApiProperty({required: false})
     @IsNumber()
     @IsOptional()
-    id: number;
+    id: string;
 
     @ApiProperty()
     @IsOptional()
