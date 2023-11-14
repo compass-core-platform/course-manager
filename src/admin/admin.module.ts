@@ -4,13 +4,12 @@ import { AdminService } from './admin.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaModule } from 'nestjs-prisma';
 import { MockWalletModule } from 'src/mock-wallet/mock-wallet.module';
-import { MockWalletService } from 'src/mock-wallet/mock-wallet.service';
-import { ProviderService } from 'src/provider/provider.service';
-import { CourseService } from 'src/course/course.service';
+import { CourseModule } from 'src/course/course.module';
+import { ProviderModule } from 'src/provider/provider.module';
 
 @Module({
-  imports: [PrismaModule, MockWalletModule],
+  imports: [PrismaModule, CourseModule, MockWalletModule, ProviderModule],
   controllers: [AdminController],
-  providers: [AdminService, PrismaService, MockWalletService, ProviderService, CourseService]
+  providers: [AdminService, PrismaService]
 })
 export class AdminModule {}

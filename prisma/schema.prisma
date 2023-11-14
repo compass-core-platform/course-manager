@@ -36,7 +36,7 @@ enum CourseProgressStatus {
 }
 
 model Admin {
-  id        Int     @id @default(autoincrement())
+  id        String  @id @default(uuid())
   name      String  
   email     String  @unique
   password  String 
@@ -44,7 +44,7 @@ model Admin {
 }
 
 model Provider {
-  id          Int             @id @default(autoincrement())
+  id          String          @id @default(uuid())
   name        String  
   email       String          @unique
   password    String 
@@ -52,35 +52,12 @@ model Provider {
   paymentInfo Json?
   status      ProviderStatus  @default(pending)
   courses     Course[]
-  wallet      Wallet          @relation(fields: [walletId], references: [walletId])
 }
 
-// dummy wallet model
-model Wallet {
-  walletId   Int              @id @default(autoincrement())
-  type       WalletType
-  status     WalletStatus     @default(active)
-  credits    Int              @default(0)
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  provider   Provider? 
-}
-
-enum WalletType {
-  admin
-  provider
-  consumer
-}
-
-enum WalletStatus {
-  active
-  inactive
-  frozen
-}
 
 model Course {
   id                  Int                       @id @default(autoincrement())
-  providerId          Int
+  providerId          String
   title               String
   description         String
   courseLink          String
@@ -88,7 +65,7 @@ model Course {
   credits             Int
   noOfLessons         Int?
   language            String[]
-  duration            Int
+  duration            Float
   competency          Json
   author              String
   avgRating           Float?
@@ -103,7 +80,7 @@ model Course {
 
 model UserCourse {
   id                        Int                       @id @default(autoincrement())
-  userId                    String                    
+  userId                    String                    @db.Uuid
   courseId                  Int
   purchasedAt               DateTime                  @default(now())
   status                    CourseProgressStatus      @default(inProgress)

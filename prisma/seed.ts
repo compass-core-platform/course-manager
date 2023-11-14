@@ -8,11 +8,7 @@ async function main() {
         name: "Vijay Salgaonkar",
         email: "vijaysalgaonkar@gmail.com",
         password: "9d209aacaed4088d68c41bd8dfb20de39cbd8339",
-        wallet: {
-            create: {
-                type: 'provider',
-            }
-        },
+        walletId: 1,
         status: ProviderStatus.verified
     }
   });
@@ -22,11 +18,7 @@ async function main() {
         name: "udemy",
         email: "udemyorg@gmail.in",
         password: "Udemy@9812",
-        wallet: {
-            create: {
-                type: 'provider',
-            }
-        },
+        walletId: 2,
         paymentInfo: {
             bankAccNo: "1111111111",
             otherDetails: {
@@ -43,11 +35,7 @@ async function main() {
         name: "coursera",
         email: "coursera@gmail.in",
         password: "Coursera@999",
-        wallet: {
-            create: {
-                type: 'provider',
-            }
-        },
+        walletId: 3,
         paymentInfo: {
             bankAccNo: "1111111113",
             otherDetails: {
@@ -64,11 +52,7 @@ async function main() {
         name: "lern",
         email: "lern@gmail.in",
         password: "lern@999",
-        wallet: {
-            create: {
-                type: 'provider',
-            }
-        },
+        walletId: 4,
         paymentInfo: {
             bankAccNo: "1111111116",
             otherDetails: {
@@ -153,11 +137,8 @@ async function main() {
     }]
   })
 
-  const admin1 = await prisma.admin.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      id: 1,
+  const admin1 = await prisma.admin.create({
+    data: {
       name: 'admin1',
       email: "admin1@gmail.com",
       password: "123456",
@@ -165,11 +146,8 @@ async function main() {
     },
   });
 
-  const admin2 = await prisma.admin.upsert({
-    where: { id: 2 },
-    update: {},
-    create: {
-      id: 2,
+  const admin2 = await prisma.admin.create({
+    data: {
       name: 'admin2',
       email: "admin2@gmail.com",
       password: "admin",
@@ -177,11 +155,8 @@ async function main() {
     },
   });
 
-  const admin3 = await prisma.admin.upsert({
-    where: { id: 3 },
-    update: {},
-    create: {
-      id: 3,
+  const admin3 = await prisma.admin.create({
+    data: {
       name: 'admin3',
       email: "admin3@gmail.com",
       password: "admin3",
@@ -193,7 +168,7 @@ async function main() {
 
   const course1 = await prisma.course.create({
     data: {
-        providerId: 1,
+        providerId: provider1.id,
         title: "Learn DevOps & Kubernetes",
         description: "This course enables anyone to get started with devops engineering.",
         courseLink: "https://udemy.com/courses/pYUxbhj",
@@ -217,7 +192,7 @@ async function main() {
 
   const course2 = await prisma.course.create({
     data: {
-        providerId: 1,
+        providerId: provider1.id,
         title: "Introduction to Programming",
         description: "This course covers all the fundamentals of programming",
         courseLink: "https://udemy.com/courses/jQKsLpm",
@@ -239,7 +214,7 @@ async function main() {
 
   const course3 = await prisma.course.create({
     data: {
-        providerId: 1,
+        providerId: provider1.id,
         title: "Introduction to Compiler Engineering",
         description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
         courseLink: "https://udemy.com/courses/jQKsLpm",
@@ -263,22 +238,22 @@ async function main() {
   console.log("All courses: ", resp);
   const response3 = await prisma.userCourse.createMany({
     data: [{
-      userId: "56e2b",
+      userId: "c2cc3f08-b6fc-4d53-aa91-2bfcb4e0a5c1",
       feedback: "Great course",
       rating: 4,
       courseId: 1
     }, {
-      userId: "c8200",
+      userId: "8d1f5e46-4e0d-401e-83b4-5a72fbd6c5a9",
       feedback: "Instructor is very friendly",
       rating: 4,
       courseId: 2
     }, {
-      userId: "f9464",
+      userId: "a3a5f480-9ac1-4e20-b0d9-7b3a662e2c36",
       feedback: "Some more real world applications could be discussed",
       rating: 3,
       courseId: 2
     }, {
-      userId: "91e61",
+      userId: "f9b69f4b-1095-4d29-9f49-8f653eb5b3bd",
       feedback: "Not satisfied with the content",
       rating: 2,
       courseId: 3

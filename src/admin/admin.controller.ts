@@ -73,18 +73,17 @@ export class AdminController {
 
     @ApiOperation({ summary: "Settle credits for a provider" })
     @ApiResponse({ status: HttpStatus.OK, type: json})
-    @Post('/providers/settlements/settle')
-    async settleProvider(@Body() settleDto: ProviderSettlementDto, @Res() res : Response) {
+    @Post('/:adminId/providers/settlements/settle')
+    async settleProvider(@Param("adminId", ParseIntPipe) adminId: number, @Body() settleDto: ProviderSettlementDto, @Res() res : Response) {
         try {
             this.logger.log(`Settling the credits for the given provider`);
 
-            const updatedWallet = await this.adminService.settleCredits(settleDto.id);
+            await this.adminService.settleCredits(adminId, settleDto.id);
 
             this.logger.log(`Successfully settled the credits for the provider`);
 
             res.status(HttpStatus.OK).json({
                 message: "Settlement done for the provider",
-                data: updatedWallet
             });
         } catch (err) {
             this.logger.error(`Failed to retreive all the providers' information for settlement`);

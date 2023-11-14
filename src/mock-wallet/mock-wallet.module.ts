@@ -4,6 +4,7 @@ import { MockWalletService } from './mock-wallet.service';
 
 @Module({
   controllers: [MockWalletController],
-  providers: [MockWalletService]
+  providers: [MockWalletService],
+  exports: [MockWalletService]
 })
 export class MockWalletModule {}

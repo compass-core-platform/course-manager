@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsInt, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreditRequest {
     
@@ -10,6 +10,6 @@ export class CreditRequest {
 
     @ApiProperty()
     @IsNotEmpty()
-    @IsNumber()
+    @IsInt()
     readonly credits: number
 }

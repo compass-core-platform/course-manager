@@ -1,5 +1,5 @@
 import { NotFoundException, BadRequestException, Injectable, HttpException } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { AddCourseDto } from "./dto/add-course.dto";
 import { Course, CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
