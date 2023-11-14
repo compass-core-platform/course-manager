@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProviderStatus } from '@prisma/client';
@@ -143,7 +143,7 @@ export class ProviderService {
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
         
-        const userCourses =  await this.courseService.getUserCourses(courseId);
+        const userCourses =  await this.courseService.getPurchasedUsersByCourseId(courseId);
 
         let feedbacks: Feedback[] = [];
         for(let u of userCourses) {
@@ -167,7 +167,7 @@ export class ProviderService {
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
         
-        const userCourses =  await this.courseService.getUserCourses(courseId);
+        const userCourses =  await this.courseService.getPurchasedUsersByCourseId(courseId);
 
         return userCourses.map((u) => {
             return {
@@ -206,7 +206,7 @@ export class ProviderService {
         let providerInfo = await this.getProvider(providerId);
 
         if(providerInfo.status != ProviderStatus.PENDING) {
-            throw new HttpException(`Provider is either verified or rejected.`, 406);
+            throw new NotAcceptableException(`Provider is either verified or rejected.`);
         }
         return this.prisma.provider.update({ 
             where:    {id: providerId},

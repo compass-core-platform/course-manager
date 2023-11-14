@@ -1,4 +1,6 @@
 import { CourseStatus, CourseVerificationStatus } from "@prisma/client";
+import { JsonValue } from "@prisma/client/runtime/library";
+import { CompetencyMap } from "src/utils/types";
 
 export class CourseResponse {
 
@@ -12,7 +14,7 @@ export class CourseResponse {
     readonly noOfLessons: number | null;
     readonly language: string[];
     readonly duration: number;
-    readonly competency: any;
+    readonly competency: JsonValue;
     readonly author: string;
     readonly avgRating: number | null;
     readonly status: CourseStatus;

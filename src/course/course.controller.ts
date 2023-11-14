@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Logger, Param, ParseIntPipe, Patch, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Logger, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Res } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CourseService } from "./course.service";
 import { FeedbackDto } from "./dto/feedback.dto";
@@ -79,7 +79,7 @@ export class CourseController {
     // Confirmation of user purchase of a course
     async purchaseCourse(
         @Param("courseId", ParseIntPipe) courseId: number,
-        @Param("userId") userId: string,
+        @Param("userId", ParseUUIDPipe) userId: string,
         @Res() res
     ) {
         try {
@@ -109,7 +109,7 @@ export class CourseController {
     // Give feedback and rating
     async feedback(
         @Param("courseId", ParseIntPipe) courseId: number,
-        @Param("userId") userId: string,
+        @Param("userId", ParseUUIDPipe) userId: string,
         @Body() feedbackDto: FeedbackDto,
         @Res() res
     ) {

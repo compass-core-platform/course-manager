@@ -2,6 +2,7 @@ import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { AddCourseDto } from "./add-course.dto";
 import { IsArray, IsDate, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
 import { CourseStatus } from "@prisma/client";
+import { CompetencyMap } from "src/utils/types";
 
 export class EditCourseDto {
 
@@ -58,7 +59,7 @@ export class EditCourseDto {
     // competency
     @ApiProperty()
     @IsOptional()
-    competency?: any;
+    competency?: CompetencyMap;
 
     // author
     @ApiProperty()

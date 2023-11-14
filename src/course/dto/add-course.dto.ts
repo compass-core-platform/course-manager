@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { CourseStatus, CourseVerificationStatus } from "@prisma/client";
-import { IsArray, IsDate, IsInt, IsJSON, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
+import { ArrayNotEmpty, IsArray, IsDate, IsEnum, IsInt, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { CompetencyMap } from "src/utils/types";
 
 export class AddCourseDto {
 
@@ -43,21 +44,21 @@ export class AddCourseDto {
 
     // language
     @ApiProperty()
-    @IsNotEmpty()
     @IsArray()
+    @ArrayNotEmpty()
     language: string[];
 
     // course duration
     @ApiProperty()
     @IsNotEmpty()
     @Min(0)
-    @IsInt()
+    @IsNumber()
     duration: number;
 
     // competency
     @ApiProperty()
     @IsNotEmpty()
-    competency: any;
+    competency: CompetencyMap;
 
     // author
     @ApiProperty()
@@ -68,7 +69,7 @@ export class AddCourseDto {
     // course status (active/inactive/archived)
     @ApiProperty()
     @IsNotEmpty()
-    @IsString()
+    @IsEnum(CourseStatus)
     status: CourseStatus;
 
     // course availability time

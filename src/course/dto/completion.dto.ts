@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsUUID } from "class-validator";
 
 
 export class CompleteCourseDto {
@@ -13,6 +13,6 @@ export class CompleteCourseDto {
     // user ID
     @ApiProperty()
     @IsNotEmpty()
-    @IsString()
+    @IsUUID()
     userId: string;
 }

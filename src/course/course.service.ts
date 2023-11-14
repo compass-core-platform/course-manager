@@ -1,4 +1,4 @@
-import { NotFoundException, BadRequestException, Injectable, HttpException } from "@nestjs/common";
+import { NotFoundException, BadRequestException, Injectable, NotAcceptableException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { AddCourseDto } from "./dto/add-course.dto";
@@ -70,21 +70,10 @@ export class CourseService {
         return await this.prisma.course.update({
             where: { id: courseId },
             data: {
-                providerId,
-                title: editCourseDto.title,
-                description: editCourseDto.description,
-                courseLink: editCourseDto.courseLink,
-                imgLink: editCourseDto.imgLink,
-                credits: editCourseDto.credits,
-                noOfLessons: editCourseDto.noOfLessons,
-                language: editCourseDto.language,
-                duration: editCourseDto.duration,
-                competency: editCourseDto.competency,
-                author: editCourseDto.author,
+                ...editCourseDto,
                 verificationStatus: CourseVerificationStatus.PENDING,
-                availabilityTime: editCourseDto.availabilityTime 
             }
-        })
+        });
     }
 
     async getCourse(courseId: number): Promise<AdminCourseResponse> {
@@ -162,7 +151,7 @@ export class CourseService {
 
     }
 
-    async getUserCourses(courseId: number) {
+    async getPurchasedUsersByCourseId(courseId: number) {
 
         return this.prisma.userCourse.findMany({
             where: {
@@ -195,7 +184,7 @@ export class CourseService {
         let course = await this.getCourse(courseId);
 
         if(course.verificationStatus != CourseVerificationStatus.PENDING) {
-            throw new HttpException(`Course is either rejected or is already accepted.`, 406);
+            throw new NotAcceptableException(`Course is either rejected or is already accepted.`);
         }
         return this.prisma.course.update({
             where: { id: courseId },
