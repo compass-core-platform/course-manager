@@ -1,4 +1,4 @@
-import { Controller, Body, Get, Post, Patch, Res, Delete, HttpStatus, Param, ParseIntPipe, Logger} from '@nestjs/common';
+import { Controller, Body, Get, Post, Patch, Res, Delete, HttpStatus, Param, ParseIntPipe, Logger, ParseUUIDPipe} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { ProviderProfileResponse } from '../provider/dto/provider-profile-response.dto';
@@ -74,7 +74,7 @@ export class AdminController {
     @ApiOperation({ summary: "Settle credits for a provider" })
     @ApiResponse({ status: HttpStatus.OK, type: json})
     @Post('/:adminId/providers/settlements/settle')
-    async settleProvider(@Param("adminId", ParseIntPipe) adminId: number, @Body() settleDto: ProviderSettlementDto, @Res() res : Response) {
+    async settleProvider(@Param("adminId", ParseUUIDPipe) adminId: string, @Body() settleDto: ProviderSettlementDto, @Res() res : Response) {
         try {
             this.logger.log(`Settling the credits for the given provider`);
 
@@ -100,7 +100,7 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: ProviderProfileResponse})
     @Get('/providers/:providerId')
     async getProviderProfile (
-        @Param("providerId", ParseIntPipe) providerId: number, @Res() res: Response
+        @Param("providerId", ParseUUIDPipe) providerId: string, @Res() res: Response
     ) {
         try {
             this.logger.log(`Getting provider information for id ${providerId}`);
@@ -129,7 +129,7 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: ProviderProfileResponse})
     @Patch('/providers/:providerId')
     async editProviderProfile (
-        @Param("providerId", ParseIntPipe) providerId: number, @Body() providerDto: EditProvider ,@Res() res
+        @Param("providerId", ParseUUIDPipe) providerId: string, @Body() providerDto: EditProvider ,@Res() res
     ){
         try {
             this.logger.log(`Getting provider information for id ${providerId}`);
@@ -139,7 +139,6 @@ export class AdminController {
                 name: providerDto.name,
                 email: providerDto.email,
                 password: providerDto.password,
-                walletId: providerDto.walletId,
                 status: providerDto.status
             }
 
@@ -165,7 +164,7 @@ export class AdminController {
     @ApiOperation({ summary: "Verify provider" })
     @ApiResponse({ status: HttpStatus.OK, type: json })
     @Patch('/providers/:providerId/verify')
-    async verifyProvider(@Param("providerId", ParseIntPipe) providerId: number, @Res() res) {
+    async verifyProvider(@Param("providerId", ParseUUIDPipe) providerId: string, @Res() res) {
         try {
             this.logger.log(`Verifying the provider's account with id ${providerId}`);
 
@@ -332,7 +331,7 @@ export class AdminController {
     @ApiOperation({ summary: "Get transaction history between admin and consumers"})
     @ApiResponse({ status: HttpStatus.OK, type: TransactionResponse, isArray: true})
     @Get('/:adminId/transactions/consumers')
-    async getTransactions (@Param("adminId") adminId: number, @Res() res
+    async getTransactions (@Param("adminId", ParseUUIDPipe) adminId: string, @Res() res
     ){
         try {
             this.logger.log(`Getting all transactions between admin and consumers.`);
@@ -358,7 +357,7 @@ export class AdminController {
     @ApiOperation({ summary: "Add credits to a Provider"})
     @ApiResponse({ status: HttpStatus.OK, type: json})
     @Post('/:adminId/providers/credits/addCredits')
-    async addCredits (@Param("adminId") adminId: number, @Body() reqBody: CreditRequest, @Res() res
+    async addCredits (@Param("adminId", ParseUUIDPipe) adminId: string, @Body() reqBody: CreditRequest, @Res() res
     ){
         try {
             this.logger.log(`Adding credits to providers' wallet`);
@@ -388,7 +387,7 @@ export class AdminController {
     @ApiOperation({ summary: "Remove credits from a Provider"})
     @ApiResponse({ status: HttpStatus.OK, type: json })
     @Post('/:adminId/providers/credits/reduceCredits')
-    async reduceCredits (@Param("adminId") adminId: number, @Body() reqBody: CreditRequest, @Res() res
+    async reduceCredits (@Param("adminId") adminId: string, @Body() reqBody: CreditRequest, @Res() res
     ){
         try {
             this.logger.log(`Reducing credits from providers' wallet`);

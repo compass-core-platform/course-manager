@@ -5,7 +5,7 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 export class ProviderSettlementDto {
     @ApiProperty({required: false})
     @IsNumber()
-    id: number;
+    id: string;
 
     @ApiProperty()
     @IsOptional()

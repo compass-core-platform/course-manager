@@ -7,7 +7,7 @@ export class ProviderProfileResponse {
     @ApiProperty({required: false})
     @IsNumber()
     @IsOptional()
-    id: number;
+    id: string;
 
     @ApiProperty()
     @IsOptional()
@@ -24,10 +24,6 @@ export class ProviderProfileResponse {
     @IsOptional()
     password?: string;
 
-    @ApiProperty()
-    @IsNumber()
-    @IsOptional()
-    walletId: number;
 
     @ApiProperty()
     @IsOptional()

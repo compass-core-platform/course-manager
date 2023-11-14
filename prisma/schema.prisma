@@ -13,26 +13,32 @@ datasource db {
 // Here goes models
 
 enum ProviderStatus {
-  pending
-  verified
-  rejected
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum WalletType {
+  ADMIN
+  PROVIDER
+  CONSUMER
 }
 
 enum CourseVerificationStatus {
-  pending
-  accepted
-  rejected
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 enum CourseStatus {
-  active
-  inactive
-  archived
+  ACTIVE
+  INACTIVE
+  ARCHIVED
 }
 
 enum CourseProgressStatus {
-  inProgress
-  completed
+  IN_PROGRESS
+  COMPLETED
 }
 
 model Admin {
@@ -48,9 +54,8 @@ model Provider {
   name        String  
   email       String          @unique
   password    String 
-  walletId    Int             @unique
   paymentInfo Json?
-  status      ProviderStatus  @default(pending)
+  status      ProviderStatus  @default(PENDING)
   courses     Course[]
 }
 
@@ -71,7 +76,7 @@ model Course {
   avgRating           Float?
   status              CourseStatus
   availabilityTime    DateTime?
-  verificationStatus  CourseVerificationStatus  @default(pending)
+  verificationStatus  CourseVerificationStatus  @default(PENDING)
   cqfScore            Int?
   impactScore         Float?
   provider            Provider                  @relation(fields: [providerId], references: [id])
@@ -83,7 +88,7 @@ model UserCourse {
   userId                    String                    @db.Uuid
   courseId                  Int
   purchasedAt               DateTime                  @default(now())
-  status                    CourseProgressStatus      @default(inProgress)
+  status                    CourseProgressStatus      @default(IN_PROGRESS)
   courseCompletionScore     Float?
   rating                    Int?
   feedback                  String?
@@ -93,7 +98,7 @@ model UserCourse {
 }
 
 enum TransactionType {
-  purchase
-  creditRequest
-  settlement
+  PURCHASE
+  CREDIT_REQUEST
+  SETTLEMENT
 }

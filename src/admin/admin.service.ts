@@ -18,7 +18,7 @@ export class AdminService {
         private courseService: CourseService
     ) {}
 
-    async verifyProvider(providerId: number) {
+    async verifyProvider(providerId: string) {
 
         return this.providerService.verifyProvider(providerId);
     }
@@ -28,7 +28,7 @@ export class AdminService {
         return this.providerService.fetchAllProviders();
     }
 
-    async findProviderById(providerId: number): Promise<Provider> {
+    async findProviderById(providerId: string): Promise<Provider> {
 
         return this.providerService.getProvider(providerId);
     }
@@ -58,7 +58,7 @@ export class AdminService {
         return this.courseService.removeCourse(courseId);
     }
 
-    async getTransactions(adminId: number) {
+    async getTransactions(adminId: string) {
 
         const walletService = process.env.WALLET_SERVICE_URL;
         const endpoint = `/admin/${adminId}/transactions/consumers`;
@@ -72,7 +72,7 @@ export class AdminService {
         }
     }
 
-    async addOrRemoveCreditsToProvider(adminId: number, providerId: number, credits: number) {
+    async addOrRemoveCreditsToProvider(adminId: string, providerId: string, credits: number) {
         const walletService = process.env.WALLET_SERVICE_URL;
         let endpoint: string;
         if(credits >= 0) {
@@ -98,7 +98,7 @@ export class AdminService {
         return this.providerService.editProviderProfileByAdmin(profileInfo);
     }
 
-    async getNoOfCoursePurchasesForProvider(providerId: number) {
+    async getNoOfCoursePurchasesForProvider(providerId: string) {
         return await this.prisma.userCourse.count({
             where: { 
                 course: {
@@ -108,7 +108,7 @@ export class AdminService {
         });
     }
 
-    async getNumberOfCoursesForProvider(providerId: number) {
+    async getNumberOfCoursesForProvider(providerId: string) {
         return await this.prisma.course.count({
             where: {
                 providerId: providerId
@@ -116,10 +116,11 @@ export class AdminService {
         });
     }
 
-    async getProviderWalletCredits(providerId: number) {
+    async getProviderWalletCredits(providerId: string) {
         const url = process.env.WALLET_SERVICE_URL;
         const endpoint = url + `/api/providers/${providerId}/credits`;
         const resp = await axios.get(endpoint);
+        return resp.data.credits;
     }
 
     async getAllProviderInfoForSettlement() {
@@ -138,7 +139,7 @@ export class AdminService {
         return results;
     }
 
-    async settleCredits(adminId: number, providerId: number) {
+    async settleCredits(adminId: string, providerId: string) {
         // Need to add transaction, add paymentReceipt additional settlement processing
         // then set the credits of the provider to 0
         const totCredits = await this.getProviderWalletCredits(providerId);

@@ -6,7 +6,7 @@ export class CreditRequest {
     @ApiProperty()
     @IsNotEmpty()
     @IsNumber()
-    readonly providerId: number
+    readonly providerId: string
 
     @ApiProperty()
     @IsNotEmpty()
