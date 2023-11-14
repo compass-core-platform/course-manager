@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, ParseIntPipe, Patch, Post, Put, Res } from '@nestjs/common';
 import { ProviderService } from './provider.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignupDto, SignupResponseDto } from './dto/signup.dto';
@@ -11,10 +11,14 @@ import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 import { CourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
+import { getPrismaErrorStatusAndMessage } from 'src/utils/utils';
 
 @Controller('provider')
 @ApiTags('provider')
 export class ProviderController {
+
+    private readonly logger = new Logger(ProviderController.name);
+
     constructor(
         private providerService: ProviderService,
     ) {}
@@ -27,14 +31,28 @@ export class ProviderController {
         @Body() signupDto: SignupDto,
         @Res() res
     ) {
-        const providerId = await this.providerService.createNewAccount(signupDto);
+        try {
+            this.logger.log(`Creating new provider account`);
 
-        res.status(HttpStatus.CREATED).json({
-            message: "account created successfully",
-            data: {
-                providerId
-            }
-        })
+            const providerId = await this.providerService.createNewAccount(signupDto);
+
+            this.logger.log(`successfully created new provider account`);
+
+            res.status(HttpStatus.CREATED).json({
+                message: "account created successfully",
+                data: {
+                    providerId
+                }
+            })
+        } catch (err) {
+            this.logger.error(`Failed to create new provider account`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to create new provider account`",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'provider login' })
@@ -45,14 +63,28 @@ export class ProviderController {
         @Body() loginDto: LoginDto,
         @Res() res
     ) {
-        const providerId = await this.providerService.getProviderIdFromLogin(loginDto);
+        try {
+            this.logger.log(`Getting provider ID`);
 
-        res.status(HttpStatus.OK).json({
-            message: "login successful",
-            data: {
-                providerId
-            }
-        })
+            const providerId = await this.providerService.getProviderIdFromLogin(loginDto);
+
+            this.logger.log(`successfully logged in`);
+
+            res.status(HttpStatus.OK).json({
+                message: "login successful",
+                data: {
+                    providerId
+                }
+            })
+        } catch (err) {
+            this.logger.error(`Failed to log in`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to log in`",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'view provider profile' })
@@ -63,12 +95,26 @@ export class ProviderController {
         @Param("providerId", ParseIntPipe) providerId: number,
         @Res() res
     ) {
-        const provider = await this.providerService.getProvider(providerId);
+        try {
+            this.logger.log(`Getting provider profile`);
 
-         res.status(HttpStatus.OK).json({
-            message: "fetch successful",
-            data : provider
-        })
+            const provider = await this.providerService.getProvider(providerId);
+            
+            this.logger.log(`successfully retreived provider profile`);
+
+            res.status(HttpStatus.OK).json({
+                message: "fetch successful",
+                data : provider
+            })
+        } catch (err) {
+            this.logger.error(`Failed to retreive provider profile`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to retreive provider profile`",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'update provider profile information' })
@@ -80,11 +126,25 @@ export class ProviderController {
         @Body() updateProfileDto: UpdateProfileDto,
         @Res() res
     ) {
-        await this.providerService.updateProfileInfo(providerId, updateProfileDto);
+        try {
+            this.logger.log(`Updating provider profile`);
 
-        res.status(HttpStatus.OK).json({
-            message: "account updated successfully",
-        })
+            await this.providerService.updateProfileInfo(providerId, updateProfileDto);
+
+            this.logger.log(`successfully updated provider profile`);
+
+            res.status(HttpStatus.OK).json({
+                message: "account updated successfully",
+            })
+        } catch (err) {
+            this.logger.error(`Failed to update provider profile`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to update provider profile`",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'edit course information' })
@@ -97,27 +157,55 @@ export class ProviderController {
         @Body() editCourseDto: EditCourseDto,
         @Res() res
     ) {
-        await this.providerService.editCourse(providerId, courseId, editCourseDto);
+        try {
+            this.logger.log(`Updating course information`);
 
-        res.status(HttpStatus.OK).json({
-            message: "course edited successfully",
-        })
+            await this.providerService.editCourse(providerId, courseId, editCourseDto);
+
+            this.logger.log(`Successfully updated course information`);
+
+            res.status(HttpStatus.OK).json({
+                message: "course edited successfully",
+            })
+        } catch (err) {
+            this.logger.error(`Failed to update course information`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to update course information`",
+            });
+        }
     }
 
-    @ApiOperation({ summary: 'Archive course ' })
+    @ApiOperation({ summary: 'Archive course' })
     @ApiResponse({ status: HttpStatus.OK })
-    @Get("/:providerId/course/:courseId/archive")
+    @Patch("/:providerId/course/:courseId/archive")
     // edit course information
     async archiveCourse(
         @Param("providerId", ParseIntPipe) providerId: number,
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
-        await this.providerService.archiveCourse(providerId, courseId);
+        try {
+            this.logger.log(`Archiving course`);
 
-        res.status(HttpStatus.OK).json({
-            message: "course edited successfully",
-        })
+            await this.providerService.archiveCourse(providerId, courseId);
+
+            this.logger.log(`Successfully archived the course`);
+
+            res.status(HttpStatus.OK).json({
+                message: "course archived successfully",
+            })
+        } catch (err) {
+            this.logger.error(`Failed to archive the course`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to archive the course`",
+            });
+        }
     }
     
     @ApiOperation({ summary: 'add new course' })
@@ -129,12 +217,26 @@ export class ProviderController {
         @Body() addCourseDto: AddCourseDto,
         @Res() res
     ) {
-        const course = await this.providerService.addNewCourse(providerId, addCourseDto);
+        try {
+            this.logger.log(`Adding new course`);
 
-        res.status(HttpStatus.CREATED).json({
-            message: "course added successfully",
-            data: course
-        })
+            const course = await this.providerService.addNewCourse(providerId, addCourseDto);
+
+            this.logger.log(`Successfully added new course`);
+
+            res.status(HttpStatus.CREATED).json({
+                message: "course added successfully",
+                data: course
+            })
+        } catch (err) {
+            this.logger.error(`Failed to add the course`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to add the course`",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'remove a course' })
@@ -146,11 +248,26 @@ export class ProviderController {
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
-        await this.providerService.removeCourse(providerId, courseId);
+        try {
+            this.logger.log(`Removing course`);
 
-        res.status(HttpStatus.OK).json({
-            message: "course deleted successfully",
-        })
+            await this.providerService.removeCourse(providerId, courseId);
+
+            this.logger.log(`Successfully deleted the course`);
+
+
+            res.status(HttpStatus.OK).json({
+                message: "course deleted successfully",
+            })
+        } catch (err) {
+            this.logger.error(`Failed to delete the course`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to delete the course`",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'View courses offered by self' })
@@ -161,12 +278,26 @@ export class ProviderController {
         @Param("providerId", ParseIntPipe) providerId: number,
         @Res() res
     ) {
-        const courses = await this.providerService.getCourses(providerId);
+        try {
+            this.logger.log(`Getting courses`);
 
-        res.status(HttpStatus.OK).json({
-            message: "courses fetched successfully",
-            data: courses
-        })
+            const courses = await this.providerService.getCourses(providerId);
+
+            this.logger.log(`Successfully retrieved the courses`);
+
+            res.status(HttpStatus.OK).json({
+                message: "courses fetched successfully",
+                data: courses
+            })
+        } catch (err) {
+            this.logger.error(`Failed to fetch the courses`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to fetch the courses",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'View Course Feedback & ratings, numberOfPurchases' })
@@ -178,12 +309,26 @@ export class ProviderController {
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
-        const feedbackResponse = await this.providerService.getCourseFeedbacks(providerId, courseId);
+        try {
+            this.logger.log(`Getting course feedbacks`);
 
-        res.status(HttpStatus.OK).json({
-            message: "feedbacks fetched successfully",
-            data: feedbackResponse
-        })
+            const feedbackResponse = await this.providerService.getCourseFeedbacks(providerId, courseId);
+
+            this.logger.log(`Successfully retrieved the feedbacks`);
+
+            res.status(HttpStatus.OK).json({
+                message: "feedbacks fetched successfully",
+                data: feedbackResponse
+            })
+        } catch (err) {
+            this.logger.error(`Failed to fetch the feedbacks`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to fetch the feedbacks",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'Get all transactions for course purchase user wise' })
@@ -195,12 +340,26 @@ export class ProviderController {
         @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
-        const purchaseResponse = await this.providerService.getCoursePurchases(providerId, courseId);
+        try {
+            this.logger.log(`Getting course purchase transactions`);
 
-        res.status(HttpStatus.OK).json({
-            message: "purchases fetched successfully",
-            data: purchaseResponse
-        })
+            const purchaseResponse = await this.providerService.getCoursePurchases(providerId, courseId);
+
+            this.logger.log(`Successfully retrieved course purchase transactions`);
+
+            res.status(HttpStatus.OK).json({
+                message: "purchases fetched successfully",
+                data: purchaseResponse
+            })
+        } catch (err) {
+            this.logger.error(`Failed to fetch the transactions`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to fetch the transactions",
+            });
+        }
     }
 
     @ApiOperation({ summary: 'Mark course as complete' })
@@ -212,10 +371,24 @@ export class ProviderController {
         @Body() completeCourseDto: CompleteCourseDto,
         @Res() res
     ) {
-        await this.providerService.markCourseComplete(providerId, completeCourseDto);
+        try {
+            this.logger.log(`Updating course as complete`);
 
-        res.status(HttpStatus.OK).json({
-            message: "course marked complete",
-        })
+            await this.providerService.markCourseComplete(providerId, completeCourseDto);
+
+            this.logger.log(`Successfully marked the course as complete`);
+
+            res.status(HttpStatus.OK).json({
+                message: "course marked complete",
+            })
+        } catch (err) {
+            this.logger.error(`Failed to mark the course completion`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to mark the course completion",
+            });
+        }
     }
 }

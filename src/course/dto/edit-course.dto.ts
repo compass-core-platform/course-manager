@@ -9,32 +9,32 @@ export class EditCourseDto {
     @ApiProperty()
     @IsString()
     @IsOptional()
-    title: string;
+    title?: string;
 
     // description
     @ApiProperty()
     @IsString()
     @IsOptional()
-    description: string;
+    description?: string;
 
     // link for the course content
     @ApiProperty()
     @IsString()
     @IsOptional()
-    courseLink: string;
+    courseLink?: string;
 
     // course image
     @ApiProperty()
     @IsString()
     @IsOptional()
-    imgLink: string;
+    imgLink?: string;
 
     // number of credits required to purchase course
     @ApiProperty()
     @Min(0)
     @IsInt()
     @IsOptional()
-    credits: number;
+    credits?: number;
 
     // Number of lessons
     @ApiProperty()
@@ -46,25 +46,25 @@ export class EditCourseDto {
     @ApiProperty()
     @IsArray()
     @IsOptional()
-    language: string[];
+    language?: string[];
 
     // course duration
     @ApiProperty()
     @Min(0)
     @IsInt()
     @IsOptional()
-    duration: number;
+    duration?: number;
 
     // competency
     @ApiProperty()
     @IsOptional()
-    competency: any;
+    competency?: any;
 
     // author
     @ApiProperty()
     @IsString()
     @IsOptional()
-    author: string;
+    author?: string;
 
     // course status (active/inactive/archived)
     // @ApiProperty()
@@ -77,5 +77,4 @@ export class EditCourseDto {
     @IsDate()
     @IsOptional()
     availabilityTime?: Date;
-
 }

@@ -10,6 +10,7 @@ import { ProviderModule } from 'src/provider/provider.module';
 @Module({
   imports: [PrismaModule, CourseModule, MockWalletModule, ProviderModule],
   controllers: [AdminController],
-  providers: [AdminService, PrismaService]
+  providers: [AdminService, PrismaService],
+  exports: [AdminService]
 })
 export class AdminModule {}
