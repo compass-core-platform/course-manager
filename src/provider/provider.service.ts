@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma, Provider, ProviderStatus } from '@prisma/client';
+import { ProviderStatus } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto } from 'src/course/dto/add-course.dto';
@@ -32,17 +32,20 @@ export class ProviderService {
         if(provider)
             throw new BadRequestException("Account with that email ID already exists");
 
-        // update the endpoint 
-        const url = process.env.WALLET_SERVICE_URL;
-        const endpoint = url + `/admin/:adminId/providers/create`;
-        const resp = await axios.post(endpoint);
-
         provider = await this.prisma.provider.create({
             data: {
                 ...signupDto,
-                walletId: resp.data.walletId
             }
-        })
+        });
+
+        const url = process.env.WALLET_SERVICE_URL;
+        const endpoint = url + `/api/wallet/create`;
+        const reqBody = {
+            userId: provider.id,
+            type: 'PROVIDER'
+        }
+        const resp = await axios.post(endpoint, reqBody);
+
         return provider.id
     }
 
@@ -101,7 +104,7 @@ export class ProviderService {
 
         const provider = await this.getProvider(providerId);
 
-        if(provider.status != ProviderStatus.verified)
+        if(provider.status != ProviderStatus.VERIFIED)
             throw new UnauthorizedException("Provider account is not verified");
 
         return this.courseService.addCourse(providerId, addCourseDto);
@@ -195,19 +198,19 @@ export class ProviderService {
     async fetchAllProviders(): Promise<ProviderProfileResponse[]> {
 
         return this.prisma.provider.findMany({
-            select: { id: true, name: true, email: true, walletId: true, paymentInfo: true, courses: true, status: true}
+            select: { id: true, name: true, email: true, paymentInfo: true, courses: true, status: true}
         });
     }
 
     async verifyProvider(providerId: string) {
         let providerInfo = await this.getProvider(providerId);
 
-        if(providerInfo.status != ProviderStatus.pending) {
+        if(providerInfo.status != ProviderStatus.PENDING) {
             throw new HttpException(`Provider is either verified or rejected.`, 406);
         }
         return this.prisma.provider.update({ 
             where:    {id: providerId},
-            data:  {status: ProviderStatus.verified} 
+            data:  {status: ProviderStatus.VERIFIED} 
         });
     }
 }

@@ -8,8 +8,7 @@ async function main() {
         name: "Vijay Salgaonkar",
         email: "vijaysalgaonkar@gmail.com",
         password: "9d209aacaed4088d68c41bd8dfb20de39cbd8339",
-        walletId: 1,
-        status: ProviderStatus.verified
+        status: ProviderStatus.VERIFIED
     }
   });
 
@@ -18,14 +17,13 @@ async function main() {
         name: "udemy",
         email: "udemyorg@gmail.in",
         password: "Udemy@9812",
-        walletId: 2,
         paymentInfo: {
             bankAccNo: "1111111111",
             otherDetails: {
 
             }
         },
-        status: 'verified',
+        status: 'VERIFIED',
         // courses: []
     }
   });
@@ -35,14 +33,13 @@ async function main() {
         name: "coursera",
         email: "coursera@gmail.in",
         password: "Coursera@999",
-        walletId: 3,
         paymentInfo: {
             bankAccNo: "1111111113",
             otherDetails: {
 
             }
         },
-        status: 'pending',
+        status: 'PENDING',
         // courses: []
     }
   });
@@ -52,14 +49,13 @@ async function main() {
         name: "lern",
         email: "lern@gmail.in",
         password: "lern@999",
-        walletId: 4,
         paymentInfo: {
             bankAccNo: "1111111116",
             otherDetails: {
 
             }
         },
-        status: 'rejected',
+        status: 'REJECTED',
         // courses: []
     }
   });
@@ -81,7 +77,7 @@ async function main() {
           "Backend engineering": ["Level1"]
         },
         author: "Stephen Grider",
-        status: "active",
+        status: "ACTIVE",
         availabilityTime: new Date("2024-05-01").toISOString()
     }, {
         providerId: provider1.id,
@@ -98,7 +94,7 @@ async function main() {
           "Understanding brand": ["Level1"]
         },
         author: "Lindsay Marsh",
-        status: "active",
+        status: "ACTIVE",
         availabilityTime: new Date("2024-05-01").toISOString()
     }, {
         providerId: provider1.id,
@@ -116,7 +112,7 @@ async function main() {
           "MySQL": ["Level1"]
         },
         author: "Jose Portilla",
-        status: "active",
+        status: "ACTIVE",
         availabilityTime: new Date("2024-05-01").toISOString()
     }, {
         providerId: response.id,
@@ -132,7 +128,7 @@ async function main() {
           "Excel": ["Level1", "Level2", "Level3", "Level4"]
         },
         author: "Kyle Pew",
-        status: "active",
+        status: "ACTIVE",
         availabilityTime: new Date("2024-05-01").toISOString()
     }]
   })
@@ -183,9 +179,9 @@ async function main() {
             "Orchestration": [ "Level5" ]
         },
         author: "Jason Frig",
-        status: CourseStatus.active,
+        status: CourseStatus.ACTIVE,
         availabilityTime: new Date("2023-06-01"),
-        verificationStatus: CourseVerificationStatus.accepted,
+        verificationStatus: CourseVerificationStatus.ACCEPTED,
         cqfScore: 10,
     }
   });
@@ -206,9 +202,9 @@ async function main() {
             "Python": [ "Level1", "Level2" ]
         },
         author: "James Franco",
-        status: CourseStatus.active,
+        status: CourseStatus.ACTIVE,
         availabilityTime: new Date("2023-08-10"),
-        verificationStatus: CourseVerificationStatus.pending,
+        verificationStatus: CourseVerificationStatus.PENDING,
     }
   });
 
@@ -228,9 +224,9 @@ async function main() {
             "LLVM": [ "Level4" ]
         },
         author: "Ramakrishna Upadrasta",
-        status: CourseStatus.active,
+        status: CourseStatus.ACTIVE,
         availabilityTime: new Date("2023-10-10"),
-        verificationStatus: CourseVerificationStatus.rejected,
+        verificationStatus: CourseVerificationStatus.REJECTED,
     }
   });
 

@@ -139,7 +139,6 @@ export class AdminController {
                 name: providerDto.name,
                 email: providerDto.email,
                 password: providerDto.password,
-                walletId: providerDto.walletId,
                 status: providerDto.status
             }
 

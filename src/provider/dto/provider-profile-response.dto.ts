@@ -24,10 +24,6 @@ export class ProviderProfileResponse {
     @IsOptional()
     password?: string;
 
-    @ApiProperty()
-    @IsNumber()
-    @IsOptional()
-    walletId: number;
 
     @ApiProperty()
     @IsOptional()

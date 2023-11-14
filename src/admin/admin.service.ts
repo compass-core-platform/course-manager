@@ -120,6 +120,7 @@ export class AdminService {
         const url = process.env.WALLET_SERVICE_URL;
         const endpoint = url + `/api/providers/${providerId}/credits`;
         const resp = await axios.get(endpoint);
+        return resp.data.credits;
     }
 
     async getAllProviderInfoForSettlement() {

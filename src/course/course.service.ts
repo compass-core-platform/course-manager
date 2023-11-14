@@ -60,7 +60,7 @@ export class CourseService {
 
         return this.prisma.course.update({
             where: { id: courseId },
-            data: { status: CourseStatus.archived }
+            data: { status: CourseStatus.ARCHIVED }
         });
 
     }
@@ -81,7 +81,7 @@ export class CourseService {
                 duration: editCourseDto.duration,
                 competency: editCourseDto.competency,
                 author: editCourseDto.author,
-                verificationStatus: CourseVerificationStatus.pending,
+                verificationStatus: CourseVerificationStatus.PENDING,
                 availabilityTime: editCourseDto.availabilityTime 
             }
         })
@@ -127,7 +127,7 @@ export class CourseService {
         if(!userCourse)
             throw new NotFoundException("This user has not subscribed to this course");
         
-        if(userCourse.status != CourseProgressStatus.completed)
+        if(userCourse.status != CourseProgressStatus.COMPLETED)
             throw new BadRequestException("Course not complete");
         
         await this.prisma.userCourse.update({
@@ -180,7 +180,7 @@ export class CourseService {
                 }
             },
             data: {
-                status: CourseProgressStatus.completed
+                status: CourseProgressStatus.COMPLETED
             }
         })
     }
@@ -194,13 +194,13 @@ export class CourseService {
 
         let course = await this.getCourse(courseId);
 
-        if(course.verificationStatus != CourseVerificationStatus.pending) {
+        if(course.verificationStatus != CourseVerificationStatus.PENDING) {
             throw new HttpException(`Course is either rejected or is already accepted.`, 406);
         }
         return this.prisma.course.update({
             where: { id: courseId },
             data: {
-                verificationStatus: CourseVerificationStatus.accepted,
+                verificationStatus: CourseVerificationStatus.ACCEPTED,
                 cqfScore: cqf_score
             }
         });
@@ -212,7 +212,7 @@ export class CourseService {
 
         return this.prisma.course.update({
             where: {id: courseId},
-            data: {verificationStatus: CourseVerificationStatus.rejected}
+            data: {verificationStatus: CourseVerificationStatus.REJECTED}
         });
     }
 
