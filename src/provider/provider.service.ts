@@ -13,13 +13,16 @@ import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 import { EditProvider } from 'src/admin/dto/edit-provider.dto';
 import { CourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
+import { AuthService } from 'src/auth/auth.service';
 import axios from 'axios';
+
 
 @Injectable()
 export class ProviderService {
     constructor(
         private prisma: PrismaService,
-        private courseService: CourseService
+        private courseService: CourseService,
+        private authService: AuthService
     ) {}
 
     async createNewAccount(signupDto: SignupDto) {
@@ -28,13 +31,20 @@ export class ProviderService {
             where : {
                 email: signupDto.email
             }
-        })
+        });
+
         if(provider)
             throw new BadRequestException("Account with that email ID already exists");
 
+        const hashedPassword = await this.authService.hashPassword(signupDto.password);
+
         provider = await this.prisma.provider.create({
             data: {
-                ...signupDto,
+                name: signupDto.name,
+                email: signupDto.email,
+                password: hashedPassword,
+                paymentInfo: signupDto.paymentInfo ? signupDto.paymentInfo : null
+            // other user profile data
             }
         });
 
@@ -59,7 +69,9 @@ export class ProviderService {
         if(!provider)
             throw new NotFoundException("Email ID does not exist");
         
-        if(provider.password != loginDto.password)
+        const isPasswordValid = await this.authService.comparePasswords(loginDto.password, provider.password);
+        
+        if(!isPasswordValid)
             throw new BadRequestException("Incorrect password");
         
         return provider.id

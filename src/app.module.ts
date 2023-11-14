@@ -7,6 +7,7 @@ import { ProviderModule } from "./provider/provider.module";
 import { AdminModule } from './admin/admin.module';
 import { MockWalletModule } from './mock-wallet/mock-wallet.module';
 import { CourseModule } from "./course/course.module";
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { CourseModule } from "./course/course.module";
     ProviderModule,
     AdminModule,
     MockWalletModule,
-    CourseModule
+    CourseModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
