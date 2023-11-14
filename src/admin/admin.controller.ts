@@ -11,6 +11,7 @@ import { CreditRequest } from './dto/credit-request.dto';
 import { json } from 'stream/consumers';
 import { ProviderSettlementDto } from './dto/provider-settlement.dto';
 import { CourseVerify } from 'src/course/dto/verify-course.dto';
+import { ProviderVerify } from './dto/provider-verify-response.dto';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -162,7 +163,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Verify provider" })
-    @ApiResponse({ status: HttpStatus.OK, type: json })
+    @ApiResponse({ status: HttpStatus.OK, type: ProviderVerify })
     @Patch('/providers/:providerId/verify')
     async verifyProvider(@Param("providerId", ParseUUIDPipe) providerId: string, @Res() res) {
         try {
@@ -174,7 +175,7 @@ export class AdminController {
 
             res.status(HttpStatus.OK).json({
                 message: "Verified the provider",
-                data: response
+                data: response.id
             });
         } catch (err) {
             this.logger.error(`Failed to verify the provider with id ${providerId}`);
