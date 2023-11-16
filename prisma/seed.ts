@@ -56,6 +56,7 @@ async function main() {
             }
         },
         status: 'REJECTED',
+        rejectionReason: "Invalid backAccNo"
         // courses: []
     }
   });
@@ -227,6 +228,7 @@ async function main() {
         status: CourseStatus.ACTIVE,
         availabilityTime: new Date("2023-10-10"),
         verificationStatus: CourseVerificationStatus.REJECTED,
+        rejectionReason: "Level associated with LLVM is wrong"
     }
   });
 

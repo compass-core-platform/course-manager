@@ -195,13 +195,20 @@ export class CourseService {
         });
     }
 
-    async rejectCourse(courseId: number) {
+    async rejectCourse(courseId: number, rejectionReason: string) {
 
-        await this.getCourse(courseId);
+        const course = await this.getCourse(courseId);
+
+        if(course.verificationStatus != CourseVerificationStatus.PENDING) {
+            throw new NotAcceptableException(`Course is already rejected or is accepted`);
+        }
 
         return this.prisma.course.update({
             where: {id: courseId},
-            data: {verificationStatus: CourseVerificationStatus.REJECTED}
+            data: {
+                verificationStatus: CourseVerificationStatus.REJECTED,
+                rejectionReason: rejectionReason
+            }
         });
     }
 

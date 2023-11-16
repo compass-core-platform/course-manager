@@ -57,6 +57,7 @@ model Provider {
   paymentInfo Json?
   status      ProviderStatus  @default(PENDING)
   courses     Course[]
+  rejectionReason String?
 }
 
 
@@ -79,6 +80,7 @@ model Course {
   verificationStatus  CourseVerificationStatus  @default(PENDING)
   cqfScore            Int?
   impactScore         Float?
+  rejectionReason     String?
   provider            Provider                  @relation(fields: [providerId], references: [id])
   userCourses         UserCourse[]              
 }

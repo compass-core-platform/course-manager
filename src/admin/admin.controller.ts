@@ -12,6 +12,8 @@ import { json } from 'stream/consumers';
 import { ProviderSettlementDto } from './dto/provider-settlement.dto';
 import { CourseVerify } from 'src/course/dto/verify-course.dto';
 import { ProviderVerify } from './dto/provider-verify-response.dto';
+import { RejectProviderResponseDto } from './dto/reject-provider-response.dto';
+import { RejectProviderRequestDto } from './dto/reject-provider-request.dto';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -188,6 +190,35 @@ export class AdminController {
         }
     }
 
+    @ApiOperation({ summary: "Reject provider" })
+    @ApiResponse({ status: HttpStatus.OK, type: RejectProviderResponseDto })
+    @Patch('/providers/:providerId/reject')
+    async rejectProvider(@Param("providerId", ParseUUIDPipe) providerId: string, @Body() rejectProviderDto: RejectProviderRequestDto, @Res() res) {
+        try {
+            this.logger.log(`Rejecting the provider's account with id ${providerId}`);
+
+            const response = await this.adminService.rejectProvider(providerId, rejectProviderDto.rejectionReason);
+
+            this.logger.log(`Successfully rejected the provider account`);
+
+            res.status(HttpStatus.OK).json({
+                message: "Rejected the provider",
+                data: {
+                    providerId: response.id,
+                    rejectionReason: response.rejectionReason
+                }
+            });
+        } catch (err) {
+            this.logger.error(`Failed to reject the provider account with id ${providerId}`);
+            
+            const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode,
+                message: errorMessage || "Failed to reject the provider account",
+            });
+        }
+    }
+
     @ApiOperation({ summary: "Get all the courses"})
     @ApiResponse({ status: HttpStatus.OK, type: CourseResponse, isArray: true})
     @Get('/courses/')
@@ -275,12 +306,12 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
     @Patch('/courses/:courseId/reject')
     async rejectCourse (
-        @Param("courseId", ParseIntPipe) courseId: number, @Res() res
+        @Param("courseId", ParseIntPipe) courseId: number, @Body() courseRejectionRequestDto: RejectProviderRequestDto, @Res() res
     ) {
         try {
             this.logger.log(`Processing reject request of course with id ${courseId}`);
             
-            const course = await this.adminService.rejectCourse(courseId);
+            const course = await this.adminService.rejectCourse(courseId, courseRejectionRequestDto.rejectionReason);
 
             this.logger.log(`Successfully rejected the course`);
 

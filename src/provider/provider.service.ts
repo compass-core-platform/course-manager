@@ -225,4 +225,18 @@ export class ProviderService {
             data:  {status: ProviderStatus.VERIFIED} 
         });
     }
+
+    async rejectProvider(providerId: string, rejectionReason: string) {
+        let providerInfo = await this.getProvider(providerId);
+        if(providerInfo.status != ProviderStatus.PENDING) {
+            throw new NotAcceptableException(`Provider is either already accepted or rejected`);
+        }
+        return this.prisma.provider.update({
+            where: {id: providerId},
+            data: {
+                status: ProviderStatus.REJECTED,
+                rejectionReason: rejectionReason
+            }
+        });
+    }
 }

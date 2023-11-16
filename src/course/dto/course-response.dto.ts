@@ -20,6 +20,7 @@ export class CourseResponse {
     readonly status: CourseStatus;
     readonly availabilityTime: Date | null;
     readonly verificationStatus: CourseVerificationStatus;
+    readonly rejectionReason: string | null;
 }
 
 export class AdminCourseResponse extends CourseResponse {

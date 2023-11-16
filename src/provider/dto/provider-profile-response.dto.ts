@@ -27,11 +27,16 @@ export class ProviderProfileResponse {
 
     @ApiProperty()
     @IsOptional()
-    paymentInfo: any;
+    paymentInfo?: any;
 
     @ApiProperty()
     @IsOptional()
     @IsEnum(ProviderStatus)
-    status: ProviderStatus;
+    status?: ProviderStatus;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    rejectionReason?: string;
     // readonly courses: Course[];
 }

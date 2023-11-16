@@ -23,6 +23,10 @@ export class AdminService {
         return this.providerService.verifyProvider(providerId);
     }
 
+    async rejectProvider(providerId: string, rejectionReason: string) {
+        return this.providerService.rejectProvider(providerId, rejectionReason);
+    }
+
     async findAllProviders(): Promise<Partial<Provider>[]> {
 
         return this.providerService.fetchAllProviders();
@@ -48,9 +52,9 @@ export class AdminService {
         return this.courseService.acceptCourse(courseId, cqf_score);
     }
 
-    async rejectCourse(courseId: number) {
+    async rejectCourse(courseId: number, rejectionReason: string) {
         
-        return this.courseService.rejectCourse(courseId);
+        return this.courseService.rejectCourse(courseId, rejectionReason);
     }
 
     async removeCourse(courseId: number) {
