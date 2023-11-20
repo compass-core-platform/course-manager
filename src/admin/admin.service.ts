@@ -18,50 +18,60 @@ export class AdminService {
         private courseService: CourseService
     ) {}
 
+    // verify provider account
     async verifyProvider(providerId: string) {
 
         return this.providerService.verifyProvider(providerId);
     }
 
+    // reject provider account
     async rejectProvider(providerId: string, rejectionReason: string) {
         return this.providerService.rejectProvider(providerId, rejectionReason);
     }
 
+    // fetch all providers on marketplace
     async findAllProviders(): Promise<Partial<Provider>[]> {
 
         return this.providerService.fetchAllProviders();
     }
 
+    // fetch provider with the given id
     async findProviderById(providerId: string): Promise<Provider> {
 
         return this.providerService.getProvider(providerId);
     }
 
+    // fetch all courses added onto the marketplace
     async findAllCourses() : Promise<Course[]> {
 
         return this.courseService.fetchAllCourses();
     }
 
+    // find course by Id
     async findCourseById(courseId: number) {
 
         return this.courseService.getCourse(courseId);
     }
 
+    // accept a course along with the cqf score
     async acceptCourse(courseId: number, cqf_score: number) {
         
         return this.courseService.acceptCourse(courseId, cqf_score);
     }
 
+    // reject a course
     async rejectCourse(courseId: number, rejectionReason: string) {
         
         return this.courseService.rejectCourse(courseId, rejectionReason);
     }
 
+    // remove a course from marketplace
     async removeCourse(courseId: number) {
         
         return this.courseService.removeCourse(courseId);
     }
 
+    // get all admin-consumer transactions
     async getTransactions(adminId: string) {
 
         const walletService = process.env.WALLET_SERVICE_URL;
@@ -76,6 +86,7 @@ export class AdminService {
         }
     }
 
+    // Add or remove credits to provider wallet
     async addOrRemoveCreditsToProvider(adminId: string, providerId: string, credits: number) {
         const walletService = process.env.WALLET_SERVICE_URL;
         let endpoint: string;
@@ -97,11 +108,13 @@ export class AdminService {
         }
     }
 
+    // edit provider profile information
     async editProviderProfile(profileInfo: EditProvider) {
         
         return this.providerService.editProviderProfileByAdmin(profileInfo);
     }
 
+    // Get number of course purchases for a provider
     async getNoOfCoursePurchasesForProvider(providerId: string) {
         return await this.prisma.userCourse.count({
             where: { 
@@ -112,6 +125,7 @@ export class AdminService {
         });
     }
 
+    // Get the number of courses added by a provider
     async getNumberOfCoursesForProvider(providerId: string) {
         return await this.prisma.course.count({
             where: {
@@ -120,6 +134,7 @@ export class AdminService {
         });
     }
 
+    // Get the number of credits in a provider wallet
     async getProviderWalletCredits(providerId: string) {
         const url = process.env.WALLET_SERVICE_URL;
         const endpoint = url + `/api/providers/${providerId}/credits`;
@@ -127,6 +142,7 @@ export class AdminService {
         return resp.data.credits;
     }
 
+    // Get all the providers information for settlement
     async getAllProviderInfoForSettlement() {
         
         const providers = await this.providerService.fetchAllProviders();
@@ -143,6 +159,7 @@ export class AdminService {
         return results;
     }
 
+    // settle credits for a provider
     async settleCredits(adminId: string, providerId: string) {
         // Need to add transaction, add paymentReceipt additional settlement processing
         // then set the credits of the provider to 0
