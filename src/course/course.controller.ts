@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Logger, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Logger, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query, Res } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CourseService } from "./course.service";
 import { FeedbackDto } from "./dto/feedback.dto";
@@ -18,13 +18,13 @@ export class CourseController {
     @Get("/search")
     // search courses
     async searchCourses(
-        // @Body() searchDto: SearchDto,
+        @Query('searchInput') searchInput: string,
         @Res() res
     ) {
         try {
             this.logger.log(`Getting information of courses`);
 
-            const courses = await this.courseService.searchCourses();
+            const courses = await this.courseService.searchCourses(searchInput);
 
             this.logger.log(`Successfully retrieved the courses`);
 

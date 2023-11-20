@@ -13,18 +13,32 @@ export class CourseService {
         private prisma: PrismaService,
     ) {}
 
-    async searchCourses(): Promise<CourseResponse[]> {
-
+    async searchCourses(searchInput: string): Promise<CourseResponse[]> {
         const courses = await this.prisma.course.findMany({
-            // where: {
-            //     title: {
-            //         contains: searchDto.searchInput,
-            //         mode: "insensitive",
-            //     }
-            // }
-        })
-
-
+            where: {
+                OR: [{
+                    title: {
+                        contains: searchInput,
+                        mode: "insensitive",
+                    }
+                }, {
+                    author: {
+                        contains: searchInput,
+                        mode: "insensitive",
+                    }
+                }, {
+                    description: {
+                        contains: searchInput,
+                        mode: "insensitive",
+                    }
+                }, {
+                    competency: {
+                        string_contains: searchInput
+                    }
+                }]
+                
+            }
+        });
         return courses;
     }
 

@@ -1,10 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 
 export class ProviderSettlementDto {
     @ApiProperty({required: false})
-    @IsNumber()
+    @IsUUID()
     id: string;
 
     @ApiProperty()
