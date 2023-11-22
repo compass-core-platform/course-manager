@@ -18,7 +18,8 @@ export class CourseResponse {
     readonly author: string;
     readonly avgRating: number | null;
     readonly status: CourseStatus;
-    readonly availabilityTime: Date | null;
+    readonly startDate: Date | null;
+    readonly endDate: Date | null;
     readonly verificationStatus: CourseVerificationStatus;
     readonly rejectionReason: string | null;
 }

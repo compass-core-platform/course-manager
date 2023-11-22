@@ -66,7 +66,7 @@ export class AddCourseDto {
     @IsString()
     author: string;
 
-    // course status (active/inactive/archived)
+    // course status (archived/unarchived)
     @ApiProperty()
     @IsNotEmpty()
     @IsEnum(CourseStatus)

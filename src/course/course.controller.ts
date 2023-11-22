@@ -85,7 +85,7 @@ export class CourseController {
         try {
             this.logger.log(`Recording the user purchase of the course`);
 
-            await this.courseService.insertUserCourse(courseId, userId);
+            await this.courseService.addPurchaseRecord(courseId, userId);
 
             this.logger.log(`Successfully recorded the purchase`);
 

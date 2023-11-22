@@ -78,8 +78,8 @@ async function main() {
           "Backend engineering": ["Level1"]
         },
         author: "Stephen Grider",
-        status: "ACTIVE",
-        availabilityTime: new Date("2024-05-01").toISOString()
+        startDate: new Date("2024-05-01").toISOString(),
+        endDate: new Date("2024-07-01").toISOString()
     }, {
         providerId: provider1.id,
         title: "Graphic Design Masterclass",
@@ -95,8 +95,8 @@ async function main() {
           "Understanding brand": ["Level1"]
         },
         author: "Lindsay Marsh",
-        status: "ACTIVE",
-        availabilityTime: new Date("2024-05-01").toISOString()
+        startDate: new Date("2024-05-01").toISOString(),
+        endDate: new Date("2024-09-01").toISOString()
     }, {
         providerId: provider1.id,
         title: "Python for Data Science",
@@ -113,8 +113,6 @@ async function main() {
           "MySQL": ["Level1"]
         },
         author: "Jose Portilla",
-        status: "ACTIVE",
-        availabilityTime: new Date("2024-05-01").toISOString()
     }, {
         providerId: response.id,
         title: "Microsoft Excel",
@@ -129,8 +127,7 @@ async function main() {
           "Excel": ["Level1", "Level2", "Level3", "Level4"]
         },
         author: "Kyle Pew",
-        status: "ACTIVE",
-        availabilityTime: new Date("2024-05-01").toISOString()
+        startDate: new Date("2024-05-01").toISOString()
     }]
   })
 
@@ -180,8 +177,8 @@ async function main() {
             "Orchestration": [ "Level5" ]
         },
         author: "Jason Frig",
-        status: CourseStatus.ACTIVE,
-        availabilityTime: new Date("2023-06-01"),
+        startDate: new Date("2023-06-01"),
+        endDate: new Date("2023-08-01"),
         verificationStatus: CourseVerificationStatus.ACCEPTED,
         cqfScore: 10,
     }
@@ -203,8 +200,6 @@ async function main() {
             "Python": [ "Level1", "Level2" ]
         },
         author: "James Franco",
-        status: CourseStatus.ACTIVE,
-        availabilityTime: new Date("2023-08-10"),
         verificationStatus: CourseVerificationStatus.PENDING,
     }
   });
@@ -225,8 +220,8 @@ async function main() {
             "LLVM": [ "Level4" ]
         },
         author: "Ramakrishna Upadrasta",
-        status: CourseStatus.ACTIVE,
-        availabilityTime: new Date("2023-10-10"),
+        startDate: new Date("2023-10-10"),
+        endDate: new Date("2023-11-10"),
         verificationStatus: CourseVerificationStatus.REJECTED,
         rejectionReason: "Level associated with LLVM is wrong"
     }

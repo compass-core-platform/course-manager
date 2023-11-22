@@ -7,7 +7,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto } from 'src/course/dto/add-course.dto';
 import { CourseService } from 'src/course/course.service';
 import { Feedback, FeedbackResponseDto } from './dto/feedback.dto';
-import { PurchaseResponseDto } from './dto/purchase.dto';
+import { CourseTransactionDto } from '../course/dto/transaction.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 import { EditProvider } from 'src/admin/dto/edit-provider.dto';
@@ -27,6 +27,7 @@ export class ProviderService {
 
     async createNewAccount(signupDto: SignupDto) {
 
+        // Check if email already exists
         let provider = await this.prisma.provider.findUnique({
             where : {
                 email: signupDto.email
@@ -36,8 +37,10 @@ export class ProviderService {
         if(provider)
             throw new BadRequestException("Account with that email ID already exists");
 
+        // Hashing the password
         const hashedPassword = await this.authService.hashPassword(signupDto.password);
 
+        // Create an entry in the database
         provider = await this.prisma.provider.create({
             data: {
                 name: signupDto.name,
@@ -48,6 +51,7 @@ export class ProviderService {
             }
         });
 
+        // Forward to wallet service for creation of wallet
         const url = process.env.WALLET_SERVICE_URL;
         const endpoint = url + `/api/wallet/create`;
         const reqBody = {
@@ -61,6 +65,7 @@ export class ProviderService {
 
     async getProviderIdFromLogin(loginDto: LoginDto) {
 
+        // Fetch the provider from email ID
         const provider = await this.prisma.provider.findUnique({
             where: {
                 email: loginDto.email
@@ -69,6 +74,7 @@ export class ProviderService {
         if(!provider)
             throw new NotFoundException("Email ID does not exist");
         
+        // Compare the entered password with the password fetched from database
         const isPasswordValid = await this.authService.comparePasswords(loginDto.password, provider.password);
         
         if(!isPasswordValid)
@@ -79,6 +85,7 @@ export class ProviderService {
 
     async getProvider(providerId: string) {
 
+        // Fetch provider details using ID
         const provider = await this.prisma.provider.findUnique({
             where: {
                 id: providerId
@@ -90,20 +97,18 @@ export class ProviderService {
         return provider;
     }
 
+    // Used when provider makes a request to update profile
     async updateProfileInfo(providerId: string, updateProfileDto: UpdateProfileDto) {
 
-        try {
-            await this.prisma.provider.update({
-                where: {
-                    id: providerId
-                },
-                data: updateProfileDto
-            })
-        } catch {
-            throw new NotFoundException("profile does not exist");
-        }
+        await this.prisma.provider.update({
+            where: {
+                id: providerId
+            },
+            data: updateProfileDto
+        })
     }
 
+    // Used when admin makes a request to update provider profile
     async editProviderProfileByAdmin(profileInfo: EditProvider) {
         
         return this.prisma.provider.update({
@@ -114,16 +119,20 @@ export class ProviderService {
 
     async addNewCourse(providerId: string, addCourseDto: AddCourseDto) {
 
+        // Fetch provider
         const provider = await this.getProvider(providerId);
 
+        // Check verification
         if(provider.status != ProviderStatus.VERIFIED)
             throw new UnauthorizedException("Provider account is not verified");
 
+        // Forward to course service
         return this.courseService.addCourse(providerId, addCourseDto);
     }
 
     async removeCourse(providerId: string, courseId: number) {
 
+        // Validate course ID provided
         const course = await this.courseService.getCourse(courseId);
         if(!course)
             throw new NotFoundException("Course does not exist");
@@ -131,6 +140,7 @@ export class ProviderService {
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
         
+        // Forward to course service
         await this.courseService.deleteCourse(courseId);
     }
 
@@ -140,23 +150,34 @@ export class ProviderService {
     }
 
     async editCourse(providerId: string, courseId: number, editCourseDto: EditCourseDto) {
-        const course = await this.courseService.editCourse(providerId, courseId, editCourseDto);
-        return course;
+        
+        // Validate provider
+        await this.getProvider(providerId);
+
+        return this.courseService.editCourse(courseId, editCourseDto);
     }
 
     async archiveCourse(providerId: string, courseId: number) {
-        return this.courseService.archiveCourse(providerId, courseId);
+        
+        // Validate provider
+        await this.getProvider(providerId);
+
+        return this.courseService.archiveCourse(courseId);
     }
 
     async getCourseFeedbacks(providerId: string, courseId: number): Promise<FeedbackResponseDto> {
 
+        // Fetch course
         const course = await this.courseService.getCourse(courseId);
         
+        // Validate course with provider
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
         
+        // Forward to course service
         const userCourses =  await this.courseService.getPurchasedUsersByCourseId(courseId);
 
+        // Construction of DTO required for response
         let feedbacks: Feedback[] = [];
         for(let u of userCourses) {
             if(u.feedback && u.rating) {
@@ -172,27 +193,14 @@ export class ProviderService {
         };
     }
 
-    async getCoursePurchases(providerId: string, courseId: number): Promise<PurchaseResponseDto[]> {
+    async getCourseTransactions(providerId: string): Promise<CourseTransactionDto[]> {
 
-        const course = await this.courseService.getCourse(courseId);
-        
-        if(course.providerId != providerId)
-            throw new BadRequestException("Course does not belong to this provider");
-        
-        const userCourses =  await this.courseService.getPurchasedUsersByCourseId(courseId);
-
-        return userCourses.map((u) => {
-            return {
-                courseId: u.courseId,
-                purchasedAt: u.purchasedAt,
-                userId: u.userId
-            }
-        })
-
+        return this.courseService.getCourseTransactions(providerId)
     }
 
     async markCourseComplete(providerId: string, completeCourseDto: CompleteCourseDto) {
 
+        // Validate course ID provided
         const course = await this.courseService.getCourse(completeCourseDto.courseId);
         if(!course)
             throw new NotFoundException("Course does not exist");
@@ -200,6 +208,7 @@ export class ProviderService {
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
 
+        // Forward to course service. Error is thrown when user has not purchased a course
         try {
             await this.courseService.markCourseComplete(completeCourseDto);
         } catch {
@@ -215,11 +224,15 @@ export class ProviderService {
     }
 
     async verifyProvider(providerId: string) {
+
+        // Fetch provider
         let providerInfo = await this.getProvider(providerId);
 
+        // Check if provider verification is pending
         if(providerInfo.status != ProviderStatus.PENDING) {
             throw new NotAcceptableException(`Provider is either verified or rejected.`);
         }
+        // Update the status in database
         return this.prisma.provider.update({ 
             where:    {id: providerId},
             data:  {status: ProviderStatus.VERIFIED} 
@@ -227,10 +240,15 @@ export class ProviderService {
     }
 
     async rejectProvider(providerId: string, rejectionReason: string) {
+
+        // Fetch provider
         let providerInfo = await this.getProvider(providerId);
+
+        // Check if provider verification is pending
         if(providerInfo.status != ProviderStatus.PENDING) {
             throw new NotAcceptableException(`Provider is either already accepted or rejected`);
         }
+        // Update the status in database
         return this.prisma.provider.update({
             where: {id: providerId},
             data: {

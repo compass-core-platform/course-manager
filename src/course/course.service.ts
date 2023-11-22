@@ -6,6 +6,7 @@ import { Course, CourseProgressStatus, CourseStatus, CourseVerificationStatus } 
 import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
 import { AdminCourseResponse, CourseResponse } from "src/course/dto/course-response.dto";
+import { CourseTransactionDto } from "./dto/transaction.dto";
 
 @Injectable()
 export class CourseService {
@@ -14,6 +15,9 @@ export class CourseService {
     ) {}
 
     async searchCourses(searchInput: string): Promise<CourseResponse[]> {
+
+        // Searches for the courses available in the DB that match or contain the input search string
+        // in their title, author, description or competency
         const courses = await this.prisma.course.findMany({
             where: {
                 OR: [{
@@ -36,7 +40,6 @@ export class CourseService {
                         string_contains: searchInput
                     }
                 }]
-                
             }
         });
         return courses;
@@ -44,6 +47,7 @@ export class CourseService {
 
     async addCourse(providerId: string, addCourseDto: AddCourseDto) {
 
+        // add new course to the platform
         return await this.prisma.course.create({
             data: {
                 providerId,
@@ -52,16 +56,16 @@ export class CourseService {
         });
     }
 
-    async addPurchaseRecord(userId: string, courseId: number) {
+    async addPurchaseRecord(courseId: number, userId: string) {
 
+        // Check if course already purchased
         const record = this.prisma.userCourse.findFirst({
             where: { userId: userId, courseId: courseId }
         });
-
-        if(record != null) {
+        if(record != null)
             throw new BadRequestException("Course already purchased by the user");
-        }
 
+        // create new record for purchase
         return await this.prisma.userCourse.create({
             data: {
                 userId,
@@ -70,8 +74,9 @@ export class CourseService {
         });
     }
 
-    async archiveCourse(providerId: string, courseId: number) {
+    async archiveCourse(courseId: number) {
 
+        // update the course status to archived
         return this.prisma.course.update({
             where: { id: courseId },
             data: { status: CourseStatus.ARCHIVED }
@@ -79,9 +84,10 @@ export class CourseService {
 
     }
 
-    async editCourse(providerId: string, courseId: number, editCourseDto: EditCourseDto) {
+    async editCourse(courseId: number, editCourseDto: EditCourseDto) {
     
-        return await this.prisma.course.update({
+        // update the course details as required and change its verification status to pending
+        return this.prisma.course.update({
             where: { id: courseId },
             data: {
                 ...editCourseDto,
@@ -92,6 +98,7 @@ export class CourseService {
 
     async getCourse(courseId: number): Promise<AdminCourseResponse> {
 
+        // Find course by ID and throw error if not found
         const course = await this.prisma.course.findUnique({
             where: {
                 id: courseId
@@ -103,22 +110,13 @@ export class CourseService {
         return course;
     }
 
-    async insertUserCourse(courseId: number, userId: string) {
-
-        await this.getCourse(courseId);
-            
-        await this.prisma.userCourse.create({
-            data: {
-                courseId,
-                userId
-            }
-        })        
-    }
-
     async giveCourseFeedback(courseId: number, userId: string, feedbackDto: FeedbackDto) {
 
+        // Validate course
         await this.getCourse(courseId);
 
+        // Find purchase record with consumer Id and course ID and throw error if not found
+        // Or if course not complete
         const userCourse = await this.prisma.userCourse.findUnique({
             where: {
                 userId_courseId: {
@@ -133,6 +131,7 @@ export class CourseService {
         if(userCourse.status != CourseProgressStatus.COMPLETED)
             throw new BadRequestException("Course not complete");
         
+        // Add feedback
         await this.prisma.userCourse.update({
             where: {
                 userId_courseId: {
@@ -148,6 +147,7 @@ export class CourseService {
 
     async deleteCourse(courseId: number) {
         
+        // Delete the course entry from db
         await this.prisma.course.delete({
             where: {
                 id: courseId
@@ -157,6 +157,7 @@ export class CourseService {
 
     async getProviderCourses(providerId: string) {
 
+        // Get all courses added by a single provider
         return this.prisma.course.findMany({
             where: {
                 providerId
@@ -167,6 +168,7 @@ export class CourseService {
 
     async getPurchasedUsersByCourseId(courseId: number) {
 
+        // Get all users that have bought a course
         return this.prisma.userCourse.findMany({
             where: {
                 courseId
@@ -176,6 +178,7 @@ export class CourseService {
 
     async markCourseComplete(completeCourseDto: CompleteCourseDto) {
 
+        // Update a course as complete for a purchased course
         await this.prisma.userCourse.update({
             where: {
                 userId_courseId: {
@@ -190,16 +193,20 @@ export class CourseService {
 
     async fetchAllCourses() : Promise<Course[]> {
         
+        // Fetch all courses
         return this.prisma.course.findMany();
     }
 
     async acceptCourse(courseId: number, cqf_score: number) {
 
+        // Validate course
         let course = await this.getCourse(courseId);
 
+        // Check if the course verfication is pending
         if(course.verificationStatus != CourseVerificationStatus.PENDING) {
             throw new NotAcceptableException(`Course is either rejected or is already accepted.`);
         }
+        // Update the course as accepted
         return this.prisma.course.update({
             where: { id: courseId },
             data: {
@@ -211,12 +218,14 @@ export class CourseService {
 
     async rejectCourse(courseId: number, rejectionReason: string) {
 
+        // Validate course
         const course = await this.getCourse(courseId);
 
+        // Check if the course verfication is pending
         if(course.verificationStatus != CourseVerificationStatus.PENDING) {
             throw new NotAcceptableException(`Course is already rejected or is accepted`);
         }
-
+        // Reject the course
         return this.prisma.course.update({
             where: {id: courseId},
             data: {
@@ -227,11 +236,48 @@ export class CourseService {
     }
 
     async removeCourse(courseId: number) {
-
+        
+        // Validate course
         await this.getCourse(courseId);
 
+        // Delete course entry
         return this.prisma.course.delete({
             where: {id: courseId}
+        });
+    }
+
+    async getCourseTransactions(providerId: string): Promise<CourseTransactionDto[]> {
+
+        // Fetch course details and number of purchases
+        const transactions = await this.prisma.course.findMany({
+            where: {
+                providerId
+            },
+            select: {
+                id: true,
+                title: true,
+                startDate: true,
+                endDate: true,
+                credits: true,
+                _count: {
+                    select: {
+                        userCourses: true
+                    }
+                }
+            },
+        });
+
+        // Refactor to the DTO format required
+        return transactions.map((c) => {
+            return {
+                courseId: c.id,
+                courseName: c.title,
+                startDate: c.startDate,
+                endDate: c.endDate,
+                credits: c.credits,
+                numConsumersEnrolled: c._count.userCourses,
+                income: c.credits * c._count.userCourses
+            }
         });
     }
 }

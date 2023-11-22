@@ -6,7 +6,7 @@ import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto, AddCourseResponseDto } from 'src/course/dto/add-course.dto';
 import { FeedbackResponseDto } from './dto/feedback.dto';
-import { PurchaseResponseDto } from './dto/purchase.dto';
+import { CourseTransactionDto } from '../course/dto/transaction.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 import { CourseResponse } from 'src/course/dto/course-response.dto';
@@ -331,25 +331,24 @@ export class ProviderController {
         }
     }
 
-    @ApiOperation({ summary: 'Get all transactions for course purchase user wise' })
-    @ApiResponse({ status: HttpStatus.OK, type: [PurchaseResponseDto] })
-    @Get("/:providerId/course/:courseId/purchases")
-    // Get all the transactions for course purchase user wise
-    async getCoursePurchases(
+    @ApiOperation({ summary: 'Get transactions of all courses' })
+    @ApiResponse({ status: HttpStatus.OK, type: [CourseTransactionDto] })
+    @Get("/:providerId/course/transactions")
+    // Get transactions of all courses
+    async getCourseTransactions(
         @Param("providerId", ParseUUIDPipe) providerId: string,
-        @Param("courseId", ParseIntPipe) courseId: number,
         @Res() res
     ) {
         try {
-            this.logger.log(`Getting course purchase transactions`);
+            this.logger.log(`Getting course transactions`);
 
-            const purchaseResponse = await this.providerService.getCoursePurchases(providerId, courseId);
+            const transactionsResponse = await this.providerService.getCourseTransactions(providerId);
 
-            this.logger.log(`Successfully retrieved course purchase transactions`);
+            this.logger.log(`Successfully retrieved course transactions`);
 
             res.status(HttpStatus.OK).json({
-                message: "purchases fetched successfully",
-                data: purchaseResponse
+                message: "transactions fetched successfully",
+                data: transactionsResponse
             })
         } catch (err) {
             this.logger.error(`Failed to fetch the transactions`);

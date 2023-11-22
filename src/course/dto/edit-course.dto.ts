@@ -67,7 +67,7 @@ export class EditCourseDto {
     @IsOptional()
     author?: string;
 
-    // course status (active/inactive/archived)
+    // course status (archived/unarchived)
     // @ApiProperty()
     // @IsString()
     // @IsOptional()

@@ -31,8 +31,7 @@ enum CourseVerificationStatus {
 }
 
 enum CourseStatus {
-  ACTIVE
-  INACTIVE
+  UNARCHIVED
   ARCHIVED
 }
 
@@ -75,8 +74,9 @@ model Course {
   competency          Json
   author              String
   avgRating           Float?
-  status              CourseStatus
-  availabilityTime    DateTime?
+  status              CourseStatus              @default(UNARCHIVED)
+  startDate           DateTime?
+  endDate             DateTime?
   verificationStatus  CourseVerificationStatus  @default(PENDING)
   cqfScore            Int?
   impactScore         Float?
