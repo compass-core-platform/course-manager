@@ -9,6 +9,10 @@ export class CheckRegDto {
     email: string
 }
 
+export class CheckRegResponseDto {
+    readonly found: boolean
+}
+
 export class LoginDto {
 
     @ApiProperty()

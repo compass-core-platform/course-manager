@@ -51,7 +51,7 @@ export class ProviderProfileResponse {
     @ApiProperty()
     @IsNotEmpty()
     @IsEnum(ProviderStatus)
-    status?: ProviderStatus;
+    status: ProviderStatus;
 
     @ApiProperty()
     @IsNotEmpty()

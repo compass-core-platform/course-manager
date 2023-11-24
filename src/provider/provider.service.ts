@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, Injectable, NotAcceptableException,
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProviderStatus } from '@prisma/client';
-import { LoginDto } from './dto/login.dto';
+import { CheckRegResponseDto, LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto } from 'src/course/dto/add-course.dto';
 import { CourseService } from 'src/course/course.service';
@@ -15,6 +15,7 @@ import { CourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { AuthService } from 'src/auth/auth.service';
 import axios from 'axios';
+import { CourseStatusDto } from 'src/course/dto/course-status.dto';
 
 
 @Injectable()
@@ -78,7 +79,13 @@ export class ProviderService {
     async getProviderIdFromLogin(loginDto: LoginDto) {
 
         // Fetch the provider from email ID
-        const provider = await this.getProviderFromEmail(loginDto.email);
+        const provider = await this.prisma.provider.findUnique({
+            where: {
+                email: loginDto.email
+            }
+        });
+        if(!provider)
+            throw new NotFoundException("provider not found");
         
         // Compare the entered password with the password fetched from database
         const isPasswordValid = await this.authService.comparePasswords(loginDto.password, provider.password);
@@ -103,7 +110,7 @@ export class ProviderService {
         return provider;
     }
 
-    async getProviderFromEmail(email: string) {
+    async checkProviderFromEmail(email: string): Promise<CheckRegResponseDto> {
 
         // Fetch provider details using email ID
         const provider = await this.prisma.provider.findUnique({
@@ -112,11 +119,11 @@ export class ProviderService {
             }
         });
         if(!provider)
-            throw new NotFoundException("provider not found");
+            return { found: false }
 
-        return provider;
+        return { found: true };
     }
-    
+
     // Used when provider makes a request to update profile
     async updateProfileInfo(providerId: string, updateProfileDto: UpdateProfileDto) {
 
@@ -177,12 +184,12 @@ export class ProviderService {
         return this.courseService.editCourse(courseId, editCourseDto);
     }
 
-    async archiveCourse(providerId: string, courseId: number) {
+    async changeCourseStatus(providerId: string, courseId: number, courseStatusDto: CourseStatusDto) {
         
         // Validate provider
         await this.getProvider(providerId);
 
-        return this.courseService.archiveCourse(courseId);
+        return this.courseService.changeStatus(courseId, providerId, courseStatusDto);
     }
 
     async getCourseFeedbacks(providerId: string, courseId: number): Promise<FeedbackResponseDto> {

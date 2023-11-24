@@ -7,6 +7,7 @@ import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
 import { AdminCourseResponse, CourseResponse } from "src/course/dto/course-response.dto";
 import { CourseTransactionDto } from "./dto/transaction.dto";
+import { CourseStatusDto } from "./dto/course-status.dto";
 
 @Injectable()
 export class CourseService {
@@ -74,14 +75,19 @@ export class CourseService {
         });
     }
 
-    async archiveCourse(courseId: number) {
+    async changeStatus(courseId: number, providerId: string, courseStatusDto: CourseStatusDto) {
+
+        // Validate course
+        const course = await this.getCourse(courseId)
+
+        if(course.providerId != providerId)
+            throw new BadRequestException("Course does not belong to the provider");
 
         // update the course status to archived
         return this.prisma.course.update({
-            where: { id: courseId },
-            data: { status: CourseStatus.ARCHIVED }
+            where: { id: courseId, providerId },
+            data: { status: courseStatusDto.status }
         });
-
     }
 
     async editCourse(courseId: number, editCourseDto: EditCourseDto) {
@@ -173,15 +179,18 @@ export class CourseService {
         })
     }
 
-    async getProviderCourses(providerId: string) {
+    async getProviderCourses(providerId: string): Promise<CourseResponse[]> {
 
         // Get all courses added by a single provider
-        return this.prisma.course.findMany({
+        const courses = await this.prisma.course.findMany({
             where: {
                 providerId
             }
         })
-
+        return courses.map((c) => {
+            const {cqfScore, impactScore, ...clone} = c;
+            return clone;
+        })
     }
 
     async getPurchasedUsersByCourseId(courseId: number) {

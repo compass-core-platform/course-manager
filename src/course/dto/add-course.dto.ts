@@ -68,9 +68,9 @@ export class AddCourseDto {
 
     // course status (archived/unarchived)
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsEnum(CourseStatus)
-    status: CourseStatus;
+    status?: CourseStatus;
 
     // course availability time
     @ApiProperty()
