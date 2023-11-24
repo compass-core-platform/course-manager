@@ -1,6 +1,6 @@
 import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { AddCourseDto } from "./add-course.dto";
-import { IsArray, IsDate, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
+import { IsArray, IsDate, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, Min } from "class-validator";
 import { CourseStatus } from "@prisma/client";
 import { CompetencyMap } from "src/utils/types";
 
@@ -20,13 +20,13 @@ export class EditCourseDto {
 
     // link for the course content
     @ApiProperty()
-    @IsString()
+    @IsUrl()
     @IsOptional()
     courseLink?: string;
 
     // course image
     @ApiProperty()
-    @IsString()
+    @IsUrl()
     @IsOptional()
     imgLink?: string;
 

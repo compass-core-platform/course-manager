@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProviderStatus } from '@prisma/client';
@@ -46,33 +46,39 @@ export class ProviderService {
                 name: signupDto.name,
                 email: signupDto.email,
                 password: hashedPassword,
-                paymentInfo: signupDto.paymentInfo ? signupDto.paymentInfo : null
-            // other user profile data
+                paymentInfo: signupDto.paymentInfo,
+                orgName: signupDto.orgName,
+                orgLogo: signupDto.orgLogo,
+                phone: signupDto.phone
             }
         });
-
-        // Forward to wallet service for creation of wallet
-        const url = process.env.WALLET_SERVICE_URL;
-        const endpoint = url + `/api/wallet/create`;
-        const reqBody = {
-            userId: provider.id,
-            type: 'PROVIDER'
+        try {
+            // Forward to wallet service for creation of wallet
+            if(!process.env.WALLET_SERVICE_URL)
+                throw new HttpException("Wallet service URL not defined", 500);
+            const url = process.env.WALLET_SERVICE_URL;
+            const endpoint = url + `/api/wallet/create`;
+            const reqBody = {
+                userId: provider.id,
+                type: 'PROVIDER',
+                credits: 0
+            }
+            const resp = await axios.post(endpoint, reqBody);
+        } catch(err) {
+            await this.prisma.provider.delete({
+                where: {
+                    id: provider.id
+                }
+            });
+            throw new HttpException(err.response, err.response.status);
         }
-        const resp = await axios.post(endpoint, reqBody);
-
         return provider.id
     }
 
     async getProviderIdFromLogin(loginDto: LoginDto) {
 
         // Fetch the provider from email ID
-        const provider = await this.prisma.provider.findUnique({
-            where: {
-                email: loginDto.email
-            }
-        })
-        if(!provider)
-            throw new NotFoundException("Email ID does not exist");
+        const provider = await this.getProviderFromEmail(loginDto.email);
         
         // Compare the entered password with the password fetched from database
         const isPasswordValid = await this.authService.comparePasswords(loginDto.password, provider.password);
@@ -97,6 +103,20 @@ export class ProviderService {
         return provider;
     }
 
+    async getProviderFromEmail(email: string) {
+
+        // Fetch provider details using email ID
+        const provider = await this.prisma.provider.findUnique({
+            where: {
+                email
+            }
+        });
+        if(!provider)
+            throw new NotFoundException("provider not found");
+
+        return provider;
+    }
+    
     // Used when provider makes a request to update profile
     async updateProfileInfo(providerId: string, updateProfileDto: UpdateProfileDto) {
 
@@ -218,9 +238,21 @@ export class ProviderService {
 
     async fetchAllProviders(): Promise<ProviderProfileResponse[]> {
 
-        return this.prisma.provider.findMany({
-            select: { id: true, name: true, email: true, paymentInfo: true, courses: true, status: true}
-        });
+        const providers =  await this.prisma.provider.findMany();
+
+        return providers.map((p) => {
+            return {
+                id: p.id,
+                name: p.name,
+                email: p.email,
+                paymentInfo: (typeof p.paymentInfo === "string") ? JSON.parse(p.paymentInfo) : p.paymentInfo ?? undefined,
+                rejectionReason: p.rejectionReason,
+                status: p.status,
+                orgLogo: p.orgLogo,
+                orgName: p.orgName,
+                phone: p.phone,
+            }
+        })
     }
 
     async verifyProvider(providerId: string) {

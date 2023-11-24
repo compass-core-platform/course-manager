@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsOptional, IsString, IsStrongPassword } from "class-validator";
+import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsPhoneNumber, IsString, IsStrongPassword, IsUrl } from "class-validator";
+import { PaymentInfo } from "src/utils/types";
 
 export class SignupDto {
 
@@ -29,12 +30,31 @@ export class SignupDto {
         },
         { message: 'Password is not strong enough' },
     )
-    password: string
+    password: string;
+
+    // organisation name
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    orgName: string;
+
+    // organisation logo image link
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsUrl()
+    orgLogo: string;
+
+    // phone number
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsPhoneNumber()
+    phone: string;
 
     // payment info
     @ApiProperty()
     @IsOptional()
-    paymentInfo?: any
+    @IsObject()
+    paymentInfo?: PaymentInfo
 }
 
 export class SignupResponseDto {

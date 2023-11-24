@@ -8,7 +8,10 @@ async function main() {
         name: "Vijay Salgaonkar",
         email: "vijaysalgaonkar@gmail.com",
         password: "9d209aacaed4088d68c41bd8dfb20de39cbd8339",
-        status: ProviderStatus.VERIFIED
+        status: ProviderStatus.VERIFIED,
+        orgLogo: "https://logos-world.net/wp-content/uploads/2021/11/Udemy-Logo.png",
+        orgName: "Udemy",
+        phone: "9999999999",
     }
   });
 
@@ -24,7 +27,9 @@ async function main() {
             }
         },
         status: 'VERIFIED',
-        // courses: []
+        orgLogo: "https://logos-world.net/wp-content/uploads/2021/11/Udemy-Logo.png",
+        orgName: "Udemy",
+        phone: "9999999999",
     }
   });
 
@@ -40,7 +45,9 @@ async function main() {
             }
         },
         status: 'PENDING',
-        // courses: []
+        orgLogo: "https://1000logos.net/wp-content/uploads/2022/06/Coursera-Logo-2012.png",
+        orgName: "Coursera",
+        phone: "9999999999",
     }
   });
 
@@ -56,8 +63,10 @@ async function main() {
             }
         },
         status: 'REJECTED',
-        rejectionReason: "Invalid backAccNo"
-        // courses: []
+        rejectionReason: "Invalid backAccNo",
+        orgLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Logo_of_Twitter.svg/2491px-Logo_of_Twitter.svg.png",
+        orgName: "Sunbird",
+        phone: "9999999999",
     }
   });
 

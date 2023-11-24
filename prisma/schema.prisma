@@ -52,7 +52,10 @@ model Provider {
   id          String          @id @default(uuid())
   name        String  
   email       String          @unique
-  password    String 
+  password    String
+  orgName     String
+  orgLogo     String
+  phone       String
   paymentInfo Json?
   status      ProviderStatus  @default(PENDING)
   courses     Course[]

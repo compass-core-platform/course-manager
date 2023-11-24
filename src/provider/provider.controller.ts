@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, ParseIntPipe,
 import { ProviderService } from './provider.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignupDto, SignupResponseDto } from './dto/signup.dto';
-import { LoginDto, LoginResponseDto } from './dto/login.dto';
+import { CheckRegDto, LoginDto, LoginResponseDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto, AddCourseResponseDto } from 'src/course/dto/add-course.dto';
 import { FeedbackResponseDto } from './dto/feedback.dto';
@@ -22,6 +22,34 @@ export class ProviderController {
     constructor(
         private providerService: ProviderService,
     ) {}
+
+    @ApiOperation({ summary: 'Check if provider is registered' })
+    @ApiResponse({ status: HttpStatus.OK })
+    @Post()
+    // Check if provider is registered
+    async checkProviderReg(
+        @Body() checkRegDto: CheckRegDto,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Checking provider email`);
+
+            await this.providerService.getProviderFromEmail(checkRegDto.email);
+            
+            this.logger.log(`Successfully found provider`);
+
+            res.status(HttpStatus.OK).json({
+                message: "Provider found"
+            })
+        } catch (err) {
+            this.logger.error(`Failed to check provider`);
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to check provider",
+            });
+        }
+    }
 
     @ApiOperation({ summary: 'create provider account' })
     @ApiResponse({ status: HttpStatus.CREATED, type: SignupResponseDto })

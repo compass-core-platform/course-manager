@@ -1,42 +1,61 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ProviderStatus } from "@prisma/client";
-import { IsEmail, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsEnum, IsObject, IsOptional as IsNotEmpty, IsString, IsUUID, IsOptional, IsUrl, IsPhoneNumber } from 'class-validator';
+import { PaymentInfo } from "src/utils/types";
 
 
 export class ProviderProfileResponse {
     @ApiProperty({required: false})
     @IsUUID()
-    @IsOptional()
+    @IsNotEmpty()
     id: string;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     name: string;
 
     @ApiProperty({format: 'email'})
     @IsEmail()
-    @IsOptional()
+    @IsNotEmpty()
     email: string;
     
     @ApiProperty()
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     password?: string;
 
+    // organisation name
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    orgName: string;
+
+    // organisation logo image link
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsUrl()
+    orgLogo: string;
+
+    // phone number
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsPhoneNumber()
+    phone: string;
 
     @ApiProperty()
     @IsOptional()
-    paymentInfo?: any;
+    @IsObject()
+    paymentInfo: PaymentInfo;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsEnum(ProviderStatus)
     status?: ProviderStatus;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
-    rejectionReason?: string;
+    rejectionReason: string | null;
     // readonly courses: Course[];
 }

@@ -113,7 +113,7 @@ export class CourseService {
     async giveCourseFeedback(courseId: number, userId: string, feedbackDto: FeedbackDto) {
 
         // Validate course
-        await this.getCourse(courseId);
+        const course = await this.getCourse(courseId);
 
         // Find purchase record with consumer Id and course ID and throw error if not found
         // Or if course not complete
@@ -141,6 +141,24 @@ export class CourseService {
             },
             data: {
                 ...feedbackDto
+            }
+        });
+
+        // Change average rating of the course
+        const avgRating = await this.prisma.userCourse.aggregate({
+            where: {
+                courseId
+            },
+            _avg: {
+                rating: true
+            }
+        });
+        await this.prisma.course.update({
+            where: {
+                id: courseId
+            },
+            data: {
+                avgRating: avgRating._avg.rating
             }
         });
     }
