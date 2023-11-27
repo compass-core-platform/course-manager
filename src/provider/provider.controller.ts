@@ -9,7 +9,7 @@ import { FeedbackResponseDto } from './dto/feedback.dto';
 import { CourseTransactionDto } from '../course/dto/transaction.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
-import { CourseResponse } from 'src/course/dto/course-response.dto';
+import { ProviderCourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { getPrismaErrorStatusAndMessage } from 'src/utils/utils';
 import { CourseStatusDto } from 'src/course/dto/course-status.dto';
@@ -302,7 +302,7 @@ export class ProviderController {
     }
 
     @ApiOperation({ summary: 'View courses offered by self' })
-    @ApiResponse({ status: HttpStatus.OK, type: [CourseResponse] })
+    @ApiResponse({ status: HttpStatus.OK, type: [ProviderCourseResponse] })
     @Get("/:providerId/course")
     // View courses offered by self
     async fetchProviderCourses(

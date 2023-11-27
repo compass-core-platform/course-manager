@@ -4,7 +4,6 @@ import { AdminService } from './admin.service';
 import { ProviderProfileResponse } from '../provider/dto/provider-profile-response.dto';
 import { getPrismaErrorStatusAndMessage } from '../utils/utils';
 import { EditProvider } from './dto/edit-provider.dto';
-import { CourseResponse } from '../course/dto/course-response.dto';
 import { TransactionResponse } from './dto/transaction-response.dto';
 import { Response } from 'express';
 import { CreditRequest } from './dto/credit-request.dto';
@@ -14,6 +13,7 @@ import { CourseVerify } from 'src/course/dto/verify-course.dto';
 import { ProviderVerify } from './dto/provider-verify-response.dto';
 import { RejectProviderResponseDto } from './dto/reject-provider-response.dto';
 import { RejectProviderRequestDto } from './dto/reject-provider-request.dto';
+import { AdminCourseResponse } from 'src/course/dto/course-response.dto';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -220,7 +220,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Get all the courses"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse, isArray: true})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse, isArray: true})
     @Get('/courses/')
     async getAllCourses(@Res() res){
         try {
@@ -246,7 +246,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Get a course, given its courseId"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Get('/courses/:courseId')
     async getCourseById (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res
@@ -275,7 +275,7 @@ export class AdminController {
 
 
     @ApiOperation({ summary: "Accept course and assign a cqf_score"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Patch('/courses/:courseId/accept')
     async acceptCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Body() verifyBody: CourseVerify, @Res() res
@@ -303,7 +303,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Reject a course given its courseId"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Patch('/courses/:courseId/reject')
     async rejectCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Body() courseRejectionRequestDto: RejectProviderRequestDto, @Res() res
@@ -331,7 +331,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Remove a course given its courseId"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Delete('/courses/:courseId')
     async removeCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res

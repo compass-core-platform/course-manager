@@ -188,6 +188,7 @@ async function main() {
         author: "Jason Frig",
         startDate: new Date("2023-06-01"),
         endDate: new Date("2023-08-01"),
+        avgRating: 3.9,
         verificationStatus: CourseVerificationStatus.ACCEPTED,
         cqfScore: 10,
     }
@@ -203,6 +204,7 @@ async function main() {
         credits: 160,
         noOfLessons: 100,
         language: ["english", "hindi"],
+        avgRating: 3.5,
         duration: 50,
         competency: {
             "Logical Thinking": ["Level5", "Level4"],

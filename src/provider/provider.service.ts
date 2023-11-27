@@ -11,7 +11,7 @@ import { CourseTransactionDto } from '../course/dto/transaction.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 import { EditProvider } from 'src/admin/dto/edit-provider.dto';
-import { CourseResponse } from 'src/course/dto/course-response.dto';
+import { ProviderCourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { AuthService } from 'src/auth/auth.service';
 import axios from 'axios';
@@ -171,7 +171,7 @@ export class ProviderService {
         await this.courseService.deleteCourse(courseId);
     }
 
-    async getCourses(providerId: string): Promise<CourseResponse[]> {
+    async getCourses(providerId: string): Promise<ProviderCourseResponse[]> {
 
         return this.courseService.getProviderCourses(providerId);
     }

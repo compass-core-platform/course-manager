@@ -54,10 +54,10 @@ export class CourseController {
         try {
             this.logger.log(`Getting information of one course`);
 
-            const course: CourseResponse = await this.courseService.getCourse(courseId);
+            const course = await this.courseService.getCourseByConsumer(courseId);
 
             this.logger.log(`Successfully retrieved the course`);
-
+            
             res.status(HttpStatus.OK).json({
                 message: "fetch successful",
                 data: course

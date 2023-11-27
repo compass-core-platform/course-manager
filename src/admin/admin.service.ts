@@ -7,6 +7,7 @@ import { MockWalletService } from '../mock-wallet/mock-wallet.service';
 import { ProviderService } from 'src/provider/provider.service';
 import { CourseService } from 'src/course/course.service';
 import axios from 'axios';
+import { AdminCourseResponse } from 'src/course/dto/course-response.dto';
 
 @Injectable()
 export class AdminService {
@@ -42,13 +43,13 @@ export class AdminService {
     }
 
     // fetch all courses added onto the marketplace
-    async findAllCourses() : Promise<Course[]> {
+    async findAllCourses() : Promise<AdminCourseResponse[]> {
 
         return this.courseService.fetchAllCourses();
     }
 
     // find course by Id
-    async findCourseById(courseId: number) {
+    async findCourseById(courseId: number): Promise<AdminCourseResponse> {
 
         return this.courseService.getCourse(courseId);
     }
@@ -74,21 +75,21 @@ export class AdminService {
     // get all admin-consumer transactions
     async getTransactions(adminId: string) {
 
+        if(!process.env.WALLET_SERVICE_URL)
+            throw new HttpException("Wallet service URL not defined", 500);
         const walletService = process.env.WALLET_SERVICE_URL;
         const endpoint = `/admin/${adminId}/transactions/consumers`;
         const url = walletService + endpoint;
-        try {
-            const response = await axios.get(url);
-            return response.data;
-    
-        } catch (err) {
-            throw new Error(`Failed to fetch data: ${err.message}`);
-        }
+
+        const response = await axios.get(url);
+        return response.data;
     }
 
     // Add or remove credits to provider wallet
     async addOrRemoveCreditsToProvider(adminId: string, providerId: string, credits: number) {
         const walletService = process.env.WALLET_SERVICE_URL;
+        if(!walletService)
+            throw new HttpException("Wallet service URL not defined", 500);
         let endpoint: string;
         if(credits >= 0) {
             endpoint = `/admin/${adminId}/add-credits`;
@@ -100,12 +101,9 @@ export class AdminService {
             consumerId: providerId,
             credits: credits
         };
-        try {
-            let response = await axios.post(url, requestBody);
-            return response;
-        } catch (err) {
-            throw new Error(`Failed to send add/reduce credits POST request to walletService.`);
-        }
+        let response = await axios.post(url, requestBody);
+        return response;
+
     }
 
     // edit provider profile information
@@ -136,7 +134,10 @@ export class AdminService {
 
     // Get the number of credits in a provider wallet
     async getProviderWalletCredits(providerId: string) {
+        
         const url = process.env.WALLET_SERVICE_URL;
+        if(!url)
+            throw new HttpException("Wallet service URL not defined", 500);
         const endpoint = url + `/api/providers/${providerId}/credits`;
         const resp = await axios.get(endpoint);
         return resp.data.credits;

@@ -2,10 +2,10 @@ import { NotFoundException, BadRequestException, Injectable, NotAcceptableExcept
 import { PrismaService } from "../prisma/prisma.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { AddCourseDto } from "./dto/add-course.dto";
-import { Course, CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
+import { CourseProgressStatus, CourseVerificationStatus } from "@prisma/client";
 import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
-import { AdminCourseResponse, CourseResponse } from "src/course/dto/course-response.dto";
+import { AdminCourseResponse, CourseResponse, ProviderCourseResponse } from "src/course/dto/course-response.dto";
 import { CourseTransactionDto } from "./dto/transaction.dto";
 import { CourseStatusDto } from "./dto/course-status.dto";
 
@@ -43,7 +43,10 @@ export class CourseService {
                 }]
             }
         });
-        return courses;
+        return courses.map((c) => {
+            const {cqfScore, impactScore, verificationStatus, rejectionReason, ...clone} = c;
+            return clone;
+        });
     }
 
     async addCourse(providerId: string, addCourseDto: AddCourseDto) {
@@ -60,7 +63,7 @@ export class CourseService {
     async addPurchaseRecord(courseId: number, userId: string) {
 
         // Check if course already purchased
-        const record = this.prisma.userCourse.findFirst({
+        const record = await this.prisma.userCourse.findFirst({
             where: { userId: userId, courseId: courseId }
         });
         if(record != null)
@@ -114,6 +117,21 @@ export class CourseService {
             throw new NotFoundException("Course does not exist");
         
         return course;
+    }
+
+    async getCourseByConsumer(courseId: number): Promise<CourseResponse> {
+
+        // Find course by ID and throw error if not found
+        const course = await this.prisma.course.findUnique({
+            where: {
+                id: courseId
+            }
+        })
+        if(!course)
+            throw new NotFoundException("Course does not exist");
+        
+        const {cqfScore, impactScore, verificationStatus, rejectionReason, ...clone} = course;
+        return clone;
     }
 
     async giveCourseFeedback(courseId: number, userId: string, feedbackDto: FeedbackDto) {
@@ -179,7 +197,7 @@ export class CourseService {
         })
     }
 
-    async getProviderCourses(providerId: string): Promise<CourseResponse[]> {
+    async getProviderCourses(providerId: string): Promise<ProviderCourseResponse[]> {
 
         // Get all courses added by a single provider
         const courses = await this.prisma.course.findMany({
@@ -218,7 +236,7 @@ export class CourseService {
         })
     }
 
-    async fetchAllCourses() : Promise<Course[]> {
+    async fetchAllCourses() : Promise<AdminCourseResponse[]> {
         
         // Fetch all courses
         return this.prisma.course.findMany();
