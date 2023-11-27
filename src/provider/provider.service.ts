@@ -144,7 +144,7 @@ export class ProviderService {
         });
     }
 
-    async addNewCourse(providerId: string, addCourseDto: AddCourseDto) {
+    async addNewCourse(providerId: string, addCourseDto: AddCourseDto): Promise<ProviderCourseResponse> {
 
         // Fetch provider
         const provider = await this.getProvider(providerId);
@@ -154,7 +154,8 @@ export class ProviderService {
             throw new UnauthorizedException("Provider account is not verified");
 
         // Forward to course service
-        return this.courseService.addCourse(providerId, addCourseDto);
+        const {cqfScore, impactScore, ...clone} = await this.courseService.addCourse(providerId, addCourseDto);
+        return clone;
     }
 
     async removeCourse(providerId: string, courseId: number) {

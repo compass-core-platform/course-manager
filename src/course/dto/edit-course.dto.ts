@@ -65,9 +65,15 @@ export class EditCourseDto {
     @IsOptional()
     author?: string;
 
-    // course availability time
+    // course start date
     @ApiProperty()
     @IsDate()
     @IsOptional()
-    availabilityTime?: Date;
+    startDate?: Date;
+
+    // course end date
+    @ApiProperty()
+    @IsDate()
+    @IsOptional()
+    endDate?: Date;
 }

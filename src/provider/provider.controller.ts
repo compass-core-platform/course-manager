@@ -4,7 +4,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignupDto, SignupResponseDto } from './dto/signup.dto';
 import { CheckRegDto, CheckRegResponseDto, LoginDto, LoginResponseDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { AddCourseDto, AddCourseResponseDto } from 'src/course/dto/add-course.dto';
+import { AddCourseDto } from 'src/course/dto/add-course.dto';
 import { FeedbackResponseDto } from './dto/feedback.dto';
 import { CourseTransactionDto } from '../course/dto/transaction.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
@@ -240,7 +240,7 @@ export class ProviderController {
     }
     
     @ApiOperation({ summary: 'add new course' })
-    @ApiResponse({ status: HttpStatus.CREATED, type: AddCourseResponseDto })
+    @ApiResponse({ status: HttpStatus.CREATED, type: ProviderCourseResponse })
     @Post("/:providerId/course")
     // add new course
     async addCourse(
