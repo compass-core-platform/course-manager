@@ -4,6 +4,7 @@ import { CourseService } from "./course.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { CourseResponse } from "./dto/course-response.dto";
 import { getPrismaErrorStatusAndMessage } from "src/utils/utils";
+import { FilterCourseDTO } from "./dto/filter-course.dto";
 
 @Controller('course')
 @ApiTags('course')
@@ -130,6 +131,36 @@ export class CourseController {
             res.status(statusCode).json({
                 statusCode, 
                 message: errorMessage || "Failed to record the feedback",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: 'Filter for verified Courses' })
+    @ApiResponse({ status: HttpStatus.OK })
+    @Post("/verifyFilter")
+    // Filter for admin verified courses
+    async verifiedFilter(
+        @Body() courses: FilterCourseDTO[],
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Filtering for courses verified by admin`);
+
+            const filteredCourses: FilterCourseDTO[] = await this.courseService.filterVerified(courses);
+
+            this.logger.log(`Successfully filtered the courses`);
+
+            res.status(HttpStatus.OK).json({
+                message: "Filtering successfull",
+                data: filteredCourses
+            });
+        } catch (err) {
+            this.logger.error(`Failed to filter the courses`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to filter the courses",
             });
         }
     }

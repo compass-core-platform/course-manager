@@ -7,6 +7,7 @@ import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
 import { AdminCourseResponse, CourseResponse } from "src/course/dto/course-response.dto";
 import { CourseTransactionDto } from "./dto/transaction.dto";
+import { FilterCourseDTO } from "./dto/filter-course.dto";
 
 @Injectable()
 export class CourseService {
@@ -279,5 +280,22 @@ export class CourseService {
                 income: c.credits * c._count.userCourses
             }
         });
+    }
+
+    async filterVerified(courses: FilterCourseDTO[]) {
+
+        return courses.filter(async (course) => {
+            const exists = await this.prisma.course.count({
+                where: {
+                    provider: {
+                        name: course.provider_name
+                    },
+                    title: course.title,
+                    verificationStatus: CourseVerificationStatus.ACCEPTED
+                }
+            });
+            return exists !== 0;
+        });
+
     }
 }
