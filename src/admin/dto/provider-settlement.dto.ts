@@ -3,7 +3,7 @@ import { IsNumber, IsOptional, IsString, IsUUID, IsUrl } from 'class-validator';
 
 
 export class ProviderSettlementDto {
-    @ApiProperty({required: false})
+    @ApiProperty()
     @IsUUID()
     id: string;
 

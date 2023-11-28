@@ -25,9 +25,15 @@ export class PurchaseDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    description: string;
+    transactionDescription: string;
 }
 
 export class PurchaseResponseDto {
     readonly walletTransactionId: number;
+}
+
+export class WalletPurchaseDto {
+    readonly providerId: string;
+    readonly credits: number;
+    readonly description: string;
 }

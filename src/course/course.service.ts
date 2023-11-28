@@ -9,7 +9,7 @@ import { AdminCourseResponse, CourseResponse, ProviderCourseResponse } from "src
 import { CourseTransactionDto } from "./dto/transaction.dto";
 import { CourseStatusDto } from "./dto/course-status.dto";
 import axios from "axios";
-import { PurchaseDto } from "./dto/purchase.dto";
+import { PurchaseDto, WalletPurchaseDto } from "./dto/purchase.dto";
 
 @Injectable()
 export class CourseService {
@@ -87,8 +87,11 @@ export class CourseService {
         // forward to wallet service for transaction
         try {
             const endpoint = `/api/consumers/${purchaseDto.consumerId}/purchase`;
-
-            const {consumerId, ...walletPurchaseBody } = purchaseDto;
+            const walletPurchaseBody: WalletPurchaseDto = {
+                providerId: purchaseDto.providerId,
+                credits: purchaseDto.credits,
+                description: purchaseDto.transactionDescription
+            }
             const walletResponse = await axios.post(process.env.WALLET_SERVICE_URL + endpoint, walletPurchaseBody);
             return walletResponse.data.data.transaction.transactionId;
         } catch (err) {

@@ -50,12 +50,15 @@ export class AdminController {
 
     @ApiOperation({ summary: "Get all providers for settlement" })
     @ApiResponse({ status: HttpStatus.OK, type: ProviderSettlementDto, isArray: true})
-    @Get('/providers/settlements')
-    async getAllProvidersForSettlement(@Res() res : Response) {
+    @Get('/:adminId/providers/settlements')
+    async getAllProvidersForSettlement(
+        @Param("adminId", ParseUUIDPipe) adminId: string,
+        @Res() res : Response
+        ) {
         try {
             this.logger.log(`Getting information of all the providers for settlement`);
 
-            const providers = await this.adminService.getAllProviderInfoForSettlement();
+            const providers = await this.adminService.getAllProviderInfoForSettlement(adminId);
 
             this.logger.log(`Successfully retrieved all the provider info for making settlement`);
 
@@ -76,7 +79,7 @@ export class AdminController {
 
     @ApiOperation({ summary: "Settle credits for a provider" })
     @ApiResponse({ status: HttpStatus.OK, type: json})
-    @Post('/:adminId/providers/settlements/settle')
+    @Post('/:adminId/providers/settlements')
     async settleProvider(@Param("adminId", ParseUUIDPipe) adminId: string, @Body() settleDto: ProviderSettlementDto, @Res() res : Response) {
         try {
             this.logger.log(`Settling the credits for the given provider`);

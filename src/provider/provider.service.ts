@@ -16,6 +16,7 @@ import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { AuthService } from 'src/auth/auth.service';
 import axios from 'axios';
 import { CourseStatusDto } from 'src/course/dto/course-status.dto';
+import { ProviderSettlementDto } from 'src/admin/dto/provider-settlement.dto';
 
 
 @Injectable()
@@ -261,6 +262,44 @@ export class ProviderService {
                 phone: p.phone,
             }
         })
+    }
+
+    async fetchProvidersForSettlement(): Promise<ProviderSettlementDto[]> {
+
+        const providers = await this.prisma.provider.findMany({
+            select: {
+                id: true,
+                orgLogo: true,
+                orgName: true,
+                courses: {
+                    select: {
+                        userCourses: {
+                            select: {
+                                userId: true
+                            }
+                        }
+                    },
+                }
+            }
+        });
+        const results = providers.map(async (provider): Promise<ProviderSettlementDto> => {
+            const providerId = provider.id;
+            const courses = provider.courses;
+            const activeUsers = new Set();
+            courses.forEach((c) => {
+                c.userCourses.forEach((uc) => {
+                    activeUsers.add(uc.userId);
+                })
+            })
+            return {
+                id: providerId,
+                name: provider.orgName,
+                imgLink: provider.orgLogo,
+                totalCourses: courses.length,
+                activeUsers: activeUsers.size
+            }
+        })
+        return Promise.all(results);
     }
 
     async verifyProvider(providerId: string) {
