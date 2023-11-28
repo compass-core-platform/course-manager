@@ -5,6 +5,7 @@ async function main() {
 
   const response = await prisma.provider.create({
     data: {
+        id: "123e4567-e89b-42d3-a456-556642440010",
         name: "Vijay Salgaonkar",
         email: "vijaysalgaonkar@gmail.com",
         password: "9d209aacaed4088d68c41bd8dfb20de39cbd8339",
@@ -17,6 +18,7 @@ async function main() {
 
   const provider1 = await prisma.provider.create({
     data: {
+      id: "123e4567-e89b-42d3-a456-556642440011",
         name: "udemy",
         email: "udemyorg@gmail.in",
         password: "Udemy@9812",
@@ -35,6 +37,7 @@ async function main() {
 
   const provider2 = await prisma.provider.create({
     data: {
+        id: "123e4567-e89b-42d3-a456-556642440012",
         name: "coursera",
         email: "coursera@gmail.in",
         password: "Coursera@999",
@@ -53,6 +56,7 @@ async function main() {
 
   const provider3 = await prisma.provider.create({
     data: {
+        id: "123e4567-e89b-42d3-a456-556642440013",
         name: "lern",
         email: "lern@gmail.in",
         password: "lern@999",
