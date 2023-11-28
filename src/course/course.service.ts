@@ -1,13 +1,15 @@
-import { NotFoundException, BadRequestException, Injectable, NotAcceptableException } from "@nestjs/common";
+import { NotFoundException, BadRequestException, Injectable, NotAcceptableException, HttpException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { AddCourseDto } from "./dto/add-course.dto";
-import { CourseProgressStatus, CourseVerificationStatus } from "@prisma/client";
+import { CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
 import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
 import { AdminCourseResponse, CourseResponse, ProviderCourseResponse } from "src/course/dto/course-response.dto";
 import { CourseTransactionDto } from "./dto/transaction.dto";
 import { CourseStatusDto } from "./dto/course-status.dto";
+import axios from "axios";
+import { PurchaseDto } from "./dto/purchase.dto";
 
 @Injectable()
 export class CourseService {
@@ -19,7 +21,7 @@ export class CourseService {
 
         // Searches for the courses available in the DB that match or contain the input search string
         // in their title, author, description or competency
-        const courses = await this.prisma.course.findMany({
+        let courses = await this.prisma.course.findMany({
             where: {
                 OR: [{
                     title: {
@@ -43,6 +45,12 @@ export class CourseService {
                 }]
             }
         });
+        courses = courses.filter((c) => 
+            c.verificationStatus == CourseVerificationStatus.ACCEPTED 
+            && c.status == CourseStatus.UNARCHIVED
+            && (c.startDate ? c.startDate <= new Date(): true)
+            && (c.endDate ? c.endDate <= new Date(): true)
+        );
         return courses.map((c) => {
             const {cqfScore, impactScore, verificationStatus, rejectionReason, ...clone} = c;
             return clone;
@@ -60,22 +68,41 @@ export class CourseService {
         });
     }
 
-    async addPurchaseRecord(courseId: number, userId: string) {
+    async addPurchaseRecord(courseId: number, purchaseDto: PurchaseDto) {
 
         // Check if course already purchased
         const record = await this.prisma.userCourse.findFirst({
-            where: { userId: userId, courseId: courseId }
+            where: { userId: purchaseDto.consumerId, courseId: courseId }
         });
         if(record != null)
             throw new BadRequestException("Course already purchased by the user");
 
         // create new record for purchase
-        return await this.prisma.userCourse.create({
+        await this.prisma.userCourse.create({
             data: {
-                userId,
+                userId: purchaseDto.consumerId,
                 courseId,
             }
         });
+        // forward to wallet service for transaction
+        try {
+            const endpoint = `/api/consumers/${purchaseDto.consumerId}/purchase`;
+
+            const {consumerId, ...walletPurchaseBody } = purchaseDto;
+            const walletResponse = await axios.post(process.env.WALLET_SERVICE_URL + endpoint, walletPurchaseBody);
+            return walletResponse.data.data.transaction.transactionId;
+        } catch (err) {
+            // if transaction failed, delete the record
+            await this.prisma.userCourse.delete({
+                where: {
+                    userId_courseId: {
+                        userId: purchaseDto.consumerId,
+                        courseId
+                    }
+                }
+            });
+            throw new HttpException(err.response.data, err.response.status | err.status)
+        }
     }
 
     async changeStatus(courseId: number, providerId: string, courseStatusDto: CourseStatusDto) {
@@ -122,13 +149,14 @@ export class CourseService {
     async getCourseByConsumer(courseId: number): Promise<CourseResponse> {
 
         // Find course by ID and throw error if not found
-        const course = await this.prisma.course.findUnique({
-            where: {
-                id: courseId
-            }
-        })
-        if(!course)
-            throw new NotFoundException("Course does not exist");
+        const course = await this.getCourse(courseId);
+
+        if(course.verificationStatus != CourseVerificationStatus.ACCEPTED)
+            throw new BadRequestException("Course is not accepted");
+        if(course.status != CourseStatus.UNARCHIVED)
+            throw new BadRequestException("Course is archived");
+        if((course.startDate && course.startDate > new Date()) || (course.endDate && course.endDate < new Date()))
+            throw new BadRequestException("Course is not available at the moment");
         
         const {cqfScore, impactScore, verificationStatus, rejectionReason, ...clone} = course;
         return clone;

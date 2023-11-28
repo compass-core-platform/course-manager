@@ -4,6 +4,7 @@ import { CourseService } from "./course.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { CourseResponse } from "./dto/course-response.dto";
 import { getPrismaErrorStatusAndMessage } from "src/utils/utils";
+import { PurchaseDto, PurchaseResponseDto } from "./dto/purchase.dto";
 
 @Controller('course')
 @ApiTags('course')
@@ -74,23 +75,27 @@ export class CourseController {
     }
 
     @ApiOperation({ summary: 'Confirmation of user purchase of a course' })
-    @ApiResponse({ status: HttpStatus.OK })
-    @Post("/:courseId/purchase/:userId")
+    @ApiResponse({ status: HttpStatus.OK, type: PurchaseResponseDto })
+    @Post("/:courseId/purchase")
     // Confirmation of user purchase of a course
     async purchaseCourse(
         @Param("courseId", ParseIntPipe) courseId: number,
-        @Param("userId", ParseUUIDPipe) userId: string,
+        @Body() purchaseDto: PurchaseDto,
+
         @Res() res
     ) {
         try {
             this.logger.log(`Recording the user purchase of the course`);
 
-            await this.courseService.addPurchaseRecord(courseId, userId);
+            const transactionId = await this.courseService.addPurchaseRecord(courseId, purchaseDto);
 
             this.logger.log(`Successfully recorded the purchase`);
 
             res.status(HttpStatus.OK).json({
-                message: "purchase successful"
+                message: "purchase successful",
+                data: {
+                    walletTransactionId: transactionId
+                }
             })
         } catch (err) {
             this.logger.error(`Failed to record the purchase`);

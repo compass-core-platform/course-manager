@@ -16,12 +16,6 @@ export class UpdateProfileDto {
     @IsOptional()
     email?: string
 
-    // password
-    @ApiProperty()
-    @IsString()
-    @IsOptional()
-    password?: string
-
     // organisation name
     @ApiProperty()
     @IsString()
