@@ -43,8 +43,16 @@ export class CourseService {
                         string_contains: searchInput
                     }
                 }]
+            },
+            include: {
+                provider: {
+                    select: {
+                        orgName: true,
+                    }
+                }
             }
         });
+        // Filter out the courses that are not accepted, archived or not available
         courses = courses.filter((c) => 
             c.verificationStatus == CourseVerificationStatus.ACCEPTED 
             && c.status == CourseStatus.UNARCHIVED
@@ -52,8 +60,12 @@ export class CourseService {
             && (c.endDate ? c.endDate <= new Date(): true)
         );
         return courses.map((c) => {
-            const {cqfScore, impactScore, verificationStatus, rejectionReason, ...clone} = c;
-            return clone;
+            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, ...clone} = c;
+            const courseResponse: CourseResponse = {
+                ...clone,
+                providerName: provider.orgName
+            }
+            return courseResponse;
         });
     }
 
@@ -141,12 +153,24 @@ export class CourseService {
         const course = await this.prisma.course.findUnique({
             where: {
                 id: courseId
+            },
+            include: {
+                provider: {
+                    select: {
+                        orgName: true,
+                    }
+                }
             }
         })
         if(!course)
             throw new NotFoundException("Course does not exist");
-        
-        return course;
+
+        // let courseResponse: AdminCourseResponse
+        const { provider, ...courseResponse } = course;
+        return {
+            ...courseResponse,
+            providerName: provider.orgName
+        }
     }
 
     async getNumOfCourseUsers(courseId: number) {

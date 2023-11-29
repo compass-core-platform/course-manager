@@ -22,6 +22,7 @@ export class CourseResponse {
     readonly createdAt: Date;
     readonly updatedAt: Date;
     readonly numOfUsers?: number;
+    readonly providerName?: string;
 }
 
 export class ProviderCourseResponse extends CourseResponse {
