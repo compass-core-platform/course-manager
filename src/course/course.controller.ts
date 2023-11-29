@@ -4,7 +4,7 @@ import { CourseService } from "./course.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { CourseResponse } from "./dto/course-response.dto";
 import { getPrismaErrorStatusAndMessage } from "src/utils/utils";
-import { FilterCourseDTO } from "./dto/filter-course.dto";
+import { SearchResponseDTO } from "./dto/search-response.dto";
 
 @Controller('course')
 @ApiTags('course')
@@ -140,13 +140,13 @@ export class CourseController {
     @Post("/verifyFilter")
     // Filter for admin verified courses
     async verifiedFilter(
-        @Body() courses: FilterCourseDTO[],
+        @Body() courses: SearchResponseDTO[],
         @Res() res
     ) {
         try {
             this.logger.log(`Filtering for courses verified by admin`);
 
-            const filteredCourses: FilterCourseDTO[] = await this.courseService.filterVerified(courses);
+            const filteredCourses: SearchResponseDTO[] = await this.courseService.filterVerified(courses);
 
             this.logger.log(`Successfully filtered the courses`);
 

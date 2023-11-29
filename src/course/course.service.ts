@@ -7,7 +7,7 @@ import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
 import { AdminCourseResponse, CourseResponse } from "src/course/dto/course-response.dto";
 import { CourseTransactionDto } from "./dto/transaction.dto";
-import { FilterCourseDTO } from "./dto/filter-course.dto";
+import { SearchResponseDTO } from "./dto/search-response.dto";
 
 @Injectable()
 export class CourseService {
@@ -15,7 +15,7 @@ export class CourseService {
         private prisma: PrismaService,
     ) {}
 
-    async searchCourses(searchInput: string): Promise<CourseResponse[]> {
+    async searchCourses(searchInput: string): Promise<SearchResponseDTO[]> {
 
         // Searches for the courses available in the DB that match or contain the input search string
         // in their title, author, description or competency
@@ -43,7 +43,38 @@ export class CourseService {
                 }]
             }
         });
-        return courses;
+
+        const respPromises = courses.map(async (course) => {
+            const provider = await this.prisma.provider.findFirst({
+                where: {
+                    id: course.providerId
+                }
+            });
+            const noOfPurchases = await this.prisma.userCourse.count({
+                where: {
+                    courseId: course.id
+                }
+            });
+            const providerName = provider?.name || "null";
+            return {
+                id: course.id.toString(),
+                title: course.title,
+                long_desc: course.description,
+                provider_id: course.providerId,
+                provider_name: providerName,
+                price: course.credits.toString(),
+                languages: course.language,
+                competency: course.competency,
+                imgUrl: course.imgLink,
+                rating: course.avgRating?.toString() || "0",
+                startTime: new Date().toISOString(), // need to change
+                endTime: new Date().toISOString(), // need to change
+                noOfPurchases: noOfPurchases.toString()
+            }
+        });
+        
+        const resp = await Promise.all(respPromises);
+        return resp;
     }
 
     async addCourse(providerId: string, addCourseDto: AddCourseDto) {
@@ -282,7 +313,7 @@ export class CourseService {
         });
     }
 
-    async filterVerified(courses: FilterCourseDTO[]) {
+    async filterVerified(courses: SearchResponseDTO[]) {
 
         return courses.filter(async (course) => {
             const exists = await this.prisma.course.count({

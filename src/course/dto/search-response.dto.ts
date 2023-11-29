@@ -1,4 +1,6 @@
-export class FilterCourseDTO {
+import { JsonValue } from "@prisma/client/runtime/library";
+
+export class SearchResponseDTO {
     readonly id: string;
     readonly title: string;
     readonly long_desc: string;
@@ -6,8 +8,10 @@ export class FilterCourseDTO {
     readonly provider_id: string;
     readonly price: string;
     readonly languages: string[];
+    readonly competency: JsonValue;
     readonly imgUrl: string;
     readonly rating: string;
-    readonly duration: string;
-    readonly noOfPurchases: number;
+    readonly startTime: string;
+    readonly endTime: string;
+    readonly noOfPurchases: string;
 }
