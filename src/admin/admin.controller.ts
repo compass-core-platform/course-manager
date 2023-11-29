@@ -139,16 +139,8 @@ export class AdminController {
     ){
         try {
             this.logger.log(`Getting provider information for id ${providerId}`);
-            
-            const updatedProviderInfo = {
-                id: providerId,
-                name: providerDto.name,
-                email: providerDto.email,
-                password: providerDto.password,
-                status: providerDto.status
-            }
 
-            const updatedProfile = await this.adminService.editProviderProfile(updatedProviderInfo);
+            const updatedProfile = await this.adminService.editProviderProfile(providerDto);
 
             this.logger.log(`Successfully retrieved the provider profile information`);
 

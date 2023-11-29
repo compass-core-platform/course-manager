@@ -108,7 +108,8 @@ export class ProviderService {
         if(!provider)
             throw new NotFoundException("provider does not exist");
         
-        return provider;
+        const { password, ...clone } = provider;
+        return clone;
     }
 
     async checkProviderFromEmail(email: string): Promise<CheckRegResponseDto> {

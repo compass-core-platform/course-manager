@@ -9,6 +9,7 @@ import { CourseService } from 'src/course/course.service';
 import axios from 'axios';
 import { AdminCourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderSettlementDto } from './dto/provider-settlement.dto';
+import { ProviderProfileResponse } from 'src/provider/dto/provider-profile-response.dto';
 
 @Injectable()
 export class AdminService {
@@ -38,7 +39,7 @@ export class AdminService {
     }
 
     // fetch provider with the given id
-    async findProviderById(providerId: string): Promise<Provider> {
+    async findProviderById(providerId: string): Promise<ProviderProfileResponse> {
 
         return this.providerService.getProvider(providerId);
     }
