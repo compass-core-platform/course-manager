@@ -84,6 +84,8 @@ model Course {
   cqfScore            Int?
   impactScore         Float?
   rejectionReason     String?
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
   provider            Provider                  @relation(fields: [providerId], references: [id])
   userCourses         UserCourse[]              
 }

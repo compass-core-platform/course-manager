@@ -28,7 +28,7 @@ async function main() {
 
             }
         },
-        status: 'VERIFIED',
+        status: ProviderStatus.VERIFIED,
         orgLogo: "https://logos-world.net/wp-content/uploads/2021/11/Udemy-Logo.png",
         orgName: "Udemy",
         phone: "9999999999",
@@ -47,7 +47,7 @@ async function main() {
 
             }
         },
-        status: 'PENDING',
+        status: ProviderStatus.PENDING,
         orgLogo: "https://1000logos.net/wp-content/uploads/2022/06/Coursera-Logo-2012.png",
         orgName: "Coursera",
         phone: "9999999999",
@@ -66,7 +66,7 @@ async function main() {
 
             }
         },
-        status: 'REJECTED',
+        status: ProviderStatus.REJECTED,
         rejectionReason: "Invalid backAccNo",
         orgLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Logo_of_Twitter.svg/2491px-Logo_of_Twitter.svg.png",
         orgName: "Sunbird",
@@ -92,7 +92,8 @@ async function main() {
         },
         author: "Stephen Grider",
         startDate: new Date("2024-05-01").toISOString(),
-        endDate: new Date("2024-07-01").toISOString()
+        endDate: new Date("2024-07-01").toISOString(),
+        verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
         providerId: provider1.id,
         title: "Graphic Design Masterclass",

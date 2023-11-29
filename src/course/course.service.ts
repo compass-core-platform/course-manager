@@ -149,10 +149,20 @@ export class CourseService {
         return course;
     }
 
+    async getNumOfCourseUsers(courseId: number) {
+
+        return this.prisma.userCourse.count({
+            where: {
+                courseId
+            }
+        })
+    }
+
     async getCourseByConsumer(courseId: number): Promise<CourseResponse> {
 
         // Find course by ID and throw error if not found
         const course = await this.getCourse(courseId);
+        const numOfUsers = await this.getNumOfCourseUsers(courseId);
 
         if(course.verificationStatus != CourseVerificationStatus.ACCEPTED)
             throw new BadRequestException("Course is not accepted");
@@ -162,7 +172,10 @@ export class CourseService {
             throw new BadRequestException("Course is not available at the moment");
         
         const {cqfScore, impactScore, verificationStatus, rejectionReason, ...clone} = course;
-        return clone;
+        return {
+            ...clone,
+            numOfUsers
+        }
     }
 
     async giveCourseFeedback(courseId: number, userId: string, feedbackDto: FeedbackDto) {

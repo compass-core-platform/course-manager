@@ -19,6 +19,9 @@ export class CourseResponse {
     readonly status: CourseStatus;
     readonly startDate: Date | null;
     readonly endDate: Date | null;
+    readonly createdAt: Date;
+    readonly updatedAt: Date;
+    readonly numOfUsers?: number;
 }
 
 export class ProviderCourseResponse extends CourseResponse {
