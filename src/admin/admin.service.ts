@@ -56,7 +56,7 @@ export class AdminService {
     }
 
     // accept a course along with the cqf score
-    async acceptCourse(courseId: number, cqf_score: number) {
+    async acceptCourse(courseId: number, cqf_score?: number) {
         
         return this.courseService.acceptCourse(courseId, cqf_score);
     }

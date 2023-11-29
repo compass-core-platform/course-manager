@@ -273,7 +273,7 @@ export class CourseService {
         return this.prisma.course.findMany();
     }
 
-    async acceptCourse(courseId: number, cqf_score: number) {
+    async acceptCourse(courseId: number, cqf_score?: number) {
 
         // Validate course
         let course = await this.getCourse(courseId);
