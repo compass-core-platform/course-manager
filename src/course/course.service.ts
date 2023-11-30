@@ -82,6 +82,9 @@ export class CourseService {
 
     async addPurchaseRecord(courseId: number, purchaseDto: PurchaseDto) {
 
+        // Validate course
+        const course = await this.getCourse(courseId);
+        
         // Check if course already purchased
         const record = await this.prisma.userCourse.findFirst({
             where: { userId: purchaseDto.consumerId, courseId: courseId }
@@ -100,8 +103,8 @@ export class CourseService {
         try {
             const endpoint = `/api/consumers/${purchaseDto.consumerId}/purchase`;
             const walletPurchaseBody: WalletPurchaseDto = {
-                providerId: purchaseDto.providerId,
-                credits: purchaseDto.credits,
+                providerId: course.providerId,
+                credits: course.credits,
                 description: purchaseDto.transactionDescription
             }
             const walletResponse = await axios.post(process.env.WALLET_SERVICE_URL + endpoint, walletPurchaseBody);
