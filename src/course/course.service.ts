@@ -307,7 +307,22 @@ export class CourseService {
     async fetchAllCourses() : Promise<AdminCourseResponse[]> {
         
         // Fetch all courses
-        return this.prisma.course.findMany();
+        const courses = await this.prisma.course.findMany({
+            include: {
+                provider: {
+                    select: {
+                        orgName: true,
+                    }
+                }
+            }
+        });
+        return courses.map((c) => {
+            const { provider, ...clone } = c;
+            return {
+                ...clone,
+                providerName: provider.orgName
+            }
+        });
     }
 
     async acceptCourse(courseId: number, cqf_score?: number) {

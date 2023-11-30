@@ -12,7 +12,6 @@ export class CourseResponse {
     readonly credits: number;
     readonly noOfLessons: number | null;
     readonly language: string[];
-    readonly duration: number;
     readonly competency: JsonValue;
     readonly author: string;
     readonly avgRating: number | null;

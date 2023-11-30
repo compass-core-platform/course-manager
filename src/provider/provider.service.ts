@@ -261,6 +261,8 @@ export class ProviderService {
                 orgLogo: p.orgLogo,
                 orgName: p.orgName,
                 phone: p.phone,
+                createdAt: p.createdAt,
+                updatedAt: p.updatedAt
             }
         })
     }
@@ -315,7 +317,10 @@ export class ProviderService {
         // Update the status in database
         return this.prisma.provider.update({ 
             where:    {id: providerId},
-            data:  {status: ProviderStatus.VERIFIED} 
+            data:  {
+                status: ProviderStatus.VERIFIED,
+                updatedAt: new Date()
+            } 
         });
     }
 
@@ -333,7 +338,8 @@ export class ProviderService {
             where: {id: providerId},
             data: {
                 status: ProviderStatus.REJECTED,
-                rejectionReason: rejectionReason
+                rejectionReason: rejectionReason,
+                updatedAt: new Date()
             }
         });
     }
