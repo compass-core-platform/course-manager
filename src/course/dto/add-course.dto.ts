@@ -48,13 +48,6 @@ export class AddCourseDto {
     @ArrayNotEmpty()
     language: string[];
 
-    // course duration
-    @ApiProperty()
-    @IsNotEmpty()
-    @Min(0)
-    @IsNumber()
-    duration: number;
-
     // competency
     @ApiProperty()
     @IsNotEmpty()

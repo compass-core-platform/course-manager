@@ -47,13 +47,6 @@ export class EditCourseDto {
     @IsOptional()
     language?: string[];
 
-    // course duration
-    @ApiProperty()
-    @Min(0)
-    @IsInt()
-    @IsOptional()
-    duration?: number;
-
     // competency
     @ApiProperty()
     @IsOptional()
