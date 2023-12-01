@@ -84,6 +84,13 @@ export class CourseService {
 
         // Validate course
         const course = await this.getCourse(courseId);
+
+        if(course.verificationStatus != CourseVerificationStatus.ACCEPTED)
+            throw new BadRequestException("Course is not accepted");
+        if(course.status == CourseStatus.ARCHIVED)
+            throw new BadRequestException("Course is archived");
+        if((course.startDate && course.startDate > new Date()) || (course.endDate && course.endDate < new Date()))
+            throw new BadRequestException("Course is not available at the moment");
         
         // Check if course already purchased
         const record = await this.prisma.userCourse.findFirst({
@@ -91,6 +98,7 @@ export class CourseService {
         });
         if(record != null)
             throw new BadRequestException("Course already purchased by the user");
+
 
         // create new record for purchase
         await this.prisma.userCourse.create({

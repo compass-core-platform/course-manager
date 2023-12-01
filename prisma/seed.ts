@@ -84,7 +84,6 @@ async function main() {
         credits: 4,
         noOfLessons: 3,
         language: ["en"],
-        duration: 4,
         competency: {
           "API Development": ["Level1", "Level2"],
           "Typescript": ["Level1"],
@@ -103,7 +102,6 @@ async function main() {
         credits: 5,
         noOfLessons: 3,
         language: ["en"],
-        duration: 4,
         competency: {
           "Photoshop": ["Level2", "Level3"],
           "Understanding brand": ["Level1"]
@@ -120,7 +118,6 @@ async function main() {
         credits: 2,
         noOfLessons: 3,
         language: ["en"],
-        duration: 4,
         competency: {
           "Statistics": ["Level1"],
           "Machine Learning": ["Level1", "Level2", "Level3"],
@@ -136,7 +133,6 @@ async function main() {
         credits: 4,
         noOfLessons: 3,
         language: ["en"],
-        duration: 4,
         competency: {
           "Excel": ["Level1", "Level2", "Level3", "Level4"]
         },
@@ -184,7 +180,6 @@ async function main() {
         credits: 120,
         noOfLessons: 120,
         language: ["english", "hindi"],
-        duration: 48,
         competency: {
             "Docker": ["Level1", "Level3"],
             "Kubernetes": ["Level1"],
@@ -210,7 +205,6 @@ async function main() {
         noOfLessons: 100,
         language: ["english", "hindi"],
         avgRating: 3.5,
-        duration: 50,
         competency: {
             "Logical Thinking": ["Level5", "Level4"],
             "Python": [ "Level1", "Level2" ]
@@ -230,7 +224,6 @@ async function main() {
         credits: 160,
         noOfLessons: 100,
         language: ["english", "hindi"],
-        duration: 50,
         competency: {
             "Compiler Design": ["Level2", "Level3"],
             "LLVM": [ "Level4" ]
