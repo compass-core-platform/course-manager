@@ -45,7 +45,6 @@ model Admin {
   name      String  
   email     String  @unique
   password  String 
-  walletId  Int     @unique
 }
 
 model Provider {

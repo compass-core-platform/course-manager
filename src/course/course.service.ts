@@ -57,7 +57,7 @@ export class CourseService {
             c.verificationStatus == CourseVerificationStatus.ACCEPTED 
             && c.status == CourseStatus.UNARCHIVED
             && (c.startDate ? c.startDate <= new Date(): true)
-            && (c.endDate ? c.endDate <= new Date(): true)
+            && (c.endDate ? c.endDate >= new Date(): true)
         );
         return courses.map((c) => {
             let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, ...clone} = c;

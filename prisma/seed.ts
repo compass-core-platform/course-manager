@@ -11,7 +11,7 @@ async function main() {
         password: "9d209aacaed4088d68c41bd8dfb20de39cbd8339",
         status: ProviderStatus.VERIFIED,
         orgLogo: "https://logos-world.net/wp-content/uploads/2021/11/Udemy-Logo.png",
-        orgName: "Udemy",
+        orgName: "NPTEL",
         phone: "9999999999",
     }
   });
@@ -90,7 +90,7 @@ async function main() {
           "Backend engineering": ["Level1"]
         },
         author: "Stephen Grider",
-        startDate: new Date("2024-05-01").toISOString(),
+        startDate: new Date("2023-05-01").toISOString(),
         endDate: new Date("2024-07-01").toISOString(),
         verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
@@ -107,7 +107,7 @@ async function main() {
           "Understanding brand": ["Level1"]
         },
         author: "Lindsay Marsh",
-        startDate: new Date("2024-05-01").toISOString(),
+        startDate: new Date("2023-05-01").toISOString(),
         endDate: new Date("2024-09-01").toISOString()
     }, {
         providerId: provider1.id,
@@ -124,6 +124,7 @@ async function main() {
           "MySQL": ["Level1"]
         },
         author: "Jose Portilla",
+        verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
         providerId: response.id,
         title: "Microsoft Excel",
@@ -137,41 +138,8 @@ async function main() {
           "Excel": ["Level1", "Level2", "Level3", "Level4"]
         },
         author: "Kyle Pew",
-        startDate: new Date("2024-05-01").toISOString()
-    }]
-  })
-
-  const admin1 = await prisma.admin.create({
-    data: {
-      name: 'admin1',
-      email: "admin1@gmail.com",
-      password: "123456",
-      walletId: 2
-    },
-  });
-
-  const admin2 = await prisma.admin.create({
-    data: {
-      name: 'admin2',
-      email: "admin2@gmail.com",
-      password: "admin",
-      walletId: 3
-    },
-  });
-
-  const admin3 = await prisma.admin.create({
-    data: {
-      name: 'admin3',
-      email: "admin3@gmail.com",
-      password: "admin3",
-      walletId: 4
-    },
-  });
-
-  
-
-  const course1 = await prisma.course.create({
-    data: {
+        startDate: new Date("2024-05-01").toISOString(),
+    }, {
         providerId: provider1.id,
         title: "Learn DevOps & Kubernetes",
         description: "This course enables anyone to get started with devops engineering.",
@@ -187,15 +155,11 @@ async function main() {
         },
         author: "Jason Frig",
         startDate: new Date("2023-06-01"),
-        endDate: new Date("2023-08-01"),
+        endDate: new Date("2024-08-01"),
         avgRating: 3.9,
         verificationStatus: CourseVerificationStatus.ACCEPTED,
         cqfScore: 10,
-    }
-  });
-
-  const course2 = await prisma.course.create({
-    data: {
+    }, {
         providerId: provider1.id,
         title: "Introduction to Programming",
         description: "This course covers all the fundamentals of programming",
@@ -211,11 +175,7 @@ async function main() {
         },
         author: "James Franco",
         verificationStatus: CourseVerificationStatus.PENDING,
-    }
-  });
-
-  const course3 = await prisma.course.create({
-    data: {
+    }, {
         providerId: provider1.id,
         title: "Introduction to Compiler Engineering",
         description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
@@ -233,7 +193,42 @@ async function main() {
         endDate: new Date("2023-11-10"),
         verificationStatus: CourseVerificationStatus.REJECTED,
         rejectionReason: "Level associated with LLVM is wrong"
+    }, {
+        providerId: provider1.id,
+        title: "Introduction to Compiler Engineering 2",
+        description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
+        courseLink: "https://udemy.com/courses/jQKsLpm",
+        imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
+        credits: 160,
+        noOfLessons: 100,
+        language: ["english", "hindi"],
+        competency: {
+            "Compiler Design": ["Level2", "Level3"],
+            "LLVM": [ "Level4" ]
+        },
+        author: "Ramakrishna Upadrasta",
+        startDate: new Date("2023-10-10"),
+        endDate: new Date("2023-11-10"),
+        rejectionReason: "Level associated with LLVM is wrong",
+        status: CourseStatus.ARCHIVED
+    }]
+  })
+
+  const admin = await prisma.admin.create({
+    data: {
+        name: "Sanchit Uke",
+        email: "sanchit@esmagico.in",
+        password: "asdfghjkl",
+        id: "123e4567-e89b-42d3-a456-556642440020",
     }
+  });
+
+  const admin1 = await prisma.admin.create({
+    data: {
+      name: 'admin1',
+      email: "admin1@gmail.com",
+      password: "123456",
+    },
   });
 
   const resp = await prisma.course.findMany({});
@@ -262,7 +257,7 @@ async function main() {
     }]
   })
   console.log(response)
-  console.log({ response1, response3, admin1, admin2, admin3, provider1, provider2, provider3, course1, course2, course3 });
+  console.log({ response1, response3, admin1, provider1, provider2, provider3, admin });
 
 }
 
