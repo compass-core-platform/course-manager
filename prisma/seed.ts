@@ -108,7 +108,8 @@ async function main() {
         },
         author: "Lindsay Marsh",
         startDate: new Date("2023-05-01").toISOString(),
-        endDate: new Date("2024-09-01").toISOString()
+        endDate: new Date("2024-09-01").toISOString(),
+        verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
         providerId: provider1.id,
         title: "Python for Data Science",
@@ -124,7 +125,6 @@ async function main() {
           "MySQL": ["Level1"]
         },
         author: "Jose Portilla",
-        verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
         providerId: response.id,
         title: "Microsoft Excel",

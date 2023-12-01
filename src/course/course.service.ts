@@ -127,7 +127,7 @@ export class CourseService {
                     }
                 }
             });
-            throw new HttpException(err.response.data || "Wallet service not running", err.response?.status || err.status || 500)
+            throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500)
         }
     }
 
