@@ -72,7 +72,7 @@ export class ProviderService {
                     id: provider.id
                 }
             });
-            throw new HttpException(err.response, err.response.status);
+            throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500);
         }
         return provider.id
     }
