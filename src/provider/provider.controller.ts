@@ -2,16 +2,17 @@ import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, ParseIntPipe,
 import { ProviderService } from './provider.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignupDto, SignupResponseDto } from './dto/signup.dto';
-import { LoginDto, LoginResponseDto } from './dto/login.dto';
+import { CheckRegDto, CheckRegResponseDto, LoginDto, LoginResponseDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { AddCourseDto, AddCourseResponseDto } from 'src/course/dto/add-course.dto';
+import { AddCourseDto } from 'src/course/dto/add-course.dto';
 import { FeedbackResponseDto } from './dto/feedback.dto';
 import { CourseTransactionDto } from '../course/dto/transaction.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
-import { CourseResponse } from 'src/course/dto/course-response.dto';
+import { ProviderCourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { getPrismaErrorStatusAndMessage } from 'src/utils/utils';
+import { CourseStatusDto } from 'src/course/dto/course-status.dto';
 
 @Controller('provider')
 @ApiTags('provider')
@@ -22,6 +23,35 @@ export class ProviderController {
     constructor(
         private providerService: ProviderService,
     ) {}
+
+    @ApiOperation({ summary: 'Check if provider is registered' })
+    @ApiResponse({ status: HttpStatus.OK, type: CheckRegResponseDto })
+    @Post()
+    // Check if provider is registered
+    async checkProviderReg(
+        @Body() checkRegDto: CheckRegDto,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Checking provider email`);
+
+            const found = await this.providerService.checkProviderFromEmail(checkRegDto.email);
+            
+            this.logger.log(`Successfully checked provider`);
+
+            res.status(HttpStatus.OK).json({
+                message: "Check successful",
+                data: found
+            })
+        } catch (err) {
+            this.logger.error(`Failed to check provider`);
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to check provider",
+            });
+        }
+    }
 
     @ApiOperation({ summary: 'create provider account' })
     @ApiResponse({ status: HttpStatus.CREATED, type: SignupResponseDto })
@@ -178,38 +208,39 @@ export class ProviderController {
         }
     }
 
-    @ApiOperation({ summary: 'Archive course' })
+    @ApiOperation({ summary: 'change course status' })
     @ApiResponse({ status: HttpStatus.OK })
-    @Patch("/:providerId/course/:courseId/archive")
-    // edit course information
-    async archiveCourse(
+    @Patch("/:providerId/course/:courseId/status")
+    // change course status (archived/unarchived)
+    async changeCourseStatus(
         @Param("providerId", ParseUUIDPipe) providerId: string,
         @Param("courseId", ParseIntPipe) courseId: number,
+        @Body() courseStatusDto: CourseStatusDto,
         @Res() res
     ) {
         try {
-            this.logger.log(`Archiving course`);
+            this.logger.log(`Changing course status`);
 
-            await this.providerService.archiveCourse(providerId, courseId);
+            await this.providerService.changeCourseStatus(providerId, courseId, courseStatusDto);
 
-            this.logger.log(`Successfully archived the course`);
+            this.logger.log(`Successfully changed course status`);
 
             res.status(HttpStatus.OK).json({
-                message: "course archived successfully",
+                message: "course status changed successfully",
             })
         } catch (err) {
-            this.logger.error(`Failed to archive the course`);
+            this.logger.error(`Failed to change course status`);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
                 statusCode, 
-                message: errorMessage || "Failed to archive the course`",
+                message: errorMessage || "Failed to change course status`",
             });
         }
     }
     
     @ApiOperation({ summary: 'add new course' })
-    @ApiResponse({ status: HttpStatus.CREATED, type: AddCourseResponseDto })
+    @ApiResponse({ status: HttpStatus.CREATED, type: ProviderCourseResponse })
     @Post("/:providerId/course")
     // add new course
     async addCourse(
@@ -271,7 +302,7 @@ export class ProviderController {
     }
 
     @ApiOperation({ summary: 'View courses offered by self' })
-    @ApiResponse({ status: HttpStatus.OK, type: [CourseResponse] })
+    @ApiResponse({ status: HttpStatus.OK, type: [ProviderCourseResponse] })
     @Get("/:providerId/course")
     // View courses offered by self
     async fetchProviderCourses(

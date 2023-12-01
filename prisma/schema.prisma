@@ -45,18 +45,22 @@ model Admin {
   name      String  
   email     String  @unique
   password  String 
-  walletId  Int     @unique
 }
 
 model Provider {
   id          String          @id @default(uuid())
   name        String  
   email       String          @unique
-  password    String 
+  password    String
+  orgName     String
+  orgLogo     String
+  phone       String
   paymentInfo Json?
   status      ProviderStatus  @default(PENDING)
   courses     Course[]
   rejectionReason String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now())
 }
 
 
@@ -70,7 +74,6 @@ model Course {
   credits             Int
   noOfLessons         Int?
   language            String[]
-  duration            Float
   competency          Json
   author              String
   avgRating           Float?
@@ -81,6 +84,8 @@ model Course {
   cqfScore            Int?
   impactScore         Float?
   rejectionReason     String?
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
   provider            Provider                  @relation(fields: [providerId], references: [id])
   userCourses         UserCourse[]              
 }

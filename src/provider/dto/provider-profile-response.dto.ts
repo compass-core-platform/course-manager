@@ -1,42 +1,65 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ProviderStatus } from "@prisma/client";
-import { IsEmail, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
-
+import { JsonValue } from "@prisma/client/runtime/library";
+import { IsEmail, IsEnum, IsObject, IsOptional as IsNotEmpty, IsString, IsUUID, IsOptional, IsUrl, IsPhoneNumber, IsDate } from 'class-validator';
 
 export class ProviderProfileResponse {
     @ApiProperty({required: false})
     @IsUUID()
-    @IsOptional()
+    @IsNotEmpty()
     id: string;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     name: string;
 
     @ApiProperty({format: 'email'})
     @IsEmail()
-    @IsOptional()
+    @IsNotEmpty()
     email: string;
-    
+
+    // organisation name
     @ApiProperty()
+    @IsNotEmpty()
     @IsString()
-    @IsOptional()
-    password?: string;
+    orgName: string;
 
+    // organisation logo image link
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsUrl()
+    orgLogo: string;
+
+    // phone number
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsPhoneNumber()
+    phone: string;
 
     @ApiProperty()
     @IsOptional()
-    paymentInfo?: any;
+    @IsObject()
+    paymentInfo: JsonValue;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsEnum(ProviderStatus)
-    status?: ProviderStatus;
+    status: ProviderStatus;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
-    rejectionReason?: string;
+    rejectionReason: string | null;
     // readonly courses: Course[];
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsDate()
+    createdAt: Date;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsDate()
+    updatedAt: Date;
 }

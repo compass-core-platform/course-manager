@@ -1,15 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUUID, IsUrl } from 'class-validator';
 
 
 export class ProviderSettlementDto {
-    @ApiProperty({required: false})
+    @ApiProperty()
     @IsUUID()
     id: string;
 
     @ApiProperty()
     @IsOptional()
-    @IsString()
+    @IsUrl()
     imgLink?: string;
 
     @ApiProperty()

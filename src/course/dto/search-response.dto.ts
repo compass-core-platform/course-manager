@@ -13,5 +13,5 @@ export class SearchResponseDTO {
     readonly rating: string;
     readonly startTime: string;
     readonly endTime: string;
-    readonly noOfPurchases: string;
+    readonly noOfPurchases: number;
 }

@@ -7,6 +7,9 @@ import { MockWalletService } from '../mock-wallet/mock-wallet.service';
 import { ProviderService } from 'src/provider/provider.service';
 import { CourseService } from 'src/course/course.service';
 import axios from 'axios';
+import { AdminCourseResponse } from 'src/course/dto/course-response.dto';
+import { ProviderSettlementDto } from './dto/provider-settlement.dto';
+import { ProviderProfileResponse } from 'src/provider/dto/provider-profile-response.dto';
 
 @Injectable()
 export class AdminService {
@@ -36,25 +39,25 @@ export class AdminService {
     }
 
     // fetch provider with the given id
-    async findProviderById(providerId: string): Promise<Provider> {
+    async findProviderById(providerId: string): Promise<ProviderProfileResponse> {
 
         return this.providerService.getProvider(providerId);
     }
 
     // fetch all courses added onto the marketplace
-    async findAllCourses() : Promise<Course[]> {
+    async findAllCourses() : Promise<AdminCourseResponse[]> {
 
         return this.courseService.fetchAllCourses();
     }
 
     // find course by Id
-    async findCourseById(courseId: number) {
+    async findCourseById(courseId: number): Promise<AdminCourseResponse> {
 
         return this.courseService.getCourse(courseId);
     }
 
     // accept a course along with the cqf score
-    async acceptCourse(courseId: number, cqf_score: number) {
+    async acceptCourse(courseId: number, cqf_score?: number) {
         
         return this.courseService.acceptCourse(courseId, cqf_score);
     }
@@ -74,21 +77,21 @@ export class AdminService {
     // get all admin-consumer transactions
     async getTransactions(adminId: string) {
 
+        if(!process.env.WALLET_SERVICE_URL)
+            throw new HttpException("Wallet service URL not defined", 500);
         const walletService = process.env.WALLET_SERVICE_URL;
         const endpoint = `/admin/${adminId}/transactions/consumers`;
         const url = walletService + endpoint;
-        try {
-            const response = await axios.get(url);
-            return response.data;
-    
-        } catch (err) {
-            throw new Error(`Failed to fetch data: ${err.message}`);
-        }
+
+        const response = await axios.get(url);
+        return response.data;
     }
 
     // Add or remove credits to provider wallet
     async addOrRemoveCreditsToProvider(adminId: string, providerId: string, credits: number) {
         const walletService = process.env.WALLET_SERVICE_URL;
+        if(!walletService)
+            throw new HttpException("Wallet service URL not defined", 500);
         let endpoint: string;
         if(credits >= 0) {
             endpoint = `/admin/${adminId}/add-credits`;
@@ -100,12 +103,9 @@ export class AdminService {
             consumerId: providerId,
             credits: credits
         };
-        try {
-            let response = await axios.post(url, requestBody);
-            return response;
-        } catch (err) {
-            throw new Error(`Failed to send add/reduce credits POST request to walletService.`);
-        }
+        let response = await axios.post(url, requestBody);
+        return response;
+
     }
 
     // edit provider profile information
@@ -135,43 +135,45 @@ export class AdminService {
     }
 
     // Get the number of credits in a provider wallet
-    async getProviderWalletCredits(providerId: string) {
+    async getAllProvidersWalletCredits(adminId: string) {
+        
         const url = process.env.WALLET_SERVICE_URL;
-        const endpoint = url + `/api/providers/${providerId}/credits`;
+        if(!url)
+            throw new HttpException("Wallet service URL not defined", 500);
+        const endpoint = url + `/api/admin/${adminId}/credits/providers`;
         const resp = await axios.get(endpoint);
-        return resp.data.credits;
+        const creditsResponse = resp.data.data.credits;
+        const creditsMap = {};
+        creditsResponse.forEach((c) => {
+            creditsMap[c.providerId] = c.credits;
+        });
+        return creditsMap;
     }
 
     // Get all the providers information for settlement
-    async getAllProviderInfoForSettlement() {
+    async getAllProviderInfoForSettlement(adminId: string): Promise<ProviderSettlementDto[]> {
         
-        const providers = await this.providerService.fetchAllProviders();
-        const results = providers.map(async (provider) => {
-            const providerId = provider.id;
+        const providers = await this.providerService.fetchProvidersForSettlement();
+        const creditsMap = await this.getAllProvidersWalletCredits(adminId);
+
+        return providers.map((p) => {
             return {
-                id: providerId,
-                name: provider.name,
-                numberOfCourses: await this.getNumberOfCoursesForProvider(providerId),
-                activeUsers: await this.getNoOfCoursePurchasesForProvider(providerId),
-                totalCredits: await this.getProviderWalletCredits(providerId)
+                ...p,
+                totalCredits: creditsMap[p.id]
             }
         });
-        return results;
     }
 
     // settle credits for a provider
     async settleCredits(adminId: string, providerId: string) {
         // Need to add transaction, add paymentReceipt additional settlement processing
-        // then set the credits of the provider to 0
-        const totCredits = await this.getProviderWalletCredits(providerId);
+        
         const url = process.env.WALLET_SERVICE_URL;
-        const endpoint = url + `/api/providers/${providerId}/settlement-transaction`;
-        const reqBody = {
-            adminId: adminId,
-            credits: totCredits
-        };
-        const response = await axios.post(endpoint, reqBody);
-        return;
+        if(!url)
+            throw new HttpException("Wallet service URL not defined", 500);
+        const endpoint = url + `/api/admin/${adminId}/providers/${providerId}/settle-credits`;
+
+        const response = await axios.post(endpoint);
     }
 
 }

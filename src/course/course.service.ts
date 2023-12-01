@@ -1,13 +1,16 @@
-import { NotFoundException, BadRequestException, Injectable, NotAcceptableException } from "@nestjs/common";
+import { NotFoundException, BadRequestException, Injectable, NotAcceptableException, HttpException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { AddCourseDto } from "./dto/add-course.dto";
-import { Course, CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
+import { CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
 import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
-import { AdminCourseResponse, CourseResponse } from "src/course/dto/course-response.dto";
+import { AdminCourseResponse, CourseResponse, ProviderCourseResponse } from "src/course/dto/course-response.dto";
 import { CourseTransactionDto } from "./dto/transaction.dto";
 import { SearchResponseDTO } from "./dto/search-response.dto";
+import { CourseStatusDto } from "./dto/course-status.dto";
+import axios from "axios";
+import { PurchaseDto, WalletPurchaseDto } from "./dto/purchase.dto";
 
 @Injectable()
 export class CourseService {
@@ -19,7 +22,7 @@ export class CourseService {
 
         // Searches for the courses available in the DB that match or contain the input search string
         // in their title, author, description or competency
-        const courses = await this.prisma.course.findMany({
+        let courses = await this.prisma.course.findMany({
             where: {
                 OR: [{
                     title: {
@@ -41,27 +44,42 @@ export class CourseService {
                         string_contains: searchInput
                     }
                 }]
+            },
+            include: {
+                provider: {
+                    select: {
+                        orgName: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        userCourses: true
+                    }
+                }
             }
         });
-
-        const respPromises = courses.map(async (course) => {
-            const provider = await this.prisma.provider.findFirst({
-                where: {
-                    id: course.providerId
-                }
-            });
-            const noOfPurchases = await this.prisma.userCourse.count({
-                where: {
-                    courseId: course.id
-                }
-            });
-            const providerName = provider?.name || "null";
+        // Filter out the courses that are not accepted, archived or not available
+        courses = courses.filter((c) => 
+            c.verificationStatus == CourseVerificationStatus.ACCEPTED 
+            && c.status == CourseStatus.UNARCHIVED
+            && (c.startDate ? c.startDate <= new Date(): true)
+            && (c.endDate ? c.endDate >= new Date(): true)
+        );
+        // courses = courses.map((c) => {
+        //     let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, ...clone} = c;
+        //     const courseResponse: CourseResponse = {
+        //         ...clone,
+        //         providerName: provider.orgName
+        //     }
+        //     return courseResponse;
+        // });
+        return courses.map((course) => {
             return {
                 id: course.id.toString(),
                 title: course.title,
                 long_desc: course.description,
                 provider_id: course.providerId,
-                provider_name: providerName,
+                provider_name: course.provider.orgName,
                 price: course.credits.toString(),
                 languages: course.language,
                 competency: course.competency,
@@ -69,12 +87,9 @@ export class CourseService {
                 rating: course.avgRating?.toString() || "0",
                 startTime: new Date().toISOString(), // need to change
                 endTime: new Date().toISOString(), // need to change
-                noOfPurchases: noOfPurchases.toString()
+                noOfPurchases: course._count.userCourses,
             }
         });
-        
-        const resp = await Promise.all(respPromises);
-        return resp;
     }
 
     async addCourse(providerId: string, addCourseDto: AddCourseDto) {
@@ -88,32 +103,70 @@ export class CourseService {
         });
     }
 
-    async addPurchaseRecord(courseId: number, userId: string) {
+    async addPurchaseRecord(courseId: number, purchaseDto: PurchaseDto) {
 
+        // Validate course
+        const course = await this.getCourse(courseId);
+
+        if(course.verificationStatus != CourseVerificationStatus.ACCEPTED)
+            throw new BadRequestException("Course is not accepted");
+        if(course.status == CourseStatus.ARCHIVED)
+            throw new BadRequestException("Course is archived");
+        if((course.startDate && course.startDate > new Date()) || (course.endDate && course.endDate < new Date()))
+            throw new BadRequestException("Course is not available at the moment");
+        
         // Check if course already purchased
-        const record = this.prisma.userCourse.findFirst({
-            where: { userId: userId, courseId: courseId }
+        const record = await this.prisma.userCourse.findFirst({
+            where: { userId: purchaseDto.consumerId, courseId: courseId }
         });
         if(record != null)
             throw new BadRequestException("Course already purchased by the user");
 
+
         // create new record for purchase
-        return await this.prisma.userCourse.create({
+        await this.prisma.userCourse.create({
             data: {
-                userId,
+                userId: purchaseDto.consumerId,
                 courseId,
             }
         });
+        // forward to wallet service for transaction
+        try {
+            const endpoint = `/api/consumers/${purchaseDto.consumerId}/purchase`;
+            const walletPurchaseBody: WalletPurchaseDto = {
+                providerId: course.providerId,
+                credits: course.credits,
+                description: purchaseDto.transactionDescription
+            }
+            const walletResponse = await axios.post(process.env.WALLET_SERVICE_URL + endpoint, walletPurchaseBody);
+            return walletResponse.data.data.transaction.transactionId;
+        } catch (err) {
+            // if transaction failed, delete the record
+            await this.prisma.userCourse.delete({
+                where: {
+                    userId_courseId: {
+                        userId: purchaseDto.consumerId,
+                        courseId
+                    }
+                }
+            });
+            throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500)
+        }
     }
 
-    async archiveCourse(courseId: number) {
+    async changeStatus(courseId: number, providerId: string, courseStatusDto: CourseStatusDto) {
+
+        // Validate course
+        const course = await this.getCourse(courseId)
+
+        if(course.providerId != providerId)
+            throw new BadRequestException("Course does not belong to the provider");
 
         // update the course status to archived
         return this.prisma.course.update({
-            where: { id: courseId },
-            data: { status: CourseStatus.ARCHIVED }
+            where: { id: courseId, providerId },
+            data: { status: courseStatusDto.status }
         });
-
     }
 
     async editCourse(courseId: number, editCourseDto: EditCourseDto) {
@@ -134,18 +187,59 @@ export class CourseService {
         const course = await this.prisma.course.findUnique({
             where: {
                 id: courseId
+            },
+            include: {
+                provider: {
+                    select: {
+                        orgName: true,
+                    }
+                }
             }
         })
         if(!course)
             throw new NotFoundException("Course does not exist");
+
+        // let courseResponse: AdminCourseResponse
+        const { provider, ...courseResponse } = course;
+        return {
+            ...courseResponse,
+            providerName: provider.orgName
+        }
+    }
+
+    async getNumOfCourseUsers(courseId: number) {
+
+        return this.prisma.userCourse.count({
+            where: {
+                courseId
+            }
+        })
+    }
+
+    async getCourseByConsumer(courseId: number): Promise<CourseResponse> {
+
+        // Find course by ID and throw error if not found
+        const course = await this.getCourse(courseId);
+        const numOfUsers = await this.getNumOfCourseUsers(courseId);
+
+        if(course.verificationStatus != CourseVerificationStatus.ACCEPTED)
+            throw new BadRequestException("Course is not accepted");
+        if(course.status != CourseStatus.UNARCHIVED)
+            throw new BadRequestException("Course is archived");
+        if((course.startDate && course.startDate > new Date()) || (course.endDate && course.endDate < new Date()))
+            throw new BadRequestException("Course is not available at the moment");
         
-        return course;
+        const {cqfScore, impactScore, verificationStatus, rejectionReason, ...clone} = course;
+        return {
+            ...clone,
+            numOfUsers
+        }
     }
 
     async giveCourseFeedback(courseId: number, userId: string, feedbackDto: FeedbackDto) {
 
         // Validate course
-        await this.getCourse(courseId);
+        const course = await this.getCourse(courseId);
 
         // Find purchase record with consumer Id and course ID and throw error if not found
         // Or if course not complete
@@ -175,6 +269,24 @@ export class CourseService {
                 ...feedbackDto
             }
         });
+
+        // Change average rating of the course
+        const avgRating = await this.prisma.userCourse.aggregate({
+            where: {
+                courseId
+            },
+            _avg: {
+                rating: true
+            }
+        });
+        await this.prisma.course.update({
+            where: {
+                id: courseId
+            },
+            data: {
+                avgRating: avgRating._avg.rating
+            }
+        });
     }
 
     async deleteCourse(courseId: number) {
@@ -187,15 +299,18 @@ export class CourseService {
         })
     }
 
-    async getProviderCourses(providerId: string) {
+    async getProviderCourses(providerId: string): Promise<ProviderCourseResponse[]> {
 
         // Get all courses added by a single provider
-        return this.prisma.course.findMany({
+        const courses = await this.prisma.course.findMany({
             where: {
                 providerId
             }
         })
-
+        return courses.map((c) => {
+            const {cqfScore, impactScore, ...clone} = c;
+            return clone;
+        })
     }
 
     async getPurchasedUsersByCourseId(courseId: number) {
@@ -223,13 +338,28 @@ export class CourseService {
         })
     }
 
-    async fetchAllCourses() : Promise<Course[]> {
+    async fetchAllCourses() : Promise<AdminCourseResponse[]> {
         
         // Fetch all courses
-        return this.prisma.course.findMany();
+        const courses = await this.prisma.course.findMany({
+            include: {
+                provider: {
+                    select: {
+                        orgName: true,
+                    }
+                }
+            }
+        });
+        return courses.map((c) => {
+            const { provider, ...clone } = c;
+            return {
+                ...clone,
+                providerName: provider.orgName
+            }
+        });
     }
 
-    async acceptCourse(courseId: number, cqf_score: number) {
+    async acceptCourse(courseId: number, cqf_score?: number) {
 
         // Validate course
         let course = await this.getCourse(courseId);

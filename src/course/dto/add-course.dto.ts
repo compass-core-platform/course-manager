@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { CourseStatus, CourseVerificationStatus } from "@prisma/client";
-import { ArrayNotEmpty, IsArray, IsDate, IsEnum, IsInt, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { CourseStatus } from "@prisma/client";
+import { ArrayNotEmpty, IsArray, IsDate, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Min } from "class-validator";
 import { CompetencyMap } from "src/utils/types";
 
 export class AddCourseDto {
@@ -20,13 +20,13 @@ export class AddCourseDto {
     // link for the course content
     @ApiProperty()
     @IsNotEmpty()
-    @IsString()
+    @IsUrl()
     courseLink: string;
 
     // course image
     @ApiProperty()
     @IsNotEmpty()
-    @IsString()
+    @IsUrl()
     imgLink: string;
 
     // number of credits required to purchase course
@@ -48,13 +48,6 @@ export class AddCourseDto {
     @ArrayNotEmpty()
     language: string[];
 
-    // course duration
-    @ApiProperty()
-    @IsNotEmpty()
-    @Min(0)
-    @IsNumber()
-    duration: number;
-
     // competency
     @ApiProperty()
     @IsNotEmpty()
@@ -68,28 +61,19 @@ export class AddCourseDto {
 
     // course status (archived/unarchived)
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsEnum(CourseStatus)
-    status: CourseStatus;
+    status?: CourseStatus;
 
-    // course availability time
+    // course start date
     @ApiProperty()
     @IsDate()
     @IsOptional()
-    availabilityTime?: Date;
-}
+    startDate?: Date;
 
-export class AddCourseResponseDto extends AddCourseDto {
-
-    // course ID
-    readonly id: number;
-
-    // course provider ID
-    readonly providerId: number;
-
-    // Average rating
-    readonly avgRating: number;
-
-    // Course Verification Status (pending/accepted/rejected)
-    readonly verificationStatus: CourseVerificationStatus;
+    // course end date
+    @ApiProperty()
+    @IsDate()
+    @IsOptional()
+    endDate?: Date;
 }

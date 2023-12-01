@@ -4,7 +4,6 @@ import { AdminService } from './admin.service';
 import { ProviderProfileResponse } from '../provider/dto/provider-profile-response.dto';
 import { getPrismaErrorStatusAndMessage } from '../utils/utils';
 import { EditProvider } from './dto/edit-provider.dto';
-import { CourseResponse } from '../course/dto/course-response.dto';
 import { TransactionResponse } from './dto/transaction-response.dto';
 import { Response } from 'express';
 import { CreditRequest } from './dto/credit-request.dto';
@@ -14,6 +13,7 @@ import { CourseVerify } from 'src/course/dto/verify-course.dto';
 import { ProviderVerify } from './dto/provider-verify-response.dto';
 import { RejectProviderResponseDto } from './dto/reject-provider-response.dto';
 import { RejectProviderRequestDto } from './dto/reject-provider-request.dto';
+import { AdminCourseResponse } from 'src/course/dto/course-response.dto';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -50,12 +50,15 @@ export class AdminController {
 
     @ApiOperation({ summary: "Get all providers for settlement" })
     @ApiResponse({ status: HttpStatus.OK, type: ProviderSettlementDto, isArray: true})
-    @Get('/providers/settlements')
-    async getAllProvidersForSettlement(@Res() res : Response) {
+    @Get('/:adminId/providers/settlements')
+    async getAllProvidersForSettlement(
+        @Param("adminId", ParseUUIDPipe) adminId: string,
+        @Res() res : Response
+        ) {
         try {
             this.logger.log(`Getting information of all the providers for settlement`);
 
-            const providers = await this.adminService.getAllProviderInfoForSettlement();
+            const providers = await this.adminService.getAllProviderInfoForSettlement(adminId);
 
             this.logger.log(`Successfully retrieved all the provider info for making settlement`);
 
@@ -76,7 +79,7 @@ export class AdminController {
 
     @ApiOperation({ summary: "Settle credits for a provider" })
     @ApiResponse({ status: HttpStatus.OK, type: json})
-    @Post('/:adminId/providers/settlements/settle')
+    @Post('/:adminId/providers/settlements')
     async settleProvider(@Param("adminId", ParseUUIDPipe) adminId: string, @Body() settleDto: ProviderSettlementDto, @Res() res : Response) {
         try {
             this.logger.log(`Settling the credits for the given provider`);
@@ -136,16 +139,8 @@ export class AdminController {
     ){
         try {
             this.logger.log(`Getting provider information for id ${providerId}`);
-            
-            const updatedProviderInfo = {
-                id: providerId,
-                name: providerDto.name,
-                email: providerDto.email,
-                password: providerDto.password,
-                status: providerDto.status
-            }
 
-            const updatedProfile = await this.adminService.editProviderProfile(updatedProviderInfo);
+            const updatedProfile = await this.adminService.editProviderProfile(providerDto);
 
             this.logger.log(`Successfully retrieved the provider profile information`);
 
@@ -220,7 +215,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Get all the courses"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse, isArray: true})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse, isArray: true})
     @Get('/courses/')
     async getAllCourses(@Res() res){
         try {
@@ -246,7 +241,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Get a course, given its courseId"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Get('/courses/:courseId')
     async getCourseById (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res
@@ -275,7 +270,7 @@ export class AdminController {
 
 
     @ApiOperation({ summary: "Accept course and assign a cqf_score"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Patch('/courses/:courseId/accept')
     async acceptCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Body() verifyBody: CourseVerify, @Res() res
@@ -303,7 +298,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Reject a course given its courseId"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Patch('/courses/:courseId/reject')
     async rejectCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Body() courseRejectionRequestDto: RejectProviderRequestDto, @Res() res
@@ -331,7 +326,7 @@ export class AdminController {
     }
 
     @ApiOperation({ summary: "Remove a course given its courseId"})
-    @ApiResponse({ status: HttpStatus.OK, type: CourseResponse})
+    @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Delete('/courses/:courseId')
     async removeCourse (
         @Param("courseId", ParseIntPipe) courseId: number, @Res() res

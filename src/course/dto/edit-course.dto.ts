@@ -1,7 +1,5 @@
-import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { AddCourseDto } from "./add-course.dto";
-import { IsArray, IsDate, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
-import { CourseStatus } from "@prisma/client";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsArray, IsDate, IsInt, IsOptional, IsString, IsUrl, Min } from "class-validator";
 import { CompetencyMap } from "src/utils/types";
 
 export class EditCourseDto {
@@ -20,13 +18,13 @@ export class EditCourseDto {
 
     // link for the course content
     @ApiProperty()
-    @IsString()
+    @IsUrl()
     @IsOptional()
     courseLink?: string;
 
     // course image
     @ApiProperty()
-    @IsString()
+    @IsUrl()
     @IsOptional()
     imgLink?: string;
 
@@ -49,13 +47,6 @@ export class EditCourseDto {
     @IsOptional()
     language?: string[];
 
-    // course duration
-    @ApiProperty()
-    @Min(0)
-    @IsInt()
-    @IsOptional()
-    duration?: number;
-
     // competency
     @ApiProperty()
     @IsOptional()
@@ -67,15 +58,15 @@ export class EditCourseDto {
     @IsOptional()
     author?: string;
 
-    // course status (archived/unarchived)
-    // @ApiProperty()
-    // @IsString()
-    // @IsOptional()
-    // status: CourseStatus;
-
-    // course availability time
+    // course start date
     @ApiProperty()
     @IsDate()
     @IsOptional()
-    availabilityTime?: Date;
+    startDate?: Date;
+
+    // course end date
+    @ApiProperty()
+    @IsDate()
+    @IsOptional()
+    endDate?: Date;
 }

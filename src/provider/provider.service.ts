@@ -1,8 +1,8 @@
-import { BadRequestException, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProviderStatus } from '@prisma/client';
-import { LoginDto } from './dto/login.dto';
+import { CheckRegResponseDto, LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AddCourseDto } from 'src/course/dto/add-course.dto';
 import { CourseService } from 'src/course/course.service';
@@ -11,10 +11,12 @@ import { CourseTransactionDto } from '../course/dto/transaction.dto';
 import { CompleteCourseDto } from 'src/course/dto/completion.dto';
 import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 import { EditProvider } from 'src/admin/dto/edit-provider.dto';
-import { CourseResponse } from 'src/course/dto/course-response.dto';
+import { ProviderCourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { AuthService } from 'src/auth/auth.service';
 import axios from 'axios';
+import { CourseStatusDto } from 'src/course/dto/course-status.dto';
+import { ProviderSettlementDto } from 'src/admin/dto/provider-settlement.dto';
 
 
 @Injectable()
@@ -46,20 +48,32 @@ export class ProviderService {
                 name: signupDto.name,
                 email: signupDto.email,
                 password: hashedPassword,
-                paymentInfo: signupDto.paymentInfo ? signupDto.paymentInfo : null
-            // other user profile data
+                paymentInfo: signupDto.paymentInfo,
+                orgName: signupDto.orgName,
+                orgLogo: signupDto.orgLogo,
+                phone: signupDto.phone
             }
         });
-
-        // Forward to wallet service for creation of wallet
-        const url = process.env.WALLET_SERVICE_URL;
-        const endpoint = url + `/api/wallet/create`;
-        const reqBody = {
-            userId: provider.id,
-            type: 'PROVIDER'
+        try {
+            // Forward to wallet service for creation of wallet
+            if(!process.env.WALLET_SERVICE_URL)
+                throw new HttpException("Wallet service URL not defined", 500);
+            const url = process.env.WALLET_SERVICE_URL;
+            const endpoint = url + `/api/wallet/create`;
+            const reqBody = {
+                userId: provider.id,
+                type: 'PROVIDER',
+                credits: 0
+            }
+            const resp = await axios.post(endpoint, reqBody);
+        } catch(err) {
+            await this.prisma.provider.delete({
+                where: {
+                    id: provider.id
+                }
+            });
+            throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500);
         }
-        const resp = await axios.post(endpoint, reqBody);
-
         return provider.id
     }
 
@@ -70,9 +84,9 @@ export class ProviderService {
             where: {
                 email: loginDto.email
             }
-        })
+        });
         if(!provider)
-            throw new NotFoundException("Email ID does not exist");
+            throw new NotFoundException("provider not found");
         
         // Compare the entered password with the password fetched from database
         const isPasswordValid = await this.authService.comparePasswords(loginDto.password, provider.password);
@@ -94,7 +108,22 @@ export class ProviderService {
         if(!provider)
             throw new NotFoundException("provider does not exist");
         
-        return provider;
+        const { password, ...clone } = provider;
+        return clone;
+    }
+
+    async checkProviderFromEmail(email: string): Promise<CheckRegResponseDto> {
+
+        // Fetch provider details using email ID
+        const provider = await this.prisma.provider.findUnique({
+            where: {
+                email
+            }
+        });
+        if(!provider)
+            return { found: false }
+
+        return { found: true };
     }
 
     // Used when provider makes a request to update profile
@@ -117,7 +146,7 @@ export class ProviderService {
         });
     }
 
-    async addNewCourse(providerId: string, addCourseDto: AddCourseDto) {
+    async addNewCourse(providerId: string, addCourseDto: AddCourseDto): Promise<ProviderCourseResponse> {
 
         // Fetch provider
         const provider = await this.getProvider(providerId);
@@ -127,7 +156,8 @@ export class ProviderService {
             throw new UnauthorizedException("Provider account is not verified");
 
         // Forward to course service
-        return this.courseService.addCourse(providerId, addCourseDto);
+        const {cqfScore, impactScore, ...clone} = await this.courseService.addCourse(providerId, addCourseDto);
+        return clone;
     }
 
     async removeCourse(providerId: string, courseId: number) {
@@ -144,7 +174,7 @@ export class ProviderService {
         await this.courseService.deleteCourse(courseId);
     }
 
-    async getCourses(providerId: string): Promise<CourseResponse[]> {
+    async getCourses(providerId: string): Promise<ProviderCourseResponse[]> {
 
         return this.courseService.getProviderCourses(providerId);
     }
@@ -157,12 +187,12 @@ export class ProviderService {
         return this.courseService.editCourse(courseId, editCourseDto);
     }
 
-    async archiveCourse(providerId: string, courseId: number) {
+    async changeCourseStatus(providerId: string, courseId: number, courseStatusDto: CourseStatusDto) {
         
         // Validate provider
         await this.getProvider(providerId);
 
-        return this.courseService.archiveCourse(courseId);
+        return this.courseService.changeStatus(courseId, providerId, courseStatusDto);
     }
 
     async getCourseFeedbacks(providerId: string, courseId: number): Promise<FeedbackResponseDto> {
@@ -218,9 +248,61 @@ export class ProviderService {
 
     async fetchAllProviders(): Promise<ProviderProfileResponse[]> {
 
-        return this.prisma.provider.findMany({
-            select: { id: true, name: true, email: true, paymentInfo: true, courses: true, status: true}
+        const providers =  await this.prisma.provider.findMany();
+
+        return providers.map((p) => {
+            return {
+                id: p.id,
+                name: p.name,
+                email: p.email,
+                paymentInfo: (typeof p.paymentInfo === "string") ? JSON.parse(p.paymentInfo) : p.paymentInfo ?? undefined,
+                rejectionReason: p.rejectionReason,
+                status: p.status,
+                orgLogo: p.orgLogo,
+                orgName: p.orgName,
+                phone: p.phone,
+                createdAt: p.createdAt,
+                updatedAt: p.updatedAt
+            }
+        })
+    }
+
+    async fetchProvidersForSettlement(): Promise<ProviderSettlementDto[]> {
+
+        const providers = await this.prisma.provider.findMany({
+            select: {
+                id: true,
+                orgLogo: true,
+                orgName: true,
+                courses: {
+                    select: {
+                        userCourses: {
+                            select: {
+                                userId: true
+                            }
+                        }
+                    },
+                }
+            }
         });
+        const results = providers.map(async (provider): Promise<ProviderSettlementDto> => {
+            const providerId = provider.id;
+            const courses = provider.courses;
+            const activeUsers = new Set();
+            courses.forEach((c) => {
+                c.userCourses.forEach((uc) => {
+                    activeUsers.add(uc.userId);
+                })
+            })
+            return {
+                id: providerId,
+                name: provider.orgName,
+                imgLink: provider.orgLogo,
+                totalCourses: courses.length,
+                activeUsers: activeUsers.size
+            }
+        })
+        return Promise.all(results);
     }
 
     async verifyProvider(providerId: string) {
@@ -235,7 +317,10 @@ export class ProviderService {
         // Update the status in database
         return this.prisma.provider.update({ 
             where:    {id: providerId},
-            data:  {status: ProviderStatus.VERIFIED} 
+            data:  {
+                status: ProviderStatus.VERIFIED,
+                updatedAt: new Date()
+            } 
         });
     }
 
@@ -253,7 +338,8 @@ export class ProviderService {
             where: {id: providerId},
             data: {
                 status: ProviderStatus.REJECTED,
-                rejectionReason: rejectionReason
+                rejectionReason: rejectionReason,
+                updatedAt: new Date()
             }
         });
     }
