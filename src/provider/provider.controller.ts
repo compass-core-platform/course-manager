@@ -12,6 +12,7 @@ import { EditCourseDto } from 'src/course/dto/edit-course.dto';
 import { ProviderCourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { getPrismaErrorStatusAndMessage } from 'src/utils/utils';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CourseStatusDto } from 'src/course/dto/course-status.dto';
 
 @Controller('provider')
@@ -420,5 +421,37 @@ export class ProviderController {
                 message: errorMessage || "Failed to mark the course completion",
             });
         }
+    }
+    
+    @ApiOperation({ summary: "Reset password" })
+    @ApiResponse({ status: HttpStatus.OK })
+    @Patch("/:providerId/reset-password")
+    // Reset Password
+    async resetPassword(
+      @Param("providerId", ParseUUIDPipe) providerId: string,
+      @Body() updatePasswordDto: UpdatePasswordDto,
+      @Res() res
+    ) {
+      try {
+        this.logger.log("Reseting the password of the provider.");
+        await this.providerService.updateProviderPassword(
+          providerId,
+          updatePasswordDto
+        );
+        this.logger.log(`Successfully reset the password.`);
+  
+        res.status(HttpStatus.OK).json({
+          message: "Successfully reset the password.",
+        });
+      } catch (error) {
+        this.logger.error(`Failed to reset the password.`);
+  
+        const { errorMessage, statusCode } =
+          getPrismaErrorStatusAndMessage(error);
+        res.status(statusCode).json({
+          statusCode,
+          message: errorMessage || "Failed to reset the password.",
+        });
+      }
     }
 }

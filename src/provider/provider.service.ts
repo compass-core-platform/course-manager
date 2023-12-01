@@ -15,6 +15,7 @@ import { ProviderCourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { AuthService } from 'src/auth/auth.service';
 import axios from 'axios';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CourseStatusDto } from 'src/course/dto/course-status.dto';
 import { ProviderSettlementDto } from 'src/admin/dto/provider-settlement.dto';
 
@@ -343,4 +344,33 @@ export class ProviderService {
             }
         });
     }
+
+    async updateProviderPassword(
+        providerId: string,
+        updatePasswordDto: UpdatePasswordDto
+      ) {
+        // validate the prrovider
+        const provider = await this.getProvider(providerId);
+    
+        // Compare the entered old password with the password fetched from database
+        const isPasswordValid = await this.authService.comparePasswords(
+          updatePasswordDto.oldPassword,
+          provider.password
+        );
+    
+        if (!isPasswordValid) throw new BadRequestException("Incorrect password");
+        // Hashing the password
+        const hashedPassword = await this.authService.hashPassword(
+          updatePasswordDto.newPassword
+        );
+        // Updating the password to the newly generated one
+        return this.prisma.provider.update({
+          where: {
+            id: providerId,
+          },
+          data: {
+            password: hashedPassword,
+          },
+        });
+      }
 }
