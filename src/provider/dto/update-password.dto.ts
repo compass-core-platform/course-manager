@@ -5,7 +5,6 @@ export class UpdatePasswordDto {
   // old password
   @ApiProperty()
   @IsNotEmpty({ message: "Old Password is required" })
-  @IsStrongPassword()
   oldPassword: string;
 
   // new password

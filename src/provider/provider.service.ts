@@ -349,8 +349,14 @@ export class ProviderService {
         providerId: string,
         updatePasswordDto: UpdatePasswordDto
       ) {
-        // validate the prrovider
-        const provider = await this.getProvider(providerId);
+        // Fetch provider details using ID
+        const provider = await this.prisma.provider.findUnique({
+            where: {
+                id: providerId
+            }
+        });
+        if(!provider)
+            throw new NotFoundException("provider does not exist");
     
         // Compare the entered old password with the password fetched from database
         const isPasswordValid = await this.authService.comparePasswords(

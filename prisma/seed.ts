@@ -1,14 +1,17 @@
 import { CourseStatus, CourseVerificationStatus, PrismaClient, ProviderStatus } from '@prisma/client'
+import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient()
 
 async function main() {
-
+  
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash("123456", saltRounds);
   const response = await prisma.provider.create({
     data: {
         id: "123e4567-e89b-42d3-a456-556642440010",
         name: "Vijay Salgaonkar",
         email: "vijaysalgaonkar@gmail.com",
-        password: "9d209aacaed4088d68c41bd8dfb20de39cbd8339",
+        password: hashedPassword,
         status: ProviderStatus.VERIFIED,
         orgLogo: "https://logos-world.net/wp-content/uploads/2021/11/Udemy-Logo.png",
         orgName: "NPTEL",
