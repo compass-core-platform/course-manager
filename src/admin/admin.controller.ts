@@ -244,7 +244,7 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Get('/courses/:courseId')
     async getCourseById (
-        @Param("courseId", ParseIntPipe) courseId: number, @Res() res
+        @Param("courseId", ParseUUIDPipe) courseId: string, @Res() res
     ){
         try {
             this.logger.log(`Getting course information for id ${courseId}`);
@@ -273,7 +273,7 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Patch('/courses/:courseId/accept')
     async acceptCourse (
-        @Param("courseId", ParseIntPipe) courseId: number, @Body() verifyBody: CourseVerify, @Res() res
+        @Param("courseId", ParseUUIDPipe) courseId: string, @Body() verifyBody: CourseVerify, @Res() res
     ) {
         try {
             this.logger.log(`Verifying the course with id ${courseId}`);
@@ -301,7 +301,7 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Patch('/courses/:courseId/reject')
     async rejectCourse (
-        @Param("courseId", ParseIntPipe) courseId: number, @Body() courseRejectionRequestDto: RejectProviderRequestDto, @Res() res
+        @Param("courseId", ParseUUIDPipe) courseId: string, @Body() courseRejectionRequestDto: RejectProviderRequestDto, @Res() res
     ) {
         try {
             this.logger.log(`Processing reject request of course with id ${courseId}`);
@@ -329,7 +329,7 @@ export class AdminController {
     @ApiResponse({ status: HttpStatus.OK, type: AdminCourseResponse})
     @Delete('/courses/:courseId')
     async removeCourse (
-        @Param("courseId", ParseIntPipe) courseId: number, @Res() res
+        @Param("courseId", ParseUUIDPipe) courseId: string, @Res() res
     ) {
         try {
             this.logger.log(`Processing removal request of course with id ${courseId}`);

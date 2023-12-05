@@ -18,6 +18,7 @@ import axios from 'axios';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CourseStatusDto } from 'src/course/dto/course-status.dto';
 import { ProviderSettlementDto } from 'src/admin/dto/provider-settlement.dto';
+import * as minio from 'minio';
 
 
 @Injectable()
@@ -42,6 +43,9 @@ export class ProviderService {
 
         // Hashing the password
         const hashedPassword = await this.authService.hashPassword(signupDto.password);
+
+        // upload the image to minio
+        
 
         // Create an entry in the database
         provider = await this.prisma.provider.create({
@@ -161,7 +165,7 @@ export class ProviderService {
         return clone;
     }
 
-    async removeCourse(providerId: string, courseId: number) {
+    async removeCourse(providerId: string, courseId: string) {
 
         // Validate course ID provided
         const course = await this.courseService.getCourse(courseId);
@@ -180,7 +184,7 @@ export class ProviderService {
         return this.courseService.getProviderCourses(providerId);
     }
 
-    async editCourse(providerId: string, courseId: number, editCourseDto: EditCourseDto) {
+    async editCourse(providerId: string, courseId: string, editCourseDto: EditCourseDto) {
         
         // Validate provider
         await this.getProvider(providerId);
@@ -188,7 +192,7 @@ export class ProviderService {
         return this.courseService.editCourse(courseId, editCourseDto);
     }
 
-    async changeCourseStatus(providerId: string, courseId: number, courseStatusDto: CourseStatusDto) {
+    async changeCourseStatus(providerId: string, courseId: string, courseStatusDto: CourseStatusDto) {
         
         // Validate provider
         await this.getProvider(providerId);
@@ -196,7 +200,7 @@ export class ProviderService {
         return this.courseService.changeStatus(courseId, providerId, courseStatusDto);
     }
 
-    async getCourseFeedbacks(providerId: string, courseId: number): Promise<FeedbackResponseDto> {
+    async getCourseFeedbacks(providerId: string, courseId: string): Promise<FeedbackResponseDto> {
 
         // Fetch course
         const course = await this.courseService.getCourse(courseId);

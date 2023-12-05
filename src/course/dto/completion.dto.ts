@@ -7,8 +7,8 @@ export class CompleteCourseDto {
     // course ID
     @ApiProperty()
     @IsNotEmpty()
-    @IsInt()
-    courseId: number;
+    @IsUUID()
+    courseId: string;
 
     // user ID
     @ApiProperty()

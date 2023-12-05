@@ -103,7 +103,7 @@ export class CourseService {
         });
     }
 
-    async addPurchaseRecord(courseId: number, purchaseDto: PurchaseDto) {
+    async addPurchaseRecord(courseId: string, purchaseDto: PurchaseDto) {
 
         // Validate course
         const course = await this.getCourse(courseId);
@@ -136,7 +136,7 @@ export class CourseService {
             const walletPurchaseBody: WalletPurchaseDto = {
                 providerId: course.providerId,
                 credits: course.credits,
-                description: purchaseDto.transactionDescription
+                description: `Purchased course ${course.title}`
             }
             const walletResponse = await axios.post(process.env.WALLET_SERVICE_URL + endpoint, walletPurchaseBody);
             return walletResponse.data.data.transaction.transactionId;
@@ -154,7 +154,7 @@ export class CourseService {
         }
     }
 
-    async changeStatus(courseId: number, providerId: string, courseStatusDto: CourseStatusDto) {
+    async changeStatus(courseId: string, providerId: string, courseStatusDto: CourseStatusDto) {
 
         // Validate course
         const course = await this.getCourse(courseId)
@@ -169,7 +169,7 @@ export class CourseService {
         });
     }
 
-    async editCourse(courseId: number, editCourseDto: EditCourseDto) {
+    async editCourse(courseId: string, editCourseDto: EditCourseDto) {
     
         // update the course details as required and change its verification status to pending
         return this.prisma.course.update({
@@ -181,7 +181,7 @@ export class CourseService {
         });
     }
 
-    async getCourse(courseId: number): Promise<AdminCourseResponse> {
+    async getCourse(courseId: string): Promise<AdminCourseResponse> {
 
         // Find course by ID and throw error if not found
         const course = await this.prisma.course.findUnique({
@@ -207,7 +207,7 @@ export class CourseService {
         }
     }
 
-    async getNumOfCourseUsers(courseId: number) {
+    async getNumOfCourseUsers(courseId: string) {
 
         return this.prisma.userCourse.count({
             where: {
@@ -216,7 +216,7 @@ export class CourseService {
         })
     }
 
-    async getCourseByConsumer(courseId: number): Promise<CourseResponse> {
+    async getCourseByConsumer(courseId: string): Promise<CourseResponse> {
 
         // Find course by ID and throw error if not found
         const course = await this.getCourse(courseId);
@@ -236,7 +236,7 @@ export class CourseService {
         }
     }
 
-    async giveCourseFeedback(courseId: number, userId: string, feedbackDto: FeedbackDto) {
+    async giveCourseFeedback(courseId: string, userId: string, feedbackDto: FeedbackDto) {
 
         // Validate course
         const course = await this.getCourse(courseId);
@@ -289,7 +289,7 @@ export class CourseService {
         });
     }
 
-    async deleteCourse(courseId: number) {
+    async deleteCourse(courseId: string) {
         
         // Delete the course entry from db
         await this.prisma.course.delete({
@@ -313,7 +313,7 @@ export class CourseService {
         })
     }
 
-    async getPurchasedUsersByCourseId(courseId: number) {
+    async getPurchasedUsersByCourseId(courseId: string) {
 
         // Get all users that have bought a course
         return this.prisma.userCourse.findMany({
@@ -359,7 +359,7 @@ export class CourseService {
         });
     }
 
-    async acceptCourse(courseId: number, cqf_score?: number) {
+    async acceptCourse(courseId: string, cqf_score?: number) {
 
         // Validate course
         let course = await this.getCourse(courseId);
@@ -378,7 +378,7 @@ export class CourseService {
         });
     }
 
-    async rejectCourse(courseId: number, rejectionReason: string) {
+    async rejectCourse(courseId: string, rejectionReason: string) {
 
         // Validate course
         const course = await this.getCourse(courseId);
@@ -397,7 +397,7 @@ export class CourseService {
         });
     }
 
-    async removeCourse(courseId: number) {
+    async removeCourse(courseId: string) {
         
         // Validate course
         await this.getCourse(courseId);

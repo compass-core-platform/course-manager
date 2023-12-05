@@ -79,6 +79,7 @@ async function main() {
 
   const response1 = await prisma.course.createMany({
     data: [{
+        id: "123e4567-e89b-42d3-a456-556642440050",
         providerId: provider1.id,
         title: "NestJS Complete",
         description: "Build full featured backend APIs incredibly quickly with Nest, TypeORM, and Typescript. Includes testing and deployment!",
@@ -97,6 +98,7 @@ async function main() {
         endDate: new Date("2024-07-01").toISOString(),
         verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
+        id: "123e4567-e89b-42d3-a456-556642440051",
         providerId: provider1.id,
         title: "Graphic Design Masterclass",
         description: "The Ultimate Graphic Design Course Which Covers Photoshop, Illustrator, InDesign, Design Theory, Branding & Logo Design",
@@ -114,6 +116,7 @@ async function main() {
         endDate: new Date("2024-09-01").toISOString(),
         verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
+        id: "123e4567-e89b-42d3-a456-556642440052",
         providerId: provider1.id,
         title: "Python for Data Science",
         description: "Learn how to use NumPy, Pandas, Seaborn , Matplotlib , Plotly , Scikit-Learn , Machine Learning, Tensorflow , and more",
@@ -129,6 +132,7 @@ async function main() {
         },
         author: "Jose Portilla",
     }, {
+        id: "123e4567-e89b-42d3-a456-556642440053",
         providerId: response.id,
         title: "Microsoft Excel",
         description: "Excel with this A-Z Microsoft Excel Course. Microsoft Excel 2010, 2013, 2016, Excel 2019 and Microsoft/Office 365/2023",
@@ -143,6 +147,7 @@ async function main() {
         author: "Kyle Pew",
         startDate: new Date("2024-05-01").toISOString(),
     }, {
+        id: "123e4567-e89b-42d3-a456-556642440054",
         providerId: provider1.id,
         title: "Learn DevOps & Kubernetes",
         description: "This course enables anyone to get started with devops engineering.",
@@ -163,6 +168,7 @@ async function main() {
         verificationStatus: CourseVerificationStatus.ACCEPTED,
         cqfScore: 10,
     }, {
+        id: "123e4567-e89b-42d3-a456-556642440055",
         providerId: provider1.id,
         title: "Introduction to Programming",
         description: "This course covers all the fundamentals of programming",
@@ -179,6 +185,7 @@ async function main() {
         author: "James Franco",
         verificationStatus: CourseVerificationStatus.PENDING,
     }, {
+        id: "123e4567-e89b-42d3-a456-556642440056",
         providerId: provider1.id,
         title: "Introduction to Compiler Engineering",
         description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
@@ -197,6 +204,7 @@ async function main() {
         verificationStatus: CourseVerificationStatus.REJECTED,
         rejectionReason: "Level associated with LLVM is wrong"
     }, {
+        id: "123e4567-e89b-42d3-a456-556642440057",
         providerId: provider1.id,
         title: "Introduction to Compiler Engineering 2",
         description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
@@ -234,29 +242,35 @@ async function main() {
     },
   });
 
-  const resp = await prisma.course.findMany({});
-  console.log("All courses: ", resp);
+  // const resp = await prisma.course.findMany({});
+  // console.log("All courses: ", resp);
   const response3 = await prisma.userCourse.createMany({
     data: [{
-      userId: "c2cc3f08-b6fc-4d53-aa91-2bfcb4e0a5c1",
+      userId: "123e4567-e89b-42d3-a456-556642440000",
       feedback: "Great course",
       rating: 4,
-      courseId: 1
+      courseId: "123e4567-e89b-42d3-a456-556642440050"
     }, {
-      userId: "8d1f5e46-4e0d-401e-83b4-5a72fbd6c5a9",
+      userId: "123e4567-e89b-42d3-a456-556642440000",
+      courseId: "123e4567-e89b-42d3-a456-556642440051"
+    }, {
+      userId: "123e4567-e89b-42d3-a456-556642440001",
       feedback: "Instructor is very friendly",
       rating: 4,
-      courseId: 2
+      courseId: "123e4567-e89b-42d3-a456-556642440050"
     }, {
-      userId: "a3a5f480-9ac1-4e20-b0d9-7b3a662e2c36",
+      userId: "123e4567-e89b-42d3-a456-556642440001",
+      courseId: "123e4567-e89b-42d3-a456-556642440051"
+    }, {
+      userId: "123e4567-e89b-42d3-a456-556642440001",
       feedback: "Some more real world applications could be discussed",
       rating: 3,
-      courseId: 2
+      courseId: "123e4567-e89b-42d3-a456-556642440052"
     }, {
-      userId: "f9b69f4b-1095-4d29-9f49-8f653eb5b3bd",
+      userId: "123e4567-e89b-42d3-a456-556642440002",
       feedback: "Not satisfied with the content",
       rating: 2,
-      courseId: 3
+      courseId: "123e4567-e89b-42d3-a456-556642440052"
     }]
   })
   console.log(response)

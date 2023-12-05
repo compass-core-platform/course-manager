@@ -50,7 +50,7 @@ export class CourseController {
     @Get("/:courseId")
     // Fetch details of one course
     async getCourse(
-        @Param("courseId", ParseIntPipe) courseId: number,
+        @Param("courseId", ParseUUIDPipe) courseId: string,
         @Res() res
     ) {
         try {
@@ -80,7 +80,7 @@ export class CourseController {
     @Post("/:courseId/purchase")
     // Confirmation of user purchase of a course
     async purchaseCourse(
-        @Param("courseId", ParseIntPipe) courseId: number,
+        @Param("courseId", ParseUUIDPipe) courseId: string,
         @Body() purchaseDto: PurchaseDto,
 
         @Res() res
@@ -114,7 +114,7 @@ export class CourseController {
     @Patch("/:courseId/feedback/:userId")
     // Give feedback and rating
     async feedback(
-        @Param("courseId", ParseIntPipe) courseId: number,
+        @Param("courseId", ParseUUIDPipe) courseId: string,
         @Param("userId", ParseUUIDPipe) userId: string,
         @Body() feedbackDto: FeedbackDto,
         @Res() res

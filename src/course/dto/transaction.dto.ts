@@ -3,7 +3,7 @@
 export class CourseTransactionDto {
 
     // course ID
-    readonly courseId: number;
+    readonly courseId: string;
 
     // course name
     readonly courseName: string;

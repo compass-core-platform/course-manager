@@ -65,7 +65,7 @@ model Provider {
 
 
 model Course {
-  id                  Int                       @id @default(autoincrement())
+  id                  String                       @id @default(uuid())
   providerId          String
   title               String
   description         String
@@ -93,7 +93,7 @@ model Course {
 model UserCourse {
   id                        Int                       @id @default(autoincrement())
   userId                    String                    @db.Uuid
-  courseId                  Int
+  courseId                  String
   purchasedAt               DateTime                  @default(now())
   status                    CourseProgressStatus      @default(IN_PROGRESS)
   courseCompletionScore     Float?

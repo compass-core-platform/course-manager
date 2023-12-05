@@ -51,25 +51,25 @@ export class AdminService {
     }
 
     // find course by Id
-    async findCourseById(courseId: number): Promise<AdminCourseResponse> {
+    async findCourseById(courseId: string): Promise<AdminCourseResponse> {
 
         return this.courseService.getCourse(courseId);
     }
 
     // accept a course along with the cqf score
-    async acceptCourse(courseId: number, cqf_score?: number) {
+    async acceptCourse(courseId: string, cqf_score?: number) {
         
         return this.courseService.acceptCourse(courseId, cqf_score);
     }
 
     // reject a course
-    async rejectCourse(courseId: number, rejectionReason: string) {
+    async rejectCourse(courseId: string, rejectionReason: string) {
         
         return this.courseService.rejectCourse(courseId, rejectionReason);
     }
 
     // remove a course from marketplace
-    async removeCourse(courseId: number) {
+    async removeCourse(courseId: string) {
         
         return this.courseService.removeCourse(courseId);
     }

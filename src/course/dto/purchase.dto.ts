@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsUUID } from "class-validator";
 
 
 export class PurchaseDto {
@@ -8,12 +8,6 @@ export class PurchaseDto {
     @IsNotEmpty()
     @IsUUID()
     consumerId: string;
-
-    // Purchase description
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    transactionDescription: string;
 }
 
 export class PurchaseResponseDto {
