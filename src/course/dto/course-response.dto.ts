@@ -10,7 +10,6 @@ export class CourseResponse {
     readonly courseLink: string;
     readonly imgLink: string;
     readonly credits: number;
-    readonly noOfLessons: number | null;
     readonly language: string[];
     readonly competency: JsonValue;
     readonly author: string;

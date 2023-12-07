@@ -1,5 +1,5 @@
 
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Provider, Course } from '@prisma/client';
 import { EditProvider } from './dto/edit-provider.dto';
@@ -10,6 +10,10 @@ import axios from 'axios';
 import { AdminCourseResponse } from 'src/course/dto/course-response.dto';
 import { ProviderSettlementDto } from './dto/provider-settlement.dto';
 import { ProviderProfileResponse } from 'src/provider/dto/provider-profile-response.dto';
+import { AdminSignupDto } from './dto/signup.dto';
+import { uploadFile } from 'src/utils/minio';
+import { AuthService } from 'src/auth/auth.service';
+import { AdminLoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AdminService {
@@ -18,8 +22,45 @@ export class AdminService {
         private prisma: PrismaService, 
         private wallet: MockWalletService, 
         private providerService: ProviderService,
-        private courseService: CourseService
+        private courseService: CourseService,
+        private authService: AuthService
     ) {}
+
+    // create a new admin
+    async signup(signupDto: AdminSignupDto, image?: Express.Multer.File) {
+
+        let imageUrl: string | undefined;
+        if(image) {
+            imageUrl = await uploadFile(signupDto.name, image.buffer, `/admin`)
+        }
+
+        // Hashing the password
+        const hashedPassword = await this.authService.hashPassword(signupDto.password);
+
+        const admin = await this.prisma.admin.create({
+            data: {
+                name: signupDto.name,
+                email: signupDto.email,
+                password: hashedPassword,
+                image: imageUrl
+            }
+        });
+        return admin.id;
+    }
+
+    async login(loginDto: AdminLoginDto) {
+        const admin = await this.prisma.admin.findUnique({
+            where: { email: loginDto.email }
+        });
+        if (admin == null) {
+            throw new NotFoundException(`Admin not found`);
+        }
+        const isMatch = await this.authService.comparePasswords(loginDto.password, admin.password);
+        if (!isMatch) {
+            throw new BadRequestException(`Invalid credentials`);
+        }
+        return admin.id;
+    }
 
     // verify provider account
     async verifyProvider(providerId: string) {

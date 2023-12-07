@@ -77,26 +77,22 @@ export class CourseController {
 
     @ApiOperation({ summary: 'Confirmation of user purchase of a course' })
     @ApiResponse({ status: HttpStatus.OK, type: PurchaseResponseDto })
-    @Post("/:courseId/purchase")
+    @Post("/:courseId/purchase/:consumerId")
     // Confirmation of user purchase of a course
     async purchaseCourse(
         @Param("courseId", ParseUUIDPipe) courseId: string,
-        @Body() purchaseDto: PurchaseDto,
-
+        @Param("consumerId", ParseUUIDPipe) consumerId: string,
         @Res() res
     ) {
         try {
             this.logger.log(`Recording the user purchase of the course`);
 
-            const transactionId = await this.courseService.addPurchaseRecord(courseId, purchaseDto);
+            await this.courseService.addPurchaseRecord(courseId, consumerId);
 
             this.logger.log(`Successfully recorded the purchase`);
 
             res.status(HttpStatus.OK).json({
                 message: "purchase successful",
-                data: {
-                    walletTransactionId: transactionId
-                }
             })
         } catch (err) {
             this.logger.error(`Failed to record the purchase`);

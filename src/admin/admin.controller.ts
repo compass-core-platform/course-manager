@@ -1,4 +1,4 @@
-import { Controller, Body, Get, Post, Patch, Res, Delete, HttpStatus, Param, ParseIntPipe, Logger, ParseUUIDPipe} from '@nestjs/common';
+import { Controller, Body, Get, Post, Patch, Res, Delete, HttpStatus, Param, Logger, ParseUUIDPipe, UseInterceptors, UploadedFile} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { ProviderProfileResponse } from '../provider/dto/provider-profile-response.dto';
@@ -14,6 +14,9 @@ import { ProviderVerify } from './dto/provider-verify-response.dto';
 import { RejectProviderResponseDto } from './dto/reject-provider-response.dto';
 import { RejectProviderRequestDto } from './dto/reject-provider-request.dto';
 import { AdminCourseResponse } from 'src/course/dto/course-response.dto';
+import { AdminSignupDto } from './dto/signup.dto';
+import { AdminLoginDto, AdminLoginResponseDto } from './dto/login.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -21,6 +24,72 @@ export class AdminController {
     private readonly logger = new Logger(AdminController.name);
 
     constructor(private adminService: AdminService) {}
+
+    @ApiOperation({ summary: 'signup for admin' })
+    @ApiResponse({ status: HttpStatus.OK, type: AdminLoginResponseDto })
+    @Post("/signup")
+    @UseInterceptors(FileInterceptor('image'))
+    // admin signup
+    async adminSignup(
+        @Body() signupDto: AdminSignupDto,
+        @UploadedFile() image: Express.Multer.File,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Signing up as admin`)
+
+            const adminId = await this.adminService.signup(signupDto, image);
+
+            this.logger.log(`Successfully signed up as admin`)
+
+            res.status(HttpStatus.OK).json({
+                message: "sign up successful",
+                data: {
+                    adminId
+                }
+            });
+        } catch (err) {
+            this.logger.error(`Failed to sign up the admin with the given credentials`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to sign up as admin",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: 'Login for admin' })
+    @ApiResponse({ status: HttpStatus.OK, type: AdminLoginResponseDto })
+    @Post("/login")
+    // admin login
+    async login(
+        @Body() loginDto: AdminLoginDto,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Logging in as admin`)
+
+            const adminId = await this.adminService.login(loginDto);
+
+            this.logger.log(`Successfully logged in as admin`)
+
+            res.status(HttpStatus.OK).json({
+                message: "login successful",
+                data: {
+                    adminId
+                }
+            });
+        } catch (err) {
+            this.logger.error(`Failed to login the admin with the given credentials`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to login as admin",
+            });
+        }
+    }
 
     @ApiOperation({ summary: "Get all providers" })
     @ApiResponse({ status: HttpStatus.OK, type: ProviderProfileResponse, isArray: true})

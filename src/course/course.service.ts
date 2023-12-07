@@ -2,7 +2,7 @@ import { NotFoundException, BadRequestException, Injectable, NotAcceptableExcept
 import { PrismaService } from "../prisma/prisma.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { AddCourseDto } from "./dto/add-course.dto";
-import { CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
+import { CourseProgressStatus, CourseStatus, CourseVerificationStatus, Provider } from "@prisma/client";
 import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
 import { AdminCourseResponse, CourseResponse, ProviderCourseResponse } from "src/course/dto/course-response.dto";
@@ -10,7 +10,8 @@ import { CourseTransactionDto } from "./dto/transaction.dto";
 import { SearchResponseDTO } from "./dto/search-response.dto";
 import { CourseStatusDto } from "./dto/course-status.dto";
 import axios from "axios";
-import { PurchaseDto, WalletPurchaseDto } from "./dto/purchase.dto";
+import { uploadFile } from "src/utils/minio";
+import { ProviderProfileResponse } from "src/provider/dto/provider-profile-response.dto";
 
 @Injectable()
 export class CourseService {
@@ -18,7 +19,7 @@ export class CourseService {
         private prisma: PrismaService,
     ) {}
 
-    async searchCourses(searchInput: string): Promise<SearchResponseDTO[]> {
+    async searchCourses(searchInput: string): Promise<CourseResponse[]> {
 
         // Searches for the courses available in the DB that match or contain the input search string
         // in their title, author, description or competency
@@ -65,45 +66,49 @@ export class CourseService {
             && (c.startDate ? c.startDate <= new Date(): true)
             && (c.endDate ? c.endDate >= new Date(): true)
         );
-        // courses = courses.map((c) => {
-        //     let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, ...clone} = c;
-        //     const courseResponse: CourseResponse = {
-        //         ...clone,
-        //         providerName: provider.orgName
-        //     }
-        //     return courseResponse;
-        // });
-        return courses.map((course) => {
-            return {
-                id: course.id.toString(),
-                title: course.title,
-                long_desc: course.description,
-                provider_id: course.providerId,
-                provider_name: course.provider.orgName,
-                price: course.credits.toString(),
-                languages: course.language,
-                competency: course.competency,
-                imgUrl: course.imgLink,
-                rating: course.avgRating?.toString() || "0",
-                startTime: new Date().toISOString(), // need to change
-                endTime: new Date().toISOString(), // need to change
-                noOfPurchases: course._count.userCourses,
+        return courses.map((c) => {
+            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, ...clone} = c;
+            const courseResponse: CourseResponse = {
+                ...clone,
+                providerName: provider.orgName,
+                numOfUsers: _count.userCourses
             }
+            return courseResponse;
         });
+        // return courses.map((course) => {
+        //     return {
+        //         id: course.id.toString(),
+        //         title: course.title,
+        //         long_desc: course.description,
+        //         provider_id: course.providerId,
+        //         provider_name: course.provider.orgName,
+        //         price: course.credits.toString(),
+        //         languages: course.language,
+        //         competency: course.competency,
+        //         imgUrl: course.imgLink,
+        //         rating: course.avgRating?.toString() || "0",
+        //         startTime: new Date().toISOString(), // need to change
+        //         endTime: new Date().toISOString(), // need to change
+        //         noOfPurchases: course._count.userCourses,
+        //     }
+        // });
     }
 
-    async addCourse(providerId: string, addCourseDto: AddCourseDto) {
+    async addCourse(addCourseDto: AddCourseDto, provider: ProviderProfileResponse,  image: Express.Multer.File) {
+
+        const imgLink = await uploadFile( addCourseDto.title, image.buffer, `/provider/${provider.orgName}`);
 
         // add new course to the platform
         return await this.prisma.course.create({
             data: {
-                providerId,
-                ...addCourseDto
+                providerId: provider.id,
+                ...addCourseDto,
+                imgLink,
             }
         });
     }
 
-    async addPurchaseRecord(courseId: string, purchaseDto: PurchaseDto) {
+    async addPurchaseRecord(courseId: string, consumerId: string) {
 
         // Validate course
         const course = await this.getCourse(courseId);
@@ -117,7 +122,7 @@ export class CourseService {
         
         // Check if course already purchased
         const record = await this.prisma.userCourse.findFirst({
-            where: { userId: purchaseDto.consumerId, courseId: courseId }
+            where: { userId: consumerId, courseId: courseId }
         });
         if(record != null)
             throw new BadRequestException("Course already purchased by the user");
@@ -126,32 +131,10 @@ export class CourseService {
         // create new record for purchase
         await this.prisma.userCourse.create({
             data: {
-                userId: purchaseDto.consumerId,
+                userId: consumerId,
                 courseId,
             }
         });
-        // forward to wallet service for transaction
-        try {
-            const endpoint = `/api/consumers/${purchaseDto.consumerId}/purchase`;
-            const walletPurchaseBody: WalletPurchaseDto = {
-                providerId: course.providerId,
-                credits: course.credits,
-                description: `Purchased course ${course.title}`
-            }
-            const walletResponse = await axios.post(process.env.WALLET_SERVICE_URL + endpoint, walletPurchaseBody);
-            return walletResponse.data.data.transaction.transactionId;
-        } catch (err) {
-            // if transaction failed, delete the record
-            await this.prisma.userCourse.delete({
-                where: {
-                    userId_courseId: {
-                        userId: purchaseDto.consumerId,
-                        courseId
-                    }
-                }
-            });
-            throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500)
-        }
     }
 
     async changeStatus(courseId: string, providerId: string, courseStatusDto: CourseStatusDto) {
@@ -169,7 +152,14 @@ export class CourseService {
         });
     }
 
-    async editCourse(courseId: string, editCourseDto: EditCourseDto) {
+    async editCourse(courseId: string, editCourseDto: EditCourseDto, provider: ProviderProfileResponse, image?: Express.Multer.File) {
+
+        // Validate course
+        const course = await this.getCourse(courseId);
+        let imgUrl = course.imgLink;
+        if(image) {
+            imgUrl = await uploadFile( editCourseDto.title ?? course.title, image.buffer, `/provider/${provider.orgName}`);
+        }
     
         // update the course details as required and change its verification status to pending
         return this.prisma.course.update({
@@ -177,6 +167,7 @@ export class CourseService {
             data: {
                 ...editCourseDto,
                 verificationStatus: CourseVerificationStatus.PENDING,
+                imgLink: imgUrl
             }
         });
     }

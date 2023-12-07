@@ -23,11 +23,6 @@ export class AddCourseDto {
     @IsUrl()
     courseLink: string;
 
-    // course image
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsUrl()
-    imgLink: string;
 
     // number of credits required to purchase course
     @ApiProperty()

@@ -86,7 +86,6 @@ async function main() {
         courseLink: "https://www.udemy.com/course/nestjs-the-complete-developers-guide/",
         imgLink: "https://courses.nestjs.com/img/logo.svg",
         credits: 4,
-        noOfLessons: 3,
         language: ["en"],
         competency: {
           "API Development": ["Level1", "Level2"],
@@ -105,7 +104,6 @@ async function main() {
         courseLink: "https://www.udemy.com/course/graphic-design-masterclass-everything-you-need-to-know/",
         imgLink: "https://www.unite.ai/wp-content/uploads/2023/05/emily-bernal-v9vII5gV8Lw-unsplash.jpg",
         credits: 5,
-        noOfLessons: 3,
         language: ["en"],
         competency: {
           "Photoshop": ["Level2", "Level3"],
@@ -123,7 +121,6 @@ async function main() {
         courseLink: "https://www.udemy.com/course/python-for-data-science-and-machine-learning-bootcamp/",
         imgLink: "https://blog.imarticus.org/wp-content/uploads/2021/12/learn-Python-for-data-science.jpg",
         credits: 2,
-        noOfLessons: 3,
         language: ["en"],
         competency: {
           "Statistics": ["Level1"],
@@ -139,7 +136,6 @@ async function main() {
         courseLink: "https://www.udemy.com/course/microsoft-excel-2013-from-beginner-to-advanced-and-beyond/",
         imgLink: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Microsoft_Excel_2013-2019_logo.svg/587px-Microsoft_Excel_2013-2019_logo.svg.png",
         credits: 4,
-        noOfLessons: 3,
         language: ["en"],
         competency: {
           "Excel": ["Level1", "Level2", "Level3", "Level4"]
@@ -154,7 +150,6 @@ async function main() {
         courseLink: "https://udemy.com/courses/pYUxbhj",
         imgLink: "https://udemy.com/courses/pYUxbhj/images/cover1.jpg",
         credits: 120,
-        noOfLessons: 120,
         language: ["english", "hindi"],
         competency: {
             "Docker": ["Level1", "Level3"],
@@ -175,7 +170,6 @@ async function main() {
         courseLink: "https://udemy.com/courses/jQKsLpm",
         imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
         credits: 160,
-        noOfLessons: 100,
         language: ["english", "hindi"],
         avgRating: 3.5,
         competency: {
@@ -192,7 +186,6 @@ async function main() {
         courseLink: "https://udemy.com/courses/jQKsLpm",
         imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
         credits: 160,
-        noOfLessons: 100,
         language: ["english", "hindi"],
         competency: {
             "Compiler Design": ["Level2", "Level3"],
@@ -211,7 +204,6 @@ async function main() {
         courseLink: "https://udemy.com/courses/jQKsLpm",
         imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
         credits: 160,
-        noOfLessons: 100,
         language: ["english", "hindi"],
         competency: {
             "Compiler Design": ["Level2", "Level3"],
@@ -224,12 +216,13 @@ async function main() {
         status: CourseStatus.ARCHIVED
     }]
   })
-
+  const hashedPassword1 = await bcrypt.hash("asdfghjkl", saltRounds);
   const admin = await prisma.admin.create({
     data: {
         name: "Sanchit Uke",
         email: "sanchit@esmagico.in",
-        password: "asdfghjkl",
+        password: hashedPassword1,
+        image: "https://avatars.githubusercontent.com/u/46641520?v=4",
         id: "123e4567-e89b-42d3-a456-556642440020",
     }
   });
@@ -238,7 +231,8 @@ async function main() {
     data: {
       name: 'admin1',
       email: "admin1@gmail.com",
-      password: "123456",
+      image: "https://avatars.githubusercontent.com/u/46641520?v=4",
+      password: hashedPassword,
     },
   });
 

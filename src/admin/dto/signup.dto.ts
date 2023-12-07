@@ -1,8 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsPhoneNumber, IsString, IsStrongPassword, IsUrl } from "class-validator";
-import { PaymentInfo } from "src/utils/types";
+import {  IsEmail, IsNotEmpty, IsString, IsStrongPassword } from "class-validator";
 
-export class SignupDto {
+export class AdminSignupDto {
 
     // name
     @ApiProperty()
@@ -30,30 +29,5 @@ export class SignupDto {
         },
         { message: 'Password is not strong enough' },
     )
-    password: string;
-
-    // organisation name
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    orgName: string;
-
-
-    // phone number
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsPhoneNumber()
-    phone: string;
-
-    // payment info
-    @ApiProperty()
-    @IsOptional()
-    @IsObject()
-    paymentInfo?: PaymentInfo
-}
-
-export class SignupResponseDto {
-
-    // provider ID
-    readonly providerId: string
+    password: string
 }

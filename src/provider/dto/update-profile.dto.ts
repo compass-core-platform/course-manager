@@ -22,12 +22,6 @@ export class UpdateProfileDto {
     @IsOptional()
     orgName?: string
 
-    // organisation logo image link
-    @ApiProperty()
-    @IsString()
-    @IsOptional()
-    orgLogo?: string
-
     // phone number
     @ApiProperty()
     @IsPhoneNumber()

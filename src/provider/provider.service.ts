@@ -18,7 +18,7 @@ import axios from 'axios';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CourseStatusDto } from 'src/course/dto/course-status.dto';
 import { ProviderSettlementDto } from 'src/admin/dto/provider-settlement.dto';
-import * as minio from 'minio';
+import { uploadFile } from 'src/utils/minio';
 
 
 @Injectable()
@@ -29,7 +29,7 @@ export class ProviderService {
         private authService: AuthService
     ) {}
 
-    async createNewAccount(signupDto: SignupDto) {
+    async createNewAccount(signupDto: SignupDto, logo: Express.Multer.File) {
 
         // Check if email already exists
         let provider = await this.prisma.provider.findUnique({
@@ -44,8 +44,11 @@ export class ProviderService {
         // Hashing the password
         const hashedPassword = await this.authService.hashPassword(signupDto.password);
 
+        if(!logo) 
+            throw new BadRequestException("Logo not uploaded");
+
         // upload the image to minio
-        
+        const imgLink = await uploadFile("logo", logo.buffer, `/provider/${signupDto.orgName}/`)
 
         // Create an entry in the database
         provider = await this.prisma.provider.create({
@@ -55,7 +58,7 @@ export class ProviderService {
                 password: hashedPassword,
                 paymentInfo: signupDto.paymentInfo,
                 orgName: signupDto.orgName,
-                orgLogo: signupDto.orgLogo,
+                orgLogo: imgLink,
                 phone: signupDto.phone
             }
         });
@@ -132,13 +135,23 @@ export class ProviderService {
     }
 
     // Used when provider makes a request to update profile
-    async updateProfileInfo(providerId: string, updateProfileDto: UpdateProfileDto) {
+    async updateProfileInfo(providerId: string, updateProfileDto: UpdateProfileDto, logo?: Express.Multer.File) {
 
+        // Fetch provider
+        const provider = await this.getProvider(providerId);
+        let imgLink = provider.orgLogo;
+        if(logo) {
+            // upload the image to minio
+            imgLink = await uploadFile(provider.orgName, logo.buffer, `/provider/${provider.orgName}/`)
+        }
         await this.prisma.provider.update({
             where: {
                 id: providerId
             },
-            data: updateProfileDto
+            data: {
+                ...updateProfileDto,
+                orgLogo: imgLink
+            }
         })
     }
 
@@ -151,7 +164,7 @@ export class ProviderService {
         });
     }
 
-    async addNewCourse(providerId: string, addCourseDto: AddCourseDto): Promise<ProviderCourseResponse> {
+    async addNewCourse(providerId: string, addCourseDto: AddCourseDto, image: Express.Multer.File): Promise<ProviderCourseResponse> {
 
         // Fetch provider
         const provider = await this.getProvider(providerId);
@@ -160,8 +173,11 @@ export class ProviderService {
         if(provider.status != ProviderStatus.VERIFIED)
             throw new UnauthorizedException("Provider account is not verified");
 
+        if(!image)
+            throw new BadRequestException("Image not uploaded");
+
         // Forward to course service
-        const {cqfScore, impactScore, ...clone} = await this.courseService.addCourse(providerId, addCourseDto);
+        const {cqfScore, impactScore, ...clone} = await this.courseService.addCourse(addCourseDto, provider, image);
         return clone;
     }
 
@@ -184,12 +200,12 @@ export class ProviderService {
         return this.courseService.getProviderCourses(providerId);
     }
 
-    async editCourse(providerId: string, courseId: string, editCourseDto: EditCourseDto) {
+    async editCourse(providerId: string, courseId: string, editCourseDto: EditCourseDto, image?: Express.Multer.File) {
         
         // Validate provider
-        await this.getProvider(providerId);
+        const provider = await this.getProvider(providerId);
 
-        return this.courseService.editCourse(courseId, editCourseDto);
+        return this.courseService.editCourse(courseId, editCourseDto, provider, image);
     }
 
     async changeCourseStatus(providerId: string, courseId: string, courseStatusDto: CourseStatusDto) {

@@ -1,34 +1,32 @@
 import * as Minio from 'minio';
 
+const endPoint = process.env.MINIO_ENDPOINT!;
+
 // Replace these values with your Minio server details
 const minioClient = new Minio.Client({
-  endPoint: 'http://10.212.3.229',
+  endPoint: endPoint,
   port: 9000,
   useSSL: false,
-  accessKey: 'E7lmj73hampENjtjaS85',
-  secretKey: 'JS8T9GhvCR8k8yRLcyJoFRxhjbv9ys2o46ZblC7S',
+  accessKey: process.env.MINIO_ACCESS_KEY!,
+  secretKey: process.env.MINIO_SECRET_KEY!,
 });
 
 // Replace these values with your bucket and object details
-const bucketName = 'bucket1';
-const objectName = 'file1.txt';
-const filePath = 'path/to/your/local/file.txt';
+const bucketName = process.env.MINIO_BUCKET_NAME!;
 
 // Function to upload a file to Minio
-async function uploadFile(objectName: string, filePath: string) {
-  try {
-    // Check if the bucket exists, if not, create it
+export async function uploadFile(objectName: string, fileBuffer: Buffer, path: string) {
+
+  // Check if the bucket exists, if not, create it
     const exists = await minioClient.bucketExists(bucketName);
     if (!exists) {
-      await minioClient.makeBucket(bucketName, 'us-east-1');
+      throw new Error("Bucket not found")
     }
 
     // Upload the file to the specified bucket and object
-    await minioClient.fPutObject(bucketName, objectName, filePath);
-
+    await minioClient.putObject(bucketName, objectName, fileBuffer);
     console.log('File uploaded successfully!');
-  } catch (error) {
-    console.error('Error uploading file:', error);
-  }
+
+    return `https://${endPoint}/${bucketName}${path}/${objectName}`
 }
 

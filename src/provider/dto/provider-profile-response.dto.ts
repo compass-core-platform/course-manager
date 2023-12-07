@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ProviderStatus } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
-import { IsEmail, IsEnum, IsObject, IsOptional as IsNotEmpty, IsString, IsUUID, IsOptional, IsUrl, IsPhoneNumber, IsDate } from 'class-validator';
+import { IsEmail, IsEnum, IsObject, IsString, IsUUID, IsOptional, IsUrl, IsPhoneNumber, IsDate, IsNotEmpty } from 'class-validator';
 
 export class ProviderProfileResponse {
     @ApiProperty({required: false})

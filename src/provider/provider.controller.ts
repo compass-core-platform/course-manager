@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Put, Res, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Put, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ProviderService } from './provider.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignupDto, SignupResponseDto } from './dto/signup.dto';
@@ -14,6 +14,7 @@ import { ProviderProfileResponse } from './dto/provider-profile-response.dto';
 import { getPrismaErrorStatusAndMessage } from 'src/utils/utils';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CourseStatusDto } from 'src/course/dto/course-status.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('provider')
 @ApiTags('provider')
@@ -57,17 +58,18 @@ export class ProviderController {
     @ApiOperation({ summary: 'create provider account' })
     @ApiResponse({ status: HttpStatus.CREATED, type: SignupResponseDto })
     @Post("/signup")
+    @UseInterceptors(FileInterceptor('logo'))
     // create a new provider account
     async createAccount(
         @Body() signupDto: SignupDto,
-        @UploadedFile() file,
+        @UploadedFile() logo: Express.Multer.File,
         @Res() res
     ) {
         try {
             this.logger.log(`Creating new provider account`);
-            console.log(file)
-            const providerId = await this.providerService.createNewAccount(signupDto);
-            
+
+            const providerId = await this.providerService.createNewAccount(signupDto, logo);
+
             this.logger.log(`successfully created new provider account`);
 
             res.status(HttpStatus.CREATED).json({
@@ -152,16 +154,18 @@ export class ProviderController {
     @ApiOperation({ summary: 'update provider profile information' })
     @ApiResponse({ status: HttpStatus.OK })
     @Put("/:providerId/profile")
+    @UseInterceptors(FileInterceptor('logo'))
     // update provider profile information
     async updateProfile(
         @Param("providerId", ParseUUIDPipe) providerId: string,
         @Body() updateProfileDto: UpdateProfileDto,
+        @UploadedFile() logo: Express.Multer.File,
         @Res() res
     ) {
         try {
             this.logger.log(`Updating provider profile`);
 
-            await this.providerService.updateProfileInfo(providerId, updateProfileDto);
+            await this.providerService.updateProfileInfo(providerId, updateProfileDto, logo);
 
             this.logger.log(`successfully updated provider profile`);
 
@@ -182,17 +186,19 @@ export class ProviderController {
     @ApiOperation({ summary: 'edit course information' })
     @ApiResponse({ status: HttpStatus.OK })
     @Patch("/:providerId/course/:courseId")
+    @UseInterceptors(FileInterceptor('image'))
     // edit course information
     async editCourse(
         @Param("providerId", ParseUUIDPipe) providerId: string,
         @Param("courseId", ParseIntPipe) courseId: string,
+        @UploadedFile() image: Express.Multer.File,
         @Body() editCourseDto: EditCourseDto,
         @Res() res
     ) {
         try {
             this.logger.log(`Updating course information`);
 
-            await this.providerService.editCourse(providerId, courseId, editCourseDto);
+            await this.providerService.editCourse(providerId, courseId, editCourseDto, image);
 
             this.logger.log(`Successfully updated course information`);
 
@@ -244,16 +250,18 @@ export class ProviderController {
     @ApiOperation({ summary: 'add new course' })
     @ApiResponse({ status: HttpStatus.CREATED, type: ProviderCourseResponse })
     @Post("/:providerId/course")
+    @UseInterceptors(FileInterceptor('image'))
     // add new course
     async addCourse(
         @Param("providerId", ParseUUIDPipe) providerId: string,
         @Body() addCourseDto: AddCourseDto,
+        @UploadedFile() image: Express.Multer.File,
         @Res() res
     ) {
         try {
             this.logger.log(`Adding new course`);
 
-            const course = await this.providerService.addNewCourse(providerId, addCourseDto);
+            const course = await this.providerService.addNewCourse(providerId, addCourseDto, image);
 
             this.logger.log(`Successfully added new course`);
 
