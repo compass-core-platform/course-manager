@@ -1,4 +1,4 @@
-import { CourseStatus, CourseVerificationStatus, PrismaClient, ProviderStatus } from '@prisma/client'
+import { CourseProgressStatus, CourseStatus, CourseVerificationStatus, PrismaClient, ProviderStatus } from '@prisma/client'
 import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient()
 
@@ -243,14 +243,19 @@ async function main() {
       userId: "123e4567-e89b-42d3-a456-556642440000",
       feedback: "Great course",
       rating: 4,
+      status: CourseProgressStatus.COMPLETED,
+      courseCompletionScore: 100,
       courseId: "123e4567-e89b-42d3-a456-556642440050"
     }, {
       userId: "123e4567-e89b-42d3-a456-556642440000",
-      courseId: "123e4567-e89b-42d3-a456-556642440051"
+      courseId: "123e4567-e89b-42d3-a456-556642440051",
+      status: CourseProgressStatus.COMPLETED,
     }, {
       userId: "123e4567-e89b-42d3-a456-556642440001",
       feedback: "Instructor is very friendly",
       rating: 4,
+      status: CourseProgressStatus.COMPLETED,
+      courseCompletionScore: 100,
       courseId: "123e4567-e89b-42d3-a456-556642440050"
     }, {
       userId: "123e4567-e89b-42d3-a456-556642440001",
@@ -259,11 +264,15 @@ async function main() {
       userId: "123e4567-e89b-42d3-a456-556642440001",
       feedback: "Some more real world applications could be discussed",
       rating: 3,
+      status: CourseProgressStatus.COMPLETED,
+      courseCompletionScore: 100,
       courseId: "123e4567-e89b-42d3-a456-556642440052"
     }, {
       userId: "123e4567-e89b-42d3-a456-556642440002",
       feedback: "Not satisfied with the content",
       rating: 2,
+      status: CourseProgressStatus.COMPLETED,
+      courseCompletionScore: 100,
       courseId: "123e4567-e89b-42d3-a456-556642440052"
     }]
   })
