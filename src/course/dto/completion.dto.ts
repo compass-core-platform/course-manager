@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, IsNotEmpty, IsUUID } from "class-validator";
+import { IsInt, IsNotEmpty, IsNumber, IsUUID, Min } from "class-validator";
 
 
 export class CompleteCourseDto {
@@ -15,4 +15,11 @@ export class CompleteCourseDto {
     @IsNotEmpty()
     @IsUUID()
     userId: string;
+
+    // Course completion score
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsNumber()
+    @Min(0)
+    courseCompletionScore: number;
 }

@@ -96,13 +96,17 @@ export class CourseService {
 
     async addCourse(addCourseDto: AddCourseDto, provider: ProviderProfileResponse,  image: Express.Multer.File) {
 
-        const imgLink = await uploadFile( addCourseDto.title, image.buffer, `/provider/${provider.orgName}`);
+        const imageName = addCourseDto.title.replace(" ", "_")
+        const imgLink = await uploadFile( imageName, image.buffer, `/provider/${provider.orgName}`);
 
+        const {competency, ...clone} = addCourseDto;
+        
         // add new course to the platform
         return await this.prisma.course.create({
             data: {
                 providerId: provider.id,
-                ...addCourseDto,
+                ...clone,
+                competency: JSON.parse(competency),
                 imgLink,
             }
         });
@@ -158,14 +162,17 @@ export class CourseService {
         const course = await this.getCourse(courseId);
         let imgUrl = course.imgLink;
         if(image) {
-            imgUrl = await uploadFile( editCourseDto.title ?? course.title, image.buffer, `/provider/${provider.orgName}`);
+            const imageName = (editCourseDto.title ?? course.title).replace(" ", "_")
+            imgUrl = await uploadFile( imageName, image.buffer, `/provider/${provider.orgName}`);
         }
-    
+        const {competency, ...clone} = editCourseDto;
+
         // update the course details as required and change its verification status to pending
         return this.prisma.course.update({
             where: { id: courseId },
             data: {
-                ...editCourseDto,
+                ...clone,
+                competency: competency ? JSON.parse(competency) : undefined,
                 verificationStatus: CourseVerificationStatus.PENDING,
                 imgLink: imgUrl
             }
@@ -316,17 +323,43 @@ export class CourseService {
 
     async markCourseComplete(completeCourseDto: CompleteCourseDto) {
 
+        // Validate course
+        const userCourse = await this.prisma.userCourse.findUnique({
+            where: {
+                userId_courseId: {
+                    userId: completeCourseDto.userId,
+                    courseId: completeCourseDto.courseId
+                }
+            }
+        });
+        if(!userCourse)
+            throw new NotFoundException("User has not purchased this course");
+
+        // Forward to marketplace portal
+        const uri = process.env.MARKETPLACE_PORTAL_URL;
+        if(!uri)
+            throw new HttpException("Marketplace URL not set", 500);
+
+        const endpoint = `/api/consumer/${completeCourseDto.userId}/course/complete`;
+        const courseIdDto = {
+            courseId: completeCourseDto.courseId,
+        }
+        await axios.patch(uri + endpoint, courseIdDto);
+
         // Update a course as complete for a purchased course
         await this.prisma.userCourse.update({
             where: {
                 userId_courseId: {
-                    ...completeCourseDto
+                    courseId: completeCourseDto.courseId,
+                    userId: completeCourseDto.userId,
                 }
             },
             data: {
-                status: CourseProgressStatus.COMPLETED
+                status: CourseProgressStatus.COMPLETED,
+                courseCompletionScore: completeCourseDto.courseCompletionScore
             }
         })
+
     }
 
     async fetchAllCourses() : Promise<AdminCourseResponse[]> {

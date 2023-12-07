@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { CourseStatus } from "@prisma/client";
 import { ArrayNotEmpty, IsArray, IsDate, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Min } from "class-validator";
-import { CompetencyMap } from "src/utils/types";
 
 export class AddCourseDto {
 
@@ -31,12 +30,6 @@ export class AddCourseDto {
     @IsInt()
     credits: number;
 
-    // Number of lessons
-    @ApiProperty()
-    @IsInt()
-    @IsOptional()
-    noOfLessons?: number;
-
     // language
     @ApiProperty()
     @IsArray()
@@ -46,7 +39,8 @@ export class AddCourseDto {
     // competency
     @ApiProperty()
     @IsNotEmpty()
-    competency: CompetencyMap;
+    @IsString()
+    competency: string;
 
     // author
     @ApiProperty()

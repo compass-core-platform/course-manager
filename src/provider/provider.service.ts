@@ -142,14 +142,16 @@ export class ProviderService {
         let imgLink = provider.orgLogo;
         if(logo) {
             // upload the image to minio
-            imgLink = await uploadFile(provider.orgName, logo.buffer, `/provider/${provider.orgName}/`)
+            imgLink = await uploadFile("logo", logo.buffer, `/provider/${provider.orgName}/`)
         }
+        const { paymentInfo, ...clone } = updateProfileDto;
         await this.prisma.provider.update({
             where: {
                 id: providerId
             },
             data: {
-                ...updateProfileDto,
+                ...clone,
+                paymentInfo: paymentInfo ? JSON.parse(paymentInfo) : undefined,
                 orgLogo: imgLink
             }
         })
@@ -259,12 +261,9 @@ export class ProviderService {
         if(course.providerId != providerId)
             throw new BadRequestException("Course does not belong to this provider");
 
-        // Forward to course service. Error is thrown when user has not purchased a course
-        try {
-            await this.courseService.markCourseComplete(completeCourseDto);
-        } catch {
-            throw new NotFoundException("This user has not subscribed to this course");
-        }
+        // Forward to course service
+        await this.courseService.markCourseComplete(completeCourseDto);
+
     }
 
     async fetchAllProviders(): Promise<ProviderProfileResponse[]> {

@@ -31,6 +31,6 @@ export class UpdateProfileDto {
     // payment info
     @ApiProperty()
     @IsOptional()
-    @IsObject()
-    paymentInfo?: PaymentInfo
+    @IsString()
+    paymentInfo?: string
 }

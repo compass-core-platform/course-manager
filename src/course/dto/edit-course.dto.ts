@@ -50,7 +50,8 @@ export class EditCourseDto {
     // competency
     @ApiProperty()
     @IsOptional()
-    competency?: CompetencyMap;
+    @IsString()
+    competency?: string;
 
     // author
     @ApiProperty()

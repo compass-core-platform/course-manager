@@ -183,70 +183,6 @@ export class ProviderController {
         }
     }
 
-    @ApiOperation({ summary: 'edit course information' })
-    @ApiResponse({ status: HttpStatus.OK })
-    @Patch("/:providerId/course/:courseId")
-    @UseInterceptors(FileInterceptor('image'))
-    // edit course information
-    async editCourse(
-        @Param("providerId", ParseUUIDPipe) providerId: string,
-        @Param("courseId", ParseIntPipe) courseId: string,
-        @UploadedFile() image: Express.Multer.File,
-        @Body() editCourseDto: EditCourseDto,
-        @Res() res
-    ) {
-        try {
-            this.logger.log(`Updating course information`);
-
-            await this.providerService.editCourse(providerId, courseId, editCourseDto, image);
-
-            this.logger.log(`Successfully updated course information`);
-
-            res.status(HttpStatus.OK).json({
-                message: "course edited successfully",
-            })
-        } catch (err) {
-            this.logger.error(`Failed to update course information`);
-
-            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
-            res.status(statusCode).json({
-                statusCode, 
-                message: errorMessage || "Failed to update course information`",
-            });
-        }
-    }
-
-    @ApiOperation({ summary: 'change course status' })
-    @ApiResponse({ status: HttpStatus.OK })
-    @Patch("/:providerId/course/:courseId/status")
-    // change course status (archived/unarchived)
-    async changeCourseStatus(
-        @Param("providerId", ParseUUIDPipe) providerId: string,
-        @Param("courseId", ParseIntPipe) courseId: string,
-        @Body() courseStatusDto: CourseStatusDto,
-        @Res() res
-    ) {
-        try {
-            this.logger.log(`Changing course status`);
-
-            await this.providerService.changeCourseStatus(providerId, courseId, courseStatusDto);
-
-            this.logger.log(`Successfully changed course status`);
-
-            res.status(HttpStatus.OK).json({
-                message: "course status changed successfully",
-            })
-        } catch (err) {
-            this.logger.error(`Failed to change course status`);
-
-            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
-            res.status(statusCode).json({
-                statusCode, 
-                message: errorMessage || "Failed to change course status`",
-            });
-        }
-    }
-    
     @ApiOperation({ summary: 'add new course' })
     @ApiResponse({ status: HttpStatus.CREATED, type: ProviderCourseResponse })
     @Post("/:providerId/course")
@@ -280,37 +216,6 @@ export class ProviderController {
         }
     }
 
-    @ApiOperation({ summary: 'remove a course' })
-    @ApiResponse({ status: HttpStatus.OK })
-    @Delete("/:providerId/course/:courseId")
-    // remove an existing course
-    async removeCourse(
-        @Param("providerId", ParseUUIDPipe) providerId: string,
-        @Param("courseId", ParseIntPipe) courseId: string,
-        @Res() res
-    ) {
-        try {
-            this.logger.log(`Removing course`);
-
-            await this.providerService.removeCourse(providerId, courseId);
-
-            this.logger.log(`Successfully deleted the course`);
-
-
-            res.status(HttpStatus.OK).json({
-                message: "course deleted successfully",
-            })
-        } catch (err) {
-            this.logger.error(`Failed to delete the course`);
-
-            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
-            res.status(statusCode).json({
-                statusCode, 
-                message: errorMessage || "Failed to delete the course`",
-            });
-        }
-    }
-
     @ApiOperation({ summary: 'View courses offered by self' })
     @ApiResponse({ status: HttpStatus.OK, type: [ProviderCourseResponse] })
     @Get("/:providerId/course")
@@ -337,37 +242,6 @@ export class ProviderController {
             res.status(statusCode).json({
                 statusCode, 
                 message: errorMessage || "Failed to fetch the courses",
-            });
-        }
-    }
-
-    @ApiOperation({ summary: 'View Course Feedback & ratings, numberOfPurchases' })
-    @ApiResponse({ status: HttpStatus.OK, type: FeedbackResponseDto })
-    @Get("/:providerId/course/:courseId/feedback")
-    // View Course Feedback & ratings, numberOfPurchases
-    async getCourseFeedback(
-        @Param("providerId", ParseUUIDPipe) providerId: string,
-        @Param("courseId", ParseIntPipe) courseId: string,
-        @Res() res
-    ) {
-        try {
-            this.logger.log(`Getting course feedbacks`);
-
-            const feedbackResponse = await this.providerService.getCourseFeedbacks(providerId, courseId);
-
-            this.logger.log(`Successfully retrieved the feedbacks`);
-
-            res.status(HttpStatus.OK).json({
-                message: "feedbacks fetched successfully",
-                data: feedbackResponse
-            })
-        } catch (err) {
-            this.logger.error(`Failed to fetch the feedbacks`);
-
-            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
-            res.status(statusCode).json({
-                statusCode, 
-                message: errorMessage || "Failed to fetch the feedbacks",
             });
         }
     }
@@ -428,6 +302,132 @@ export class ProviderController {
             res.status(statusCode).json({
                 statusCode, 
                 message: errorMessage || "Failed to mark the course completion",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: 'edit course information' })
+    @ApiResponse({ status: HttpStatus.OK })
+    @Patch("/:providerId/course/:courseId")
+    @UseInterceptors(FileInterceptor('image'))
+    // edit course information
+    async editCourse(
+        @Param("providerId", ParseUUIDPipe) providerId: string,
+        @Param("courseId", ParseUUIDPipe) courseId: string,
+        @UploadedFile() image: Express.Multer.File,
+        @Body() editCourseDto: EditCourseDto,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Updating course information`);
+
+            await this.providerService.editCourse(providerId, courseId, editCourseDto, image);
+
+            this.logger.log(`Successfully updated course information`);
+
+            res.status(HttpStatus.OK).json({
+                message: "course edited successfully",
+            })
+        } catch (err) {
+            this.logger.error(`Failed to update course information`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to update course information`",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: 'remove a course' })
+    @ApiResponse({ status: HttpStatus.OK })
+    @Delete("/:providerId/course/:courseId")
+    // remove an existing course
+    async removeCourse(
+        @Param("providerId", ParseUUIDPipe) providerId: string,
+        @Param("courseId", ParseIntPipe) courseId: string,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Removing course`);
+
+            await this.providerService.removeCourse(providerId, courseId);
+
+            this.logger.log(`Successfully deleted the course`);
+
+
+            res.status(HttpStatus.OK).json({
+                message: "course deleted successfully",
+            })
+        } catch (err) {
+            this.logger.error(`Failed to delete the course`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to delete the course`",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: 'change course status' })
+    @ApiResponse({ status: HttpStatus.OK })
+    @Patch("/:providerId/course/:courseId/status")
+    // change course status (archived/unarchived)
+    async changeCourseStatus(
+        @Param("providerId", ParseUUIDPipe) providerId: string,
+        @Param("courseId", ParseIntPipe) courseId: string,
+        @Body() courseStatusDto: CourseStatusDto,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Changing course status`);
+
+            await this.providerService.changeCourseStatus(providerId, courseId, courseStatusDto);
+
+            this.logger.log(`Successfully changed course status`);
+
+            res.status(HttpStatus.OK).json({
+                message: "course status changed successfully",
+            })
+        } catch (err) {
+            this.logger.error(`Failed to change course status`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to change course status`",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: 'View Course Feedback & ratings, numberOfPurchases' })
+    @ApiResponse({ status: HttpStatus.OK, type: FeedbackResponseDto })
+    @Get("/:providerId/course/:courseId/feedback")
+    // View Course Feedback & ratings, numberOfPurchases
+    async getCourseFeedback(
+        @Param("providerId", ParseUUIDPipe) providerId: string,
+        @Param("courseId", ParseIntPipe) courseId: string,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Getting course feedbacks`);
+
+            const feedbackResponse = await this.providerService.getCourseFeedbacks(providerId, courseId);
+
+            this.logger.log(`Successfully retrieved the feedbacks`);
+
+            res.status(HttpStatus.OK).json({
+                message: "feedbacks fetched successfully",
+                data: feedbackResponse
+            })
+        } catch (err) {
+            this.logger.error(`Failed to fetch the feedbacks`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to fetch the feedbacks",
             });
         }
     }
