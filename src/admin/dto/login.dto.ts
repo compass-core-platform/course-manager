@@ -20,4 +20,6 @@ export class AdminLoginResponseDto {
 
     // provider ID
     readonly adminId: number
+    readonly name: string
+    readonly image: string
 }

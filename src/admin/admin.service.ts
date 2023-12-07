@@ -45,7 +45,7 @@ export class AdminService {
                 image: imageUrl
             }
         });
-        return admin.id;
+        return admin;
     }
 
     async login(loginDto: AdminLoginDto) {
@@ -59,7 +59,7 @@ export class AdminService {
         if (!isMatch) {
             throw new BadRequestException(`Invalid credentials`);
         }
-        return admin.id;
+        return admin;
     }
 
     // verify provider account

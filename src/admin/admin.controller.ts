@@ -38,14 +38,16 @@ export class AdminController {
         try {
             this.logger.log(`Signing up as admin`)
 
-            const adminId = await this.adminService.signup(signupDto, image);
+            const admin = await this.adminService.signup(signupDto, image);
 
             this.logger.log(`Successfully signed up as admin`)
 
             res.status(HttpStatus.OK).json({
                 message: "sign up successful",
                 data: {
-                    adminId
+                    admin: admin.id,
+                    name: admin.name,
+                    image: admin.image
                 }
             });
         } catch (err) {
@@ -70,14 +72,16 @@ export class AdminController {
         try {
             this.logger.log(`Logging in as admin`)
 
-            const adminId = await this.adminService.login(loginDto);
+            const admin = await this.adminService.login(loginDto);
 
             this.logger.log(`Successfully logged in as admin`)
 
             res.status(HttpStatus.OK).json({
                 message: "login successful",
                 data: {
-                    adminId
+                    admin: admin.id,
+                    name: admin.name,
+                    image: admin.image
                 }
             });
         } catch (err) {
