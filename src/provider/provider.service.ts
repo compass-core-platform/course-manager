@@ -48,7 +48,7 @@ export class ProviderService {
             throw new BadRequestException("Logo not uploaded");
 
         // upload the image to minio
-        const imgLink = await uploadFile("logo", logo.buffer, `/provider/${signupDto.orgName}/`)
+        const imgLink = await uploadFile(`provider/${signupDto.orgName.replace(" ", "_")}/logo`, logo.buffer)
 
         // Create an entry in the database
         provider = await this.prisma.provider.create({
@@ -142,7 +142,8 @@ export class ProviderService {
         let imgLink = provider.orgLogo;
         if(logo) {
             // upload the image to minio
-            imgLink = await uploadFile("logo", logo.buffer, `/provider/${provider.orgName}/`)
+            const imageName = updateProfileDto.orgName ?? provider.orgName;
+            imgLink = await uploadFile(`provider/${imageName.replace(" ", "_")}/logo`, logo.buffer)
         }
         const { paymentInfo, ...clone } = updateProfileDto;
         await this.prisma.provider.update({

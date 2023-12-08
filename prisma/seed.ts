@@ -79,7 +79,7 @@ async function main() {
 
   const response1 = await prisma.course.createMany({
     data: [{
-        id: "123e4567-e89b-42d3-a456-556642440050",
+        courseId: "123e4567-e89b-42d3-a456-556642440050",
         providerId: provider1.id,
         title: "NestJS Complete",
         description: "Build full featured backend APIs incredibly quickly with Nest, TypeORM, and Typescript. Includes testing and deployment!",
@@ -97,7 +97,7 @@ async function main() {
         endDate: new Date("2024-07-01").toISOString(),
         verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
-        id: "123e4567-e89b-42d3-a456-556642440051",
+        courseId: "123e4567-e89b-42d3-a456-556642440051",
         providerId: provider1.id,
         title: "Graphic Design Masterclass",
         description: "The Ultimate Graphic Design Course Which Covers Photoshop, Illustrator, InDesign, Design Theory, Branding & Logo Design",
@@ -114,7 +114,7 @@ async function main() {
         endDate: new Date("2024-09-01").toISOString(),
         verificationStatus: CourseVerificationStatus.ACCEPTED,
     }, {
-        id: "123e4567-e89b-42d3-a456-556642440052",
+        courseId: "123e4567-e89b-42d3-a456-556642440052",
         providerId: provider1.id,
         title: "Python for Data Science",
         description: "Learn how to use NumPy, Pandas, Seaborn , Matplotlib , Plotly , Scikit-Learn , Machine Learning, Tensorflow , and more",
@@ -129,7 +129,7 @@ async function main() {
         },
         author: "Jose Portilla",
     }, {
-        id: "123e4567-e89b-42d3-a456-556642440053",
+        courseId: "123e4567-e89b-42d3-a456-556642440053",
         providerId: response.id,
         title: "Microsoft Excel",
         description: "Excel with this A-Z Microsoft Excel Course. Microsoft Excel 2010, 2013, 2016, Excel 2019 and Microsoft/Office 365/2023",
@@ -143,7 +143,7 @@ async function main() {
         author: "Kyle Pew",
         startDate: new Date("2024-05-01").toISOString(),
     }, {
-        id: "123e4567-e89b-42d3-a456-556642440054",
+        courseId: "123e4567-e89b-42d3-a456-556642440054",
         providerId: provider1.id,
         title: "Learn DevOps & Kubernetes",
         description: "This course enables anyone to get started with devops engineering.",
@@ -163,7 +163,7 @@ async function main() {
         verificationStatus: CourseVerificationStatus.ACCEPTED,
         cqfScore: 10,
     }, {
-        id: "123e4567-e89b-42d3-a456-556642440055",
+        courseId: "123e4567-e89b-42d3-a456-556642440055",
         providerId: provider1.id,
         title: "Introduction to Programming",
         description: "This course covers all the fundamentals of programming",
@@ -179,7 +179,7 @@ async function main() {
         author: "James Franco",
         verificationStatus: CourseVerificationStatus.PENDING,
     }, {
-        id: "123e4567-e89b-42d3-a456-556642440056",
+        courseId: "123e4567-e89b-42d3-a456-556642440056",
         providerId: provider1.id,
         title: "Introduction to Compiler Engineering",
         description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
@@ -197,7 +197,7 @@ async function main() {
         verificationStatus: CourseVerificationStatus.REJECTED,
         rejectionReason: "Level associated with LLVM is wrong"
     }, {
-        id: "123e4567-e89b-42d3-a456-556642440057",
+        courseId: "123e4567-e89b-42d3-a456-556642440057",
         providerId: provider1.id,
         title: "Introduction to Compiler Engineering 2",
         description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",

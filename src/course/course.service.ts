@@ -2,7 +2,7 @@ import { NotFoundException, BadRequestException, Injectable, NotAcceptableExcept
 import { PrismaService } from "../prisma/prisma.service";
 import { FeedbackDto } from "./dto/feedback.dto";
 import { AddCourseDto } from "./dto/add-course.dto";
-import { CourseProgressStatus, CourseStatus, CourseVerificationStatus, Provider } from "@prisma/client";
+import { CourseProgressStatus, CourseStatus, CourseVerificationStatus } from "@prisma/client";
 import { CompleteCourseDto } from "./dto/completion.dto";
 import { EditCourseDto } from "./dto/edit-course.dto";
 import { AdminCourseResponse, CourseResponse, ProviderCourseResponse } from "src/course/dto/course-response.dto";
@@ -97,16 +97,14 @@ export class CourseService {
     async addCourse(addCourseDto: AddCourseDto, provider: ProviderProfileResponse,  image: Express.Multer.File) {
 
         const imageName = addCourseDto.title.replace(" ", "_")
-        const imgLink = await uploadFile( imageName, image.buffer, `/provider/${provider.orgName}`);
+        const imgLink = await uploadFile( `provider/${provider.orgName.replace(" ", "_")}/${imageName}`, image.buffer);
 
-        const {competency, ...clone} = addCourseDto;
         
         // add new course to the platform
         return await this.prisma.course.create({
             data: {
                 providerId: provider.id,
-                ...clone,
-                competency: JSON.parse(competency),
+                ...addCourseDto,
                 imgLink,
             }
         });
@@ -151,7 +149,7 @@ export class CourseService {
 
         // update the course status to archived
         return this.prisma.course.update({
-            where: { id: courseId, providerId },
+            where: { courseId, providerId },
             data: { status: courseStatusDto.status }
         });
     }
@@ -163,16 +161,14 @@ export class CourseService {
         let imgUrl = course.imgLink;
         if(image) {
             const imageName = (editCourseDto.title ?? course.title).replace(" ", "_")
-            imgUrl = await uploadFile( imageName, image.buffer, `/provider/${provider.orgName}`);
+            imgUrl = await uploadFile( `provider/${provider.orgName.replace(" ", "_")}/${imageName}`, image.buffer);
         }
-        const {competency, ...clone} = editCourseDto;
 
         // update the course details as required and change its verification status to pending
         return this.prisma.course.update({
-            where: { id: courseId },
+            where: { courseId },
             data: {
-                ...clone,
-                competency: competency ? JSON.parse(competency) : undefined,
+                ...editCourseDto,
                 verificationStatus: CourseVerificationStatus.PENDING,
                 imgLink: imgUrl
             }
@@ -184,7 +180,7 @@ export class CourseService {
         // Find course by ID and throw error if not found
         const course = await this.prisma.course.findUnique({
             where: {
-                id: courseId
+                courseId
             },
             include: {
                 provider: {
@@ -279,7 +275,7 @@ export class CourseService {
         });
         await this.prisma.course.update({
             where: {
-                id: courseId
+                courseId
             },
             data: {
                 avgRating: avgRating._avg.rating
@@ -292,7 +288,7 @@ export class CourseService {
         // Delete the course entry from db
         await this.prisma.course.delete({
             where: {
-                id: courseId
+                courseId
             }
         })
     }
@@ -394,7 +390,7 @@ export class CourseService {
         }
         // Update the course as accepted
         return this.prisma.course.update({
-            where: { id: courseId },
+            where: { courseId },
             data: {
                 verificationStatus: CourseVerificationStatus.ACCEPTED,
                 cqfScore: cqf_score
@@ -413,7 +409,7 @@ export class CourseService {
         }
         // Reject the course
         return this.prisma.course.update({
-            where: {id: courseId},
+            where: { courseId },
             data: {
                 verificationStatus: CourseVerificationStatus.REJECTED,
                 rejectionReason: rejectionReason
@@ -428,7 +424,7 @@ export class CourseService {
 
         // Delete course entry
         return this.prisma.course.delete({
-            where: {id: courseId}
+            where: { courseId}
         });
     }
 
@@ -440,7 +436,7 @@ export class CourseService {
                 providerId
             },
             select: {
-                id: true,
+                courseId: true,
                 title: true,
                 startDate: true,
                 endDate: true,
@@ -456,7 +452,7 @@ export class CourseService {
         // Refactor to the DTO format required
         return transactions.map((c) => {
             return {
-                courseId: c.id,
+                courseId: c.courseId,
                 courseName: c.title,
                 startDate: c.startDate,
                 endDate: c.endDate,

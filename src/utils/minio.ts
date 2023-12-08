@@ -15,18 +15,23 @@ const minioClient = new Minio.Client({
 const bucketName = process.env.MINIO_BUCKET_NAME!;
 
 // Function to upload a file to Minio
-export async function uploadFile(objectName: string, fileBuffer: Buffer, path: string) {
+export async function uploadFile(objectName: string, fileBuffer: Buffer) {
 
   // Check if the bucket exists, if not, create it
     const exists = await minioClient.bucketExists(bucketName);
     if (!exists) {
       throw new Error("Bucket not found")
     }
-
+    
     // Upload the file to the specified bucket and object
     await minioClient.putObject(bucketName, objectName, fileBuffer);
     console.log('File uploaded successfully!');
 
-    return `https://${endPoint}/${bucketName}${path}/${objectName}`
+    // minioClient.presignedUrl('GET', bucketName, objectName, 24 * 60 * 60, function (err, presignedUrl) {
+    //   if (err) return console.log(err)
+    //   console.log(presignedUrl)
+    // })
+
+    return `https://${endPoint}/${bucketName}/${objectName}`
 }
 

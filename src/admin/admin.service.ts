@@ -31,7 +31,7 @@ export class AdminService {
         let imageUrl: string | undefined;
         if(image) {
             const imageName = signupDto.name.replace(" ", "_")
-            imageUrl = await uploadFile(imageName, image.buffer, `/admin`)
+            imageUrl = await uploadFile(`admin/${imageName}`, image.buffer)
         }
 
         // Hashing the password

@@ -3,7 +3,7 @@ import { JsonValue } from "@prisma/client/runtime/library";
 
 export class CourseResponse {
 
-    readonly id: string;
+    readonly courseId: string;
     readonly providerId: string;
     readonly title: string;
     readonly description: string;
