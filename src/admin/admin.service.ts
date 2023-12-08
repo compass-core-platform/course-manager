@@ -19,8 +19,7 @@ import { AdminLoginDto } from './dto/login.dto';
 export class AdminService {
 
     constructor(
-        private prisma: PrismaService, 
-        private wallet: MockWalletService, 
+        private prisma: PrismaService,
         private providerService: ProviderService,
         private courseService: CourseService,
         private authService: AuthService
@@ -50,6 +49,7 @@ export class AdminService {
             // Forward to wallet service for creation of wallet
             if(!process.env.WALLET_SERVICE_URL)
                 throw new HttpException("Wallet service URL not defined", 500);
+            
             const url = process.env.WALLET_SERVICE_URL;
             const endpoint = url + `/api/wallet/create`;
             const reqBody = {
@@ -57,15 +57,33 @@ export class AdminService {
                 type: 'ADMIN',
                 credits: 0
             }
-            const resp = await axios.post(endpoint, reqBody);
+            await axios.post(endpoint, reqBody);
         } catch(err) {
-            await this.prisma.provider.delete({
+            await this.prisma.admin.delete({
                 where: {
                     id: admin.id
                 }
             });
             throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500);
         }
+        try {
+            // Forward to marketplace portal for creation in marketplace
+            if(!process.env.MARKETPLACE_PORTAL_URL)
+                throw new HttpException("Marketplace service URL not defined", 500);
+
+            const url = process.env.MARKETPLACE_PORTAL_URL;
+            const endpoint = url + `/api/admin/${admin.id}`;
+
+            await axios.post(endpoint);
+        } catch(err) {
+            await this.prisma.admin.delete({
+                where: {
+                    id: admin.id
+                }
+            });
+            throw new HttpException(err.response || "Marketplace service not running", err.response?.status || err.status || 500);
+        }
+
         return admin;
     }
 

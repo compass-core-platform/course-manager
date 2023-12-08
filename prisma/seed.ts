@@ -233,6 +233,7 @@ async function main() {
       email: "admin1@gmail.com",
       image: "https://avatars.githubusercontent.com/u/46641520?v=4",
       password: hashedPassword,
+      id: "123e4567-e89b-42d3-a456-556642440021",
     },
   });
 
