@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Logger, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Logger, Param, ParseUUIDPipe, Patch, Post, Query, Res } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CourseService } from "./course.service";
 import { FeedbackDto } from "./dto/feedback.dto";

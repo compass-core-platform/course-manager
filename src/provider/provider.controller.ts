@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Put, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, ParseUUIDPipe, Patch, Post, Put, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ProviderService } from './provider.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignupDto, SignupResponseDto } from './dto/signup.dto';
@@ -345,7 +345,7 @@ export class ProviderController {
     // remove an existing course
     async removeCourse(
         @Param("providerId", ParseUUIDPipe) providerId: string,
-        @Param("courseId", ParseIntPipe) courseId: string,
+        @Param("courseId", ParseUUIDPipe) courseId: string,
         @Res() res
     ) {
         try {
@@ -376,7 +376,7 @@ export class ProviderController {
     // change course status (archived/unarchived)
     async changeCourseStatus(
         @Param("providerId", ParseUUIDPipe) providerId: string,
-        @Param("courseId", ParseIntPipe) courseId: string,
+        @Param("courseId", ParseUUIDPipe) courseId: string,
         @Body() courseStatusDto: CourseStatusDto,
         @Res() res
     ) {
@@ -407,7 +407,7 @@ export class ProviderController {
     // View Course Feedback & ratings, numberOfPurchases
     async getCourseFeedback(
         @Param("providerId", ParseUUIDPipe) providerId: string,
-        @Param("courseId", ParseIntPipe) courseId: string,
+        @Param("courseId", ParseUUIDPipe) courseId: string,
         @Res() res
     ) {
         try {
