@@ -56,7 +56,7 @@ export class ProviderService {
                 name: signupDto.name,
                 email: signupDto.email,
                 password: hashedPassword,
-                paymentInfo: signupDto.paymentInfo,
+                paymentInfo: signupDto.paymentInfo ? JSON.parse(signupDto.paymentInfo) : undefined,
                 orgName: signupDto.orgName,
                 orgLogo: imgLink,
                 phone: signupDto.phone

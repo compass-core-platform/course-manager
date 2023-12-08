@@ -46,6 +46,26 @@ export class AdminService {
                 image: imageUrl
             }
         });
+        try {
+            // Forward to wallet service for creation of wallet
+            if(!process.env.WALLET_SERVICE_URL)
+                throw new HttpException("Wallet service URL not defined", 500);
+            const url = process.env.WALLET_SERVICE_URL;
+            const endpoint = url + `/api/wallet/create`;
+            const reqBody = {
+                userId: admin.id,
+                type: 'ADMIN',
+                credits: 0
+            }
+            const resp = await axios.post(endpoint, reqBody);
+        } catch(err) {
+            await this.prisma.provider.delete({
+                where: {
+                    id: admin.id
+                }
+            });
+            throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500);
+        }
         return admin;
     }
 
