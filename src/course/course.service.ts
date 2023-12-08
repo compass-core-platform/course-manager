@@ -67,11 +67,12 @@ export class CourseService {
             && (c.endDate ? c.endDate >= new Date(): true)
         );
         return courses.map((c) => {
-            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, ...clone} = c;
+            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, competency, ...clone} = c;
             const courseResponse: CourseResponse = {
                 ...clone,
                 providerName: provider.orgName,
-                numOfUsers: _count.userCourses
+                numOfUsers: _count.userCourses,
+                competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
             }
             return courseResponse;
         });
@@ -194,9 +195,10 @@ export class CourseService {
             throw new NotFoundException("Course does not exist");
 
         // let courseResponse: AdminCourseResponse
-        const { provider, ...courseResponse } = course;
+        const { provider, competency, ...courseResponse } = course;
         return {
             ...courseResponse,
+            competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
             providerName: provider.orgName
         }
     }
@@ -302,8 +304,11 @@ export class CourseService {
             }
         })
         return courses.map((c) => {
-            const {cqfScore, impactScore, ...clone} = c;
-            return clone;
+            const {cqfScore, impactScore, competency, ...clone} = c;
+            return {
+                ...clone,
+                competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
+            }
         })
     }
 
@@ -371,9 +376,10 @@ export class CourseService {
             }
         });
         return courses.map((c) => {
-            const { provider, ...clone } = c;
+            const { provider, competency, ...clone } = c;
             return {
                 ...clone,
+                competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
                 providerName: provider.orgName
             }
         });
@@ -389,13 +395,17 @@ export class CourseService {
             throw new NotAcceptableException(`Course is either rejected or is already accepted.`);
         }
         // Update the course as accepted
-        return this.prisma.course.update({
+        const {competency, ...clone} = await this.prisma.course.update({
             where: { courseId },
             data: {
                 verificationStatus: CourseVerificationStatus.ACCEPTED,
                 cqfScore: cqf_score
             }
         });
+        return {
+            ...clone,
+            competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
+        }
     }
 
     async rejectCourse(courseId: string, rejectionReason: string) {
@@ -408,13 +418,17 @@ export class CourseService {
             throw new NotAcceptableException(`Course is already rejected or is accepted`);
         }
         // Reject the course
-        return this.prisma.course.update({
+        const {competency, ...clone} = await this.prisma.course.update({
             where: { courseId },
             data: {
                 verificationStatus: CourseVerificationStatus.REJECTED,
                 rejectionReason: rejectionReason
             }
         });
+        return {
+            ...clone,
+            competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
+        }
     }
 
     async removeCourse(courseId: string) {
@@ -423,9 +437,13 @@ export class CourseService {
         await this.getCourse(courseId);
 
         // Delete course entry
-        return this.prisma.course.delete({
+        const {competency, ...clone} = await this.prisma.course.delete({
             where: { courseId}
         });
+        return {
+            ...clone,
+            competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
+        }
     }
 
     async getCourseTransactions(providerId: string): Promise<CourseTransactionDto[]> {
