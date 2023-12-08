@@ -32,4 +32,5 @@ export class AdminCourseResponse extends ProviderCourseResponse {
 
     readonly cqfScore: number | null;
     readonly impactScore: number | null;
+    readonly providerLogo: string;
 }

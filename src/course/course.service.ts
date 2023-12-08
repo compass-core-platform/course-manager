@@ -187,6 +187,7 @@ export class CourseService {
                 provider: {
                     select: {
                         orgName: true,
+                        orgLogo: true
                     }
                 }
             }
@@ -199,7 +200,8 @@ export class CourseService {
         return {
             ...courseResponse,
             competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
-            providerName: provider.orgName
+            providerName: provider.orgName,
+            providerLogo: provider.orgLogo
         }
     }
 
@@ -371,6 +373,7 @@ export class CourseService {
                 provider: {
                     select: {
                         orgName: true,
+                        orgLogo: true
                     }
                 }
             }
@@ -380,7 +383,8 @@ export class CourseService {
             return {
                 ...clone,
                 competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
-                providerName: provider.orgName
+                providerName: provider.orgName,
+                providerLogo: provider.orgLogo
             }
         });
     }
