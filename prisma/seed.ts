@@ -241,35 +241,35 @@ async function main() {
   // console.log("All courses: ", resp);
   const response3 = await prisma.userCourse.createMany({
     data: [{
-      userId: "123e4567-e89b-42d3-a456-556642440000",
+      userId: "4d45a9e9-4a4d-4c92-aaea-7b5abbd6ff98",
       feedback: "Great course",
       rating: 4,
       status: CourseProgressStatus.COMPLETED,
       courseCompletionScore: 100,
       courseId: "123e4567-e89b-42d3-a456-556642440050"
     }, {
-      userId: "123e4567-e89b-42d3-a456-556642440000",
+      userId: "4d45a9e9-4a4d-4c92-aaea-7b5abbd6ff98",
       courseId: "123e4567-e89b-42d3-a456-556642440051",
       status: CourseProgressStatus.COMPLETED,
     }, {
-      userId: "123e4567-e89b-42d3-a456-556642440001",
+      userId: "abaa7220-5d2e-4e05-842a-95b2c4ce1876",
       feedback: "Instructor is very friendly",
       rating: 4,
       status: CourseProgressStatus.COMPLETED,
       courseCompletionScore: 100,
       courseId: "123e4567-e89b-42d3-a456-556642440050"
     }, {
-      userId: "123e4567-e89b-42d3-a456-556642440001",
+      userId: "abaa7220-5d2e-4e05-842a-95b2c4ce1876",
       courseId: "123e4567-e89b-42d3-a456-556642440051"
     }, {
-      userId: "123e4567-e89b-42d3-a456-556642440001",
+      userId: "abaa7220-5d2e-4e05-842a-95b2c4ce1876",
       feedback: "Some more real world applications could be discussed",
       rating: 3,
       status: CourseProgressStatus.COMPLETED,
       courseCompletionScore: 100,
       courseId: "123e4567-e89b-42d3-a456-556642440052"
     }, {
-      userId: "123e4567-e89b-42d3-a456-556642440002",
+      userId: "0f5d0b13-8d72-46c9-a7c4-c1f7e5aa1f17",
       feedback: "Not satisfied with the content",
       rating: 2,
       status: CourseProgressStatus.COMPLETED,
