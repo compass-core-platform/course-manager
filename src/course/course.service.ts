@@ -12,6 +12,7 @@ import { CourseStatusDto } from "./dto/course-status.dto";
 import axios from "axios";
 import { uploadFile } from "src/utils/minio";
 import { ProviderProfileResponse } from "src/provider/dto/provider-profile-response.dto";
+import { PurchaseResponseDto } from "./dto/purchase.dto";
 
 @Injectable()
 export class CourseService {
@@ -86,7 +87,7 @@ export class CourseService {
         //         price: course.credits.toString(),
         //         languages: course.language,
         //         competency: course.competency,
-        //         imgUrl: course.imgLink,
+        //         imgUrl: course.imageLink,
         //         rating: course.avgRating?.toString() || "0",
         //         startTime: new Date().toISOString(), // need to change
         //         endTime: new Date().toISOString(), // need to change
@@ -97,8 +98,8 @@ export class CourseService {
 
     async addCourse(addCourseDto: AddCourseDto, provider: ProviderProfileResponse,  image: Express.Multer.File) {
 
-        const imageName = addCourseDto.title.replace(" ", "_")
-        const imgLink = await uploadFile( `provider/${provider.orgName.replace(" ", "_")}/${imageName}`, image.buffer);
+        const imageName = addCourseDto.title.replaceAll(" ", "_")
+        const imageLink = await uploadFile( `provider/${provider.orgName.replaceAll(" ", "_")}/${imageName}`, image.buffer);
 
         
         // add new course to the platform
@@ -106,12 +107,12 @@ export class CourseService {
             data: {
                 providerId: provider.id,
                 ...addCourseDto,
-                imgLink,
+                imageLink,
             }
         });
     }
 
-    async addPurchaseRecord(courseId: string, consumerId: string) {
+    async addPurchaseRecord(courseId: string, consumerId: string): Promise<PurchaseResponseDto> {
 
         // Validate course
         const course = await this.getCourse(courseId);
@@ -138,6 +139,9 @@ export class CourseService {
                 courseId,
             }
         });
+        return {
+            courseLink: course.courseLink
+        }
     }
 
     async changeStatus(courseId: string, providerId: string, courseStatusDto: CourseStatusDto) {
@@ -159,10 +163,10 @@ export class CourseService {
 
         // Validate course
         const course = await this.getCourse(courseId);
-        let imgUrl = course.imgLink;
+        let imgUrl = course.imageLink;
         if(image) {
-            const imageName = (editCourseDto.title ?? course.title).replace(" ", "_")
-            imgUrl = await uploadFile( `provider/${provider.orgName.replace(" ", "_")}/${imageName}`, image.buffer);
+            const imageName = (editCourseDto.title ?? course.title).replaceAll(" ", "_")
+            imgUrl = await uploadFile( `provider/${provider.orgName.replaceAll(" ", "_")}/${imageName}`, image.buffer);
         }
 
         // update the course details as required and change its verification status to pending
@@ -171,7 +175,7 @@ export class CourseService {
             data: {
                 ...editCourseDto,
                 verificationStatus: CourseVerificationStatus.PENDING,
-                imgLink: imgUrl
+                imageLink: imgUrl
             }
         });
     }

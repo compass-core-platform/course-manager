@@ -30,7 +30,7 @@ export class AdminService {
 
         let imageUrl: string | undefined;
         if(image) {
-            const imageName = signupDto.name.replace(" ", "_")
+            const imageName = signupDto.name.replaceAll(" ", "_")
             imageUrl = await uploadFile(`admin/${imageName}`, image.buffer)
         }
 

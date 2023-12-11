@@ -8,7 +8,7 @@ export class CourseResponse {
     readonly title: string;
     readonly description: string;
     readonly courseLink: string;
-    readonly imgLink: string;
+    readonly imageLink: string;
     readonly credits: number;
     readonly language: string[];
     readonly competency: JsonValue;

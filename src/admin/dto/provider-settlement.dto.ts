@@ -10,7 +10,7 @@ export class ProviderSettlementDto {
     @ApiProperty()
     @IsOptional()
     @IsUrl()
-    imgLink?: string;
+    imageLink?: string;
 
     @ApiProperty()
     @IsOptional()

@@ -48,7 +48,7 @@ export class ProviderService {
             throw new BadRequestException("Logo not uploaded");
 
         // upload the image to minio
-        const imgLink = await uploadFile(`provider/${signupDto.orgName.replace(" ", "_")}/logo`, logo.buffer)
+        const imageLink = await uploadFile(`provider/${signupDto.orgName.replaceAll(" ", "_")}/logo`, logo.buffer)
 
         // Create an entry in the database
         provider = await this.prisma.provider.create({
@@ -58,7 +58,7 @@ export class ProviderService {
                 password: hashedPassword,
                 paymentInfo: signupDto.paymentInfo ? JSON.parse(signupDto.paymentInfo) : undefined,
                 orgName: signupDto.orgName,
-                orgLogo: imgLink,
+                orgLogo: imageLink,
                 phone: signupDto.phone
             }
         });
@@ -139,11 +139,11 @@ export class ProviderService {
 
         // Fetch provider
         const provider = await this.getProvider(providerId);
-        let imgLink = provider.orgLogo;
+        let imageLink = provider.orgLogo;
         if(logo) {
             // upload the image to minio
             const imageName = updateProfileDto.orgName ?? provider.orgName;
-            imgLink = await uploadFile(`provider/${imageName.replace(" ", "_")}/logo`, logo.buffer)
+            imageLink = await uploadFile(`provider/${imageName.replaceAll(" ", "_")}/logo`, logo.buffer)
         }
         const { paymentInfo, ...clone } = updateProfileDto;
         await this.prisma.provider.update({
@@ -153,7 +153,7 @@ export class ProviderService {
             data: {
                 ...clone,
                 paymentInfo: paymentInfo ? JSON.parse(paymentInfo) : undefined,
-                orgLogo: imgLink
+                orgLogo: imageLink
             }
         })
     }
@@ -318,7 +318,7 @@ export class ProviderService {
             return {
                 id: providerId,
                 name: provider.orgName,
-                imgLink: provider.orgLogo,
+                imageLink: provider.orgLogo,
                 totalCourses: courses.length,
                 activeUsers: activeUsers.size
             }

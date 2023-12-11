@@ -71,7 +71,7 @@ model Course {
   title               String
   description         String
   courseLink          String
-  imgLink             String
+  imageLink           String
   credits             Int
   language            String[]
   competency          Json

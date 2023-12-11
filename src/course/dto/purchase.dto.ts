@@ -11,7 +11,7 @@ export class PurchaseDto {
 }
 
 export class PurchaseResponseDto {
-    readonly walletTransactionId: number;
+    readonly courseLink: string;
 }
 
 export class WalletPurchaseDto {

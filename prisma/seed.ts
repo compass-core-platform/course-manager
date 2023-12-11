@@ -84,7 +84,7 @@ async function main() {
         title: "NestJS Complete",
         description: "Build full featured backend APIs incredibly quickly with Nest, TypeORM, and Typescript. Includes testing and deployment!",
         courseLink: "https://www.udemy.com/course/nestjs-the-complete-developers-guide/",
-        imgLink: "https://courses.nestjs.com/img/logo.svg",
+        imageLink: "https://courses.nestjs.com/img/logo.svg",
         credits: 4,
         language: ["en"],
         competency: {
@@ -102,7 +102,7 @@ async function main() {
         title: "Graphic Design Masterclass",
         description: "The Ultimate Graphic Design Course Which Covers Photoshop, Illustrator, InDesign, Design Theory, Branding & Logo Design",
         courseLink: "https://www.udemy.com/course/graphic-design-masterclass-everything-you-need-to-know/",
-        imgLink: "https://www.unite.ai/wp-content/uploads/2023/05/emily-bernal-v9vII5gV8Lw-unsplash.jpg",
+        imageLink: "https://www.unite.ai/wp-content/uploads/2023/05/emily-bernal-v9vII5gV8Lw-unsplash.jpg",
         credits: 5,
         language: ["en"],
         competency: {
@@ -119,7 +119,7 @@ async function main() {
         title: "Python for Data Science",
         description: "Learn how to use NumPy, Pandas, Seaborn , Matplotlib , Plotly , Scikit-Learn , Machine Learning, Tensorflow , and more",
         courseLink: "https://www.udemy.com/course/python-for-data-science-and-machine-learning-bootcamp/",
-        imgLink: "https://blog.imarticus.org/wp-content/uploads/2021/12/learn-Python-for-data-science.jpg",
+        imageLink: "https://blog.imarticus.org/wp-content/uploads/2021/12/learn-Python-for-data-science.jpg",
         credits: 2,
         language: ["en"],
         competency: {
@@ -134,7 +134,7 @@ async function main() {
         title: "Microsoft Excel",
         description: "Excel with this A-Z Microsoft Excel Course. Microsoft Excel 2010, 2013, 2016, Excel 2019 and Microsoft/Office 365/2023",
         courseLink: "https://www.udemy.com/course/microsoft-excel-2013-from-beginner-to-advanced-and-beyond/",
-        imgLink: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Microsoft_Excel_2013-2019_logo.svg/587px-Microsoft_Excel_2013-2019_logo.svg.png",
+        imageLink: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Microsoft_Excel_2013-2019_logo.svg/587px-Microsoft_Excel_2013-2019_logo.svg.png",
         credits: 4,
         language: ["en"],
         competency: {
@@ -148,7 +148,7 @@ async function main() {
         title: "Learn DevOps & Kubernetes",
         description: "This course enables anyone to get started with devops engineering.",
         courseLink: "https://udemy.com/courses/pYUxbhj",
-        imgLink: "https://udemy.com/courses/pYUxbhj/images/cover1.jpg",
+        imageLink: "https://udemy.com/courses/pYUxbhj/images/cover1.jpg",
         credits: 120,
         language: ["english", "hindi"],
         competency: {
@@ -168,7 +168,7 @@ async function main() {
         title: "Introduction to Programming",
         description: "This course covers all the fundamentals of programming",
         courseLink: "https://udemy.com/courses/jQKsLpm",
-        imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
+        imageLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
         credits: 160,
         language: ["english", "hindi"],
         avgRating: 3.5,
@@ -184,7 +184,7 @@ async function main() {
         title: "Introduction to Compiler Engineering",
         description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
         courseLink: "https://udemy.com/courses/jQKsLpm",
-        imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
+        imageLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
         credits: 160,
         language: ["english", "hindi"],
         competency: {
@@ -202,7 +202,7 @@ async function main() {
         title: "Introduction to Compiler Engineering 2",
         description: "This course covers how compilers are built and also teaches you about how to create custom programming languages",
         courseLink: "https://udemy.com/courses/jQKsLpm",
-        imgLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
+        imageLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
         credits: 160,
         language: ["english", "hindi"],
         competency: {

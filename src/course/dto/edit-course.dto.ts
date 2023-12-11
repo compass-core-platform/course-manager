@@ -26,7 +26,7 @@ export class EditCourseDto {
     @ApiProperty()
     @IsUrl()
     @IsOptional()
-    imgLink?: string;
+    imageLink?: string;
 
     // number of credits required to purchase course
     @ApiProperty()

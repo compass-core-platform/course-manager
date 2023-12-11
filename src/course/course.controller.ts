@@ -87,12 +87,13 @@ export class CourseController {
         try {
             this.logger.log(`Recording the user purchase of the course`);
 
-            await this.courseService.addPurchaseRecord(courseId, consumerId);
+            const response = await this.courseService.addPurchaseRecord(courseId, consumerId);
 
             this.logger.log(`Successfully recorded the purchase`);
 
             res.status(HttpStatus.OK).json({
                 message: "purchase successful",
+                data: response
             })
         } catch (err) {
             this.logger.error(`Failed to record the purchase`);
