@@ -77,23 +77,6 @@ export class CourseService {
             }
             return courseResponse;
         });
-        // return courses.map((course) => {
-        //     return {
-        //         id: course.id.toString(),
-        //         title: course.title,
-        //         long_desc: course.description,
-        //         provider_id: course.providerId,
-        //         provider_name: course.provider.orgName,
-        //         price: course.credits.toString(),
-        //         languages: course.language,
-        //         competency: course.competency,
-        //         imgUrl: course.imageLink,
-        //         rating: course.avgRating?.toString() || "0",
-        //         startTime: new Date().toISOString(), // need to change
-        //         endTime: new Date().toISOString(), // need to change
-        //         noOfPurchases: course._count.userCourses,
-        //     }
-        // });
     }
 
     async addCourse(addCourseDto: AddCourseDto, provider: ProviderProfileResponse,  image: Express.Multer.File) {
@@ -486,6 +469,51 @@ export class CourseService {
                 numConsumersEnrolled: c._count.userCourses,
                 income: c.credits * c._count.userCourses
             }
+        });
+    }
+
+    async mostPopularCourses(limit?: number, offset?: number): Promise<CourseResponse[]> {
+
+        let courses = await this.prisma.course.findMany({
+            where: {
+                verificationStatus: CourseVerificationStatus.ACCEPTED,
+                status: CourseStatus.UNARCHIVED,
+            },
+            include: {
+                provider: {
+                    select: {
+                        orgName: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        userCourses: true
+                    }
+                }
+            },
+            orderBy: {
+                avgRating: {
+                    sort: "desc",
+                    nulls: "last"
+                }
+            },
+            skip: offset ? offset : 0,
+            take: limit ? limit : 10
+        });
+
+        // Filter out the courses that are not available
+        courses = courses.filter((c) => (c.startDate ? c.startDate <= new Date(): true) 
+            && (c.endDate ? c.endDate >= new Date(): true)
+        );
+        return courses.map((c) => {
+            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, competency, ...clone} = c;
+            const courseResponse: CourseResponse = {
+                ...clone,
+                providerName: provider.orgName,
+                numOfUsers: _count.userCourses,
+                competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
+            }
+            return courseResponse;
         });
     }
 

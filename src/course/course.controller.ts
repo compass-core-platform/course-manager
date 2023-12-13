@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Logger, Param, ParseUUIDPipe, Patch, Post, Query, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Logger, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query, Res } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CourseService } from "./course.service";
 import { FeedbackDto } from "./dto/feedback.dto";
@@ -41,6 +41,37 @@ export class CourseController {
             res.status(statusCode).json({
                 statusCode, 
                 message: errorMessage || "Failed to fetch the courses' information",
+            });
+        }
+    }
+
+    @ApiOperation({ summary: 'Get most popular courses' })
+    @ApiResponse({ status: HttpStatus.OK, type: [CourseResponse] })
+    @Get("/popular")
+    // Get a list of the most popular courses
+    async mostPopularCourses(
+        @Query('limit') limit: number,
+        @Query('offset') offset: number,
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Fetching most popular courses`);
+
+            const courses = await this.courseService.mostPopularCourses(limit, offset);
+
+            this.logger.log(`Successfully fetched the most popular courses`);
+
+            res.status(HttpStatus.OK).json({
+                message: "fetch successful",
+                data: courses
+            })
+        } catch (err) {
+            this.logger.error(`Failed to fetch courses`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to fetch courses",
             });
         }
     }
