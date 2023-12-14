@@ -42,10 +42,17 @@ export class CourseService {
                         mode: "insensitive",
                     }
                 }, {
-                    competency: {
-                        string_contains: searchInput
+                    competency: { 
+                        path: [searchInput.toLowerCase()],
+                        not: "null",
                     }
-                }]
+                }, {
+                    competency: { 
+                        path: [searchInput],
+                        not: "null",
+                    }
+                }
+            ]
             },
             include: {
                 provider: {
