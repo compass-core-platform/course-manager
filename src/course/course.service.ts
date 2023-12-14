@@ -472,6 +472,57 @@ export class CourseService {
         });
     }
 
+    async recommendedCourses(competencies: string[]): Promise<CourseResponse[]> {
+        
+        if(typeof competencies == "string")
+            competencies = [competencies];
+
+        let competencyFilter = (competencies) ? competencies.map(( competency ) => {
+
+            return {
+                competency: {
+                    string_contains: competency
+                }
+            }
+        }): undefined;
+        let courses = await this.prisma.course.findMany({
+            where: {
+                verificationStatus: CourseVerificationStatus.ACCEPTED,
+                status: CourseStatus.UNARCHIVED,
+                OR: competencyFilter
+            },
+            include: {
+                provider: {
+                    select: {
+                        orgName: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        userCourses: true
+                    }
+                }
+            },
+        });
+
+        // Filter out the courses that are not available
+        courses = courses.filter((c) => (c.startDate ? c.startDate <= new Date(): true) 
+            && (c.endDate ? c.endDate >= new Date(): true)
+        );
+        return courses.map((c) => {
+            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, competency, ...clone} = c;
+
+            const courseResponse: CourseResponse = {
+                ...clone,
+                providerName: provider.orgName,
+                numOfUsers: _count.userCourses,
+                competency: (typeof competency == "string") ? JSON.parse(competency) : competency,
+            }
+            return courseResponse;
+        });
+    }
+
+
     async mostPopularCourses(limit?: number, offset?: number): Promise<CourseResponse[]> {
 
         let courses = await this.prisma.course.findMany({

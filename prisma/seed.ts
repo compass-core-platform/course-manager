@@ -87,11 +87,11 @@ async function main() {
         imageLink: "https://courses.nestjs.com/img/logo.svg",
         credits: 4,
         language: ["en"],
-        competency: {
-          "API Development": ["Level1", "Level2"],
+        competency: JSON.stringify({
+          "NestJs": ["Level1", "Level2"],
           "Typescript": ["Level1"],
           "Backend engineering": ["Level1"]
-        },
+        }),
         author: "Stephen Grider",
         startDate: new Date("2023-05-01").toISOString(),
         endDate: new Date("2024-07-01").toISOString(),
@@ -105,10 +105,10 @@ async function main() {
         imageLink: "https://www.unite.ai/wp-content/uploads/2023/05/emily-bernal-v9vII5gV8Lw-unsplash.jpg",
         credits: 5,
         language: ["en"],
-        competency: {
+        competency: JSON.stringify({
           "Photoshop": ["Level2", "Level3"],
           "Understanding brand": ["Level1"]
-        },
+        }),
         author: "Lindsay Marsh",
         startDate: new Date("2023-05-01").toISOString(),
         endDate: new Date("2024-09-01").toISOString(),
@@ -122,11 +122,11 @@ async function main() {
         imageLink: "https://blog.imarticus.org/wp-content/uploads/2021/12/learn-Python-for-data-science.jpg",
         credits: 2,
         language: ["en"],
-        competency: {
+        competency: JSON.stringify({
           "Statistics": ["Level1"],
           "Machine Learning": ["Level1", "Level2", "Level3"],
           "MySQL": ["Level1"]
-        },
+        }),
         author: "Jose Portilla",
     }, {
         courseId: "123e4567-e89b-42d3-a456-556642440053",
@@ -137,9 +137,9 @@ async function main() {
         imageLink: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Microsoft_Excel_2013-2019_logo.svg/587px-Microsoft_Excel_2013-2019_logo.svg.png",
         credits: 4,
         language: ["en"],
-        competency: {
+        competency: JSON.stringify({
           "Excel": ["Level1", "Level2", "Level3", "Level4"]
-        },
+        }),
         author: "Kyle Pew",
         startDate: new Date("2024-05-01").toISOString(),
     }, {
@@ -151,11 +151,12 @@ async function main() {
         imageLink: "https://udemy.com/courses/pYUxbhj/images/cover1.jpg",
         credits: 120,
         language: ["english", "hindi"],
-        competency: {
+        competency: JSON.stringify({
             "Docker": ["Level1", "Level3"],
             "Kubernetes": ["Level1"],
-            "Orchestration": [ "Level5" ]
-        },
+            "Orchestration": [ "Level5" ],
+            "Micro Architecture": [ "Level1" ]
+        }),
         author: "Jason Frig",
         startDate: new Date("2023-06-01"),
         endDate: new Date("2024-08-01"),
@@ -172,10 +173,10 @@ async function main() {
         credits: 160,
         language: ["english", "hindi"],
         avgRating: 3.5,
-        competency: {
+        competency: JSON.stringify({
             "Logical Thinking": ["Level5", "Level4"],
             "Python": [ "Level1", "Level2" ]
-        },
+        }),
         author: "James Franco",
         verificationStatus: CourseVerificationStatus.PENDING,
     }, {
@@ -187,10 +188,10 @@ async function main() {
         imageLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
         credits: 160,
         language: ["english", "hindi"],
-        competency: {
+        competency: JSON.stringify({
             "Compiler Design": ["Level2", "Level3"],
             "LLVM": [ "Level4" ]
-        },
+        }),
         author: "Ramakrishna Upadrasta",
         startDate: new Date("2023-10-10"),
         endDate: new Date("2023-11-10"),
@@ -205,10 +206,10 @@ async function main() {
         imageLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
         credits: 160,
         language: ["english", "hindi"],
-        competency: {
+        competency: JSON.stringify({
             "Compiler Design": ["Level2", "Level3"],
             "LLVM": [ "Level4" ]
-        },
+        }),
         author: "Ramakrishna Upadrasta",
         startDate: new Date("2023-10-10"),
         endDate: new Date("2023-11-10"),

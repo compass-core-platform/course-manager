@@ -76,6 +76,36 @@ export class CourseController {
         }
     }
 
+    @ApiOperation({ summary: 'Get recommended courses' })
+    @ApiResponse({ status: HttpStatus.OK, type: [CourseResponse] })
+    @Get("/recommended")
+    // Get a list of the recommended courses
+    async recommendedCourses(
+        @Query('competencies') competencies: string[],
+        @Res() res
+    ) {
+        try {
+            this.logger.log(`Fetching recommended courses`);
+
+            const courses = await this.courseService.recommendedCourses(competencies);
+
+            this.logger.log(`Successfully fetched the recommended courses`);
+
+            res.status(HttpStatus.OK).json({
+                message: "fetch successful",
+                data: courses
+            })
+        } catch (err) {
+            this.logger.error(`Failed to fetch courses`);
+
+            const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
+            res.status(statusCode).json({
+                statusCode, 
+                message: errorMessage || "Failed to fetch courses",
+            });
+        }
+    }
+
     @ApiOperation({ summary: 'Fetch details of one course' })
     @ApiResponse({ status: HttpStatus.OK, type: CourseResponse })
     @Get("/:courseId")
