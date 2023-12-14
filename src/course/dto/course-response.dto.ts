@@ -7,7 +7,6 @@ export class CourseResponse {
     readonly providerId: string;
     readonly title: string;
     readonly description: string;
-    readonly courseLink: string;
     readonly imageLink: string;
     readonly credits: number;
     readonly language: string[];
@@ -24,6 +23,7 @@ export class CourseResponse {
 }
 
 export class ProviderCourseResponse extends CourseResponse {
+    readonly courseLink: string;
     readonly verificationStatus: CourseVerificationStatus;
     readonly rejectionReason: string | null;
 }

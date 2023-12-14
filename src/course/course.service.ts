@@ -75,7 +75,7 @@ export class CourseService {
             && (c.endDate ? c.endDate >= new Date(): true)
         );
         return courses.map((c) => {
-            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, competency, ...clone} = c;
+            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, competency, courseLink, ...clone} = c;
             const courseResponse: CourseResponse = {
                 ...clone,
                 providerName: provider.orgName,
@@ -221,7 +221,7 @@ export class CourseService {
         if((course.startDate && course.startDate > new Date()) || (course.endDate && course.endDate < new Date()))
             throw new BadRequestException("Course is not available at the moment");
         
-        const {cqfScore, impactScore, verificationStatus, rejectionReason, ...clone} = course;
+        const {cqfScore, impactScore, verificationStatus, rejectionReason, courseLink, ...clone} = course;
         return {
             ...clone,
             numOfUsers
@@ -517,7 +517,7 @@ export class CourseService {
             && (c.endDate ? c.endDate >= new Date(): true)
         );
         return courses.map((c) => {
-            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, competency, ...clone} = c;
+            let {cqfScore, impactScore, verificationStatus, rejectionReason, courseLink, provider, _count, competency, ...clone} = c;
 
             const courseResponse: CourseResponse = {
                 ...clone,
@@ -564,7 +564,7 @@ export class CourseService {
             && (c.endDate ? c.endDate >= new Date(): true)
         );
         return courses.map((c) => {
-            let {cqfScore, impactScore, verificationStatus, rejectionReason, provider, _count, competency, ...clone} = c;
+            let {cqfScore, impactScore, verificationStatus, rejectionReason, courseLink, provider, _count, competency, ...clone} = c;
             const courseResponse: CourseResponse = {
                 ...clone,
                 providerName: provider.orgName,
