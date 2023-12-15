@@ -22,6 +22,9 @@ export async function uploadFile(objectName: string, fileBuffer: Buffer) {
     if (!exists) {
       throw new Error("Bucket not found")
     }
+
+    // Remove the file if it already exists
+    await minioClient.removeObject(bucketName, objectName);
     
     // Upload the file to the specified bucket and object
     await minioClient.putObject(bucketName, objectName, fileBuffer);
