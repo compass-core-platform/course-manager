@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsJSON, IsObject, IsOptional, IsPhoneNumber, IsString } from "class-validator";
-import { PaymentInfo } from "src/utils/types";
+import { IsEmail, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class UpdateProfileDto {
 

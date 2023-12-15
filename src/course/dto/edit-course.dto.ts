@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsDate, IsInt, IsOptional, IsString, IsUrl, Min } from "class-validator";
-import { CompetencyMap } from "src/utils/types";
 
 export class EditCourseDto {
 

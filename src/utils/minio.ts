@@ -28,7 +28,7 @@ export async function uploadFile(objectName: string, fileBuffer: Buffer) {
     
     // Upload the file to the specified bucket and object
     await minioClient.putObject(bucketName, objectName, fileBuffer);
-    console.log('File uploaded successfully!');
+    // console.log('File uploaded successfully!');
 
     // minioClient.presignedUrl('GET', bucketName, objectName, 24 * 60 * 60, function (err, presignedUrl) {
     //   if (err) return console.log(err)
