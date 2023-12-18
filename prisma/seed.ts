@@ -6,6 +6,9 @@ async function main() {
   
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash("123456", saltRounds);
+  const hashedPassword2 = await bcrypt.hash("Udemy@9812", saltRounds);
+  const hashedPassword3 = await bcrypt.hash("Coursera@999", saltRounds);
+  const hashedPassword4 = await bcrypt.hash("lern@999", saltRounds);
   const response = await prisma.provider.create({
     data: {
         id: "123e4567-e89b-42d3-a456-556642440010",
@@ -24,7 +27,7 @@ async function main() {
       id: "123e4567-e89b-42d3-a456-556642440011",
         name: "udemy",
         email: "udemyorg@gmail.in",
-        password: "Udemy@9812",
+        password: hashedPassword2,
         paymentInfo: {
             bankAccNo: "1111111111",
             otherDetails: {
@@ -43,7 +46,7 @@ async function main() {
         id: "123e4567-e89b-42d3-a456-556642440012",
         name: "coursera",
         email: "coursera@gmail.in",
-        password: "Coursera@999",
+        password: hashedPassword3,
         paymentInfo: {
             bankAccNo: "1111111113",
             otherDetails: {
@@ -62,7 +65,7 @@ async function main() {
         id: "123e4567-e89b-42d3-a456-556642440013",
         name: "lern",
         email: "lern@gmail.in",
-        password: "lern@999",
+        password: hashedPassword4,
         paymentInfo: {
             bankAccNo: "1111111116",
             otherDetails: {
@@ -272,8 +275,8 @@ async function main() {
         providerId: provider1.id,
         title: "Learn DevOps & Kubernetes",
         description: "This course enables anyone to get started with devops engineering.",
-        courseLink: "https://udemy.com/courses/pYUxbhj",
-        imageLink: "https://udemy.com/courses/pYUxbhj/images/cover1.jpg",
+        courseLink: "https://www.udemy.com/course/devops-with-docker-kubernetes-and-azure-devops/",
+        imageLink: "https://img-c.udemycdn.com/course/240x135/5030480_b416_2.jpg",
         credits: 120,
         language: ["english", "hindi"],
         competency: JSON.stringify([{

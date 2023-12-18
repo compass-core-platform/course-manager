@@ -8,8 +8,8 @@ DATABASE_PASSWORD=secret
 DATABASE_NAME=course-manager-db
 DATABASE_PORT=5432
 DATABASE_URL="postgresql://postgres:secret@postgres:5432/course-manager-db?sslmode=prefer"
-WALLET_SERVICE_URL=
-MARKETPLACE_PORTAL_URL=
+WALLET_SERVICE_URL=http://wallet:4022
+MARKETPLACE_PORTAL_URL=https://marketplace.backend.compass.samagra.io
 
 # MINIO
 MINIO_ACCESS_KEY=
