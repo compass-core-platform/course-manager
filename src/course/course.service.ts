@@ -351,12 +351,11 @@ export class CourseService {
             throw new HttpException("Marketplace URL not set", 500);
 
         // Fetch user details from user service
-        let endpoint = `/api/consumer/${completeCourseDto.userId}/course/complete`;
 
         if(!process.env.USER_SERVICE_URL)
             throw new HttpException("User service URL not defined", 500);
 
-        endpoint = `/api/mockFracService/user/${completeCourseDto.userId}`;
+        let endpoint = `/api/mockFracService/user/${completeCourseDto.userId}`;
 
         const userResponse = await axios.get(process.env.USER_SERVICE_URL + endpoint);
 
