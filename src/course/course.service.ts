@@ -327,6 +327,19 @@ export class CourseService {
                     userId: completeCourseDto.userId,
                     courseId: completeCourseDto.courseId
                 }
+            },
+            include: {
+                course: {
+                    select: {
+                        title: true,
+                        courseLink: true,
+                        provider: {
+                            select: {
+                                orgName: true
+                            }
+                        }
+                    }
+                }
             }
         });
         if(!userCourse)
@@ -337,11 +350,40 @@ export class CourseService {
         if(!uri)
             throw new HttpException("Marketplace URL not set", 500);
 
-        const endpoint = `/api/consumer/${completeCourseDto.userId}/course/complete`;
-        const courseIdDto = {
-            courseId: completeCourseDto.courseId,
+        // Fetch user details from user service
+        let endpoint = `/api/consumer/${completeCourseDto.userId}/course/complete`;
+
+        if(!process.env.USER_SERVICE_URL)
+            throw new HttpException("User service URL not defined", 500);
+
+        endpoint = `/api/mockFracService/user/${completeCourseDto.userId}`;
+
+        const userResponse = await axios.get(process.env.USER_SERVICE_URL + endpoint);
+
+        const customer = {
+            name: userResponse.data.data.userName,
+            phone: userResponse.data.data.phone || "+919999999999",
+            email: userResponse.data.data.email
         }
-        await axios.patch(uri + endpoint, courseIdDto);
+
+        endpoint = `/api/consumer/course/complete`;
+        const courseCompletionDto = {
+            messageId: "123e4567-e89b-42d3-a456-556642440000",
+            transactionId: "123e4567-e89b-42d3-a456-556642440000",
+            bppId: "compass.bpp.course_manager",
+            bppUri: "course.backend.compass.samagra.io",
+            providerId: "123e4567-e89b-42d3-a456-556642440011",
+            providerName: userCourse.course.provider.orgName,
+            providerCourseId: userCourse.courseId,
+            providerOrderId: "123e4567-e89b-42d3-a456-556642440000",
+            courseName: userCourse.course.title,
+            courseLink: userCourse.course.courseLink,
+            customer,
+            price: {},
+            status: "COMPLETED"
+        }
+
+        await axios.patch(uri + endpoint, courseCompletionDto);
 
         // Update a course as complete for a purchased course
         await this.prisma.userCourse.update({
