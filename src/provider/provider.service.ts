@@ -41,48 +41,72 @@ export class ProviderService {
         if(provider)
             throw new BadRequestException("Account with that email ID already exists");
 
-        // Hashing the password
-        const hashedPassword = await this.authService.hashPassword(signupDto.password);
 
-        if(!logo) 
-            throw new BadRequestException("Logo not uploaded");
-
-        // upload the image to minio
-        const imageLink = await uploadFile(`provider/${signupDto.orgName.replaceAll(" ", "_")}/logo`, logo.buffer)
-
-        // Create an entry in the database
-        provider = await this.prisma.provider.create({
-            data: {
-                name: signupDto.name,
-                email: signupDto.email,
-                password: hashedPassword,
-                paymentInfo: signupDto.paymentInfo ? JSON.parse(signupDto.paymentInfo) : undefined,
-                orgName: signupDto.orgName,
-                orgLogo: imageLink,
-                phone: signupDto.phone
+        // check if there is a user with provider role in the user service
+        const baseUrl = "https://compass-dev.tarento.com/api/user/v4/user/search";
+        const headers = {
+            'Authorization': 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzRjB4UmVWNTJLcTc3R0xycnlKT2N2cXQwNVpUZTYySyJ9.ia3j2Pr-IFuioVXzerZjSNwC3HKvj-YcwjvkxOUNx0o',
+            'Content-Type': 'application/json',
+            'Cookie': 'connect.sid=s%3AXThrvZBYAza6cyO1AN6v2_6KOL5EM5cI.tQhpI4ryxMsIAvhAW6A%2Fkc9pAr5sxoC41PnTwUemWP0'
+            };
+            
+        const data = {
+            "request": {
+                "filters": {
+                "profileDetails.personalDetails.primaryEmail": signupDto.email
+                }
             }
-        });
-        try {
-            // Forward to wallet service for creation of wallet
-            if(!process.env.WALLET_SERVICE_URL)
-                throw new HttpException("Wallet service URL not defined", 500);
-            const url = process.env.WALLET_SERVICE_URL;
-            const endpoint = url + `/api/wallet/create`;
-            const reqBody = {
-                userId: provider.id,
-                type: 'PROVIDER',
-                credits: 0
-            }
-            const resp = await axios.post(endpoint, reqBody);
-        } catch(err) {
-            await this.prisma.provider.delete({
-                where: {
-                    id: provider.id
+        };
+
+        let response = await axios.post(baseUrl, data, {headers});
+        
+        if(response.data.result?.response?.content[0]?.organisations[0]?.roles?.filter(role => role == "CONTENT_CREATOR").length != 0) {
+            // Hashing the password
+            const hashedPassword = await this.authService.hashPassword(signupDto.password);
+
+            if(!logo) 
+                throw new BadRequestException("Logo not uploaded");
+
+            // upload the image to minio
+            const imageLink = await uploadFile(`provider/${signupDto.orgName.replaceAll(" ", "_")}/logo`, logo.buffer)
+
+            // Create an entry in the database
+            provider = await this.prisma.provider.create({
+                data: {
+                    id: response.data.result?.response?.content[0]?.userId,
+                    name: signupDto.name,
+                    email: signupDto.email,
+                    password: hashedPassword,
+                    paymentInfo: signupDto.paymentInfo ? JSON.parse(signupDto.paymentInfo) : undefined,
+                    orgName: signupDto.orgName,
+                    orgLogo: imageLink,
+                    phone: signupDto.phone
                 }
             });
-            throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500);
+            try {
+                // Forward to wallet service for creation of wallet
+                if(!process.env.WALLET_SERVICE_URL)
+                    throw new HttpException("Wallet service URL not defined", 500);
+                const url = process.env.WALLET_SERVICE_URL;
+                const endpoint = url + `/api/wallet/create`;
+                const reqBody = {
+                    userId: provider.id,
+                    type: 'PROVIDER',
+                    credits: 0
+                }
+                const resp = await axios.post(endpoint, reqBody);
+            } catch(err) {
+                await this.prisma.provider.delete({
+                    where: {
+                        id: provider.id
+                    }
+                });
+                throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500);
+            }
+            return provider.id
+        } else {
+            throw new HttpException("User with the given email does not exist in the user service with the role as 'PROVIDER'", 400)
         }
-        return provider.id
     }
 
     async getProviderIdFromLogin(loginDto: LoginDto) {

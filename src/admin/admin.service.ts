@@ -34,63 +34,88 @@ export class AdminService {
             imageUrl = await uploadFile(`admin/${imageName}`, image.buffer)
         }
 
-        // Hashing the password
-        const hashedPassword = await this.authService.hashPassword(signupDto.password);
-
-        const admin = await this.prisma.admin.create({
-            data: {
-                name: signupDto.name,
-                email: signupDto.email,
-                password: hashedPassword,
-                image: imageUrl
-            }
-        });
-        try {
-            // Forward to wallet service for creation of wallet
-            if(!process.env.WALLET_SERVICE_URL)
-                throw new HttpException("Wallet service URL not defined", 500);
+        // check if there is a user with admin role in the user service
+        const baseUrl = "https://compass-dev.tarento.com/api/user/v4/user/search";
+        const headers = {
+            'Authorization': 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzRjB4UmVWNTJLcTc3R0xycnlKT2N2cXQwNVpUZTYySyJ9.ia3j2Pr-IFuioVXzerZjSNwC3HKvj-YcwjvkxOUNx0o',
+            'Content-Type': 'application/json',
+            'Cookie': 'connect.sid=s%3AXThrvZBYAza6cyO1AN6v2_6KOL5EM5cI.tQhpI4ryxMsIAvhAW6A%2Fkc9pAr5sxoC41PnTwUemWP0'
+            };
             
-            const url = process.env.WALLET_SERVICE_URL;
-            const endpoint = url + `/api/wallet/create`;
-            const reqBody = {
-                userId: admin.id,
-                type: 'ADMIN',
-                credits: 0
+        const data = {
+            "request": {
+                "filters": {
+                "profileDetails.personalDetails.primaryEmail": signupDto.email
+                }
             }
-            await axios.post(endpoint, reqBody);
-        } catch(err) {
-            await this.prisma.admin.delete({
-                where: {
-                    id: admin.id
+        };
+
+        let response = await axios.post(baseUrl, data, {headers});
+        console.log("Response from user service: ", JSON.stringify(response.data.result?.response?.content[0]?.organisations[0]));
+        if(response.data.result?.response?.content[0]?.organisations[0]?.roles?.filter(role => role == "ADMIN").length != 0 ) {
+            // Hashing the password
+            const hashedPassword = await this.authService.hashPassword(signupDto.password);
+
+            const admin = await this.prisma.admin.create({
+                data: {
+                    id: response.data.result?.response?.content[0].userId,
+                    name: signupDto.name,
+                    email: signupDto.email,
+                    password: hashedPassword,
+                    image: imageUrl
                 }
             });
-            throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500);
-        }
-        try {
-            // Forward to marketplace portal for creation in marketplace
-            if(!process.env.MARKETPLACE_PORTAL_URL)
-                throw new HttpException("Marketplace service URL not defined", 500);
-
-            const url = process.env.MARKETPLACE_PORTAL_URL;
-            const endpoint = url + `/api/admin/${admin.id}`;
-
-            await axios.post(endpoint);
-        } catch(err) {
-            await this.prisma.admin.delete({
-                where: {
-                    id: admin.id
+            try {
+                // Forward to wallet service for creation of wallet
+                if(!process.env.WALLET_SERVICE_URL)
+                    throw new HttpException("Wallet service URL not defined", 500);
+                
+                const url = process.env.WALLET_SERVICE_URL;
+                const endpoint = url + `/api/wallet/create`;
+                const reqBody = {
+                    userId: admin.id,
+                    type: 'ADMIN',
+                    credits: 0
                 }
-            });
-            throw new HttpException(err.response || "Marketplace service not running", err.response?.status || err.status || 500);
+                await axios.post(endpoint, reqBody);
+            } catch(err) {
+                await this.prisma.admin.delete({
+                    where: {
+                        id: admin.id
+                    }
+                });
+                throw new HttpException(err.response || "Wallet service not running", err.response?.status || err.status || 500);
+            }
+            try {
+                // Forward to marketplace portal for creation in marketplace
+                if(!process.env.MARKETPLACE_PORTAL_URL)
+                    throw new HttpException("Marketplace service URL not defined", 500);
+
+                const url = process.env.MARKETPLACE_PORTAL_URL;
+                const endpoint = url + `/api/admin/${admin.id}`;
+
+                await axios.post(endpoint);
+            } catch(err) {
+                await this.prisma.admin.delete({
+                    where: {
+                        id: admin.id
+                    }
+                });
+                throw new HttpException(err.response || "Marketplace service not running", err.response?.status || err.status || 500);
+            }
+            return admin;
+
+        } else {
+            throw new HttpException("User with the given email Id not present as an ADMIN in User Service", 400);
         }
 
-        return admin;
     }
 
     async login(loginDto: AdminLoginDto) {
-        const admin = await this.prisma.admin.findUnique({
+        let admin = await this.prisma.admin.findUnique({
             where: { email: loginDto.email }
         });
+
         if (admin == null) {
             throw new NotFoundException(`Admin not found`);
         }
