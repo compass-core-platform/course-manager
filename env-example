@@ -11,6 +11,8 @@ DATABASE_URL="postgresql://postgres:secret@postgres:5432/course-manager-db?sslmo
 WALLET_SERVICE_URL=http://wallet:4022
 MARKETPLACE_PORTAL_URL=https://marketplace.backend.compass.samagra.io
 USER_SERVICE_URL=
+USER_SERVICE_TOKEN=
+USER_SERVICE_COOKIE=
 
 # MINIO
 MINIO_ACCESS_KEY=
