@@ -35,7 +35,7 @@ export class AdminService {
         }
 
         // check if there is a user with admin role in the user service
-        const baseUrl = "https://compass-dev.tarento.com/api/user/v4/user/search";
+        const baseUrl = process.env.USER_SERVICE_URL || "";
         const headers = {
             'Authorization': 'bearer ' + process.env.USER_SERVICE_TOKEN,
             'Content-Type': 'application/json',
