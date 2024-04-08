@@ -186,7 +186,11 @@ export class ProviderController {
     @ApiOperation({ summary: 'add new course' })
     @ApiResponse({ status: HttpStatus.CREATED, type: ProviderCourseResponse })
     @Post("/:providerId/course")
-    @UseInterceptors(FileInterceptor('image'))
+    @UseInterceptors(FileInterceptor('image', {
+        limits: {
+            fileSize: 1024 * 1024 * 6,
+        }
+    }))
     // add new course
     async addCourse(
         @Param("providerId", ParseUUIDPipe) providerId: string,
