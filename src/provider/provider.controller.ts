@@ -46,7 +46,7 @@ export class ProviderController {
                 data: found
             })
         } catch (err) {
-            this.logger.error(`Failed to check provider`);
+            this.logger.error(`Failed to check provider: `,err.message);
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
                 statusCode, 
@@ -79,7 +79,7 @@ export class ProviderController {
                 }
             })
         } catch (err) {
-            this.logger.error(`Failed to create new provider account`);
+            this.logger.error(`Failed to create new provider account: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -111,7 +111,7 @@ export class ProviderController {
                 }
             })
         } catch (err) {
-            this.logger.error(`Failed to log in`);
+            this.logger.error(`Failed to log in: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -141,7 +141,7 @@ export class ProviderController {
                 data : provider
             })
         } catch (err) {
-            this.logger.error(`Failed to retreive provider profile`);
+            this.logger.error(`Failed to retreive provider profile: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -173,7 +173,7 @@ export class ProviderController {
                 message: "account updated successfully",
             })
         } catch (err) {
-            this.logger.error(`Failed to update provider profile`);
+            this.logger.error(`Failed to update provider profile: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -210,7 +210,7 @@ export class ProviderController {
                 data: course
             })
         } catch (err) {
-            this.logger.error(`Failed to add the course`);
+            this.logger.error(`Failed to add the course: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -240,7 +240,7 @@ export class ProviderController {
                 data: courses
             })
         } catch (err) {
-            this.logger.error(`Failed to fetch the courses`);
+            this.logger.error(`Failed to fetch the courses: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -270,7 +270,7 @@ export class ProviderController {
                 data: transactionsResponse
             })
         } catch (err) {
-            this.logger.error(`Failed to fetch the transactions`);
+            this.logger.error(`Failed to fetch the transactions: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -300,7 +300,7 @@ export class ProviderController {
                 message: "course marked complete",
             })
         } catch (err) {
-            this.logger.error(`Failed to mark the course completion`);
+            this.logger.error(`Failed to mark the course completion: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -333,7 +333,7 @@ export class ProviderController {
                 message: "course edited successfully",
             })
         } catch (err) {
-            this.logger.error(`Failed to update course information`);
+            this.logger.error(`Failed to update course information: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -364,7 +364,7 @@ export class ProviderController {
                 message: "course deleted successfully",
             })
         } catch (err) {
-            this.logger.error(`Failed to delete the course`);
+            this.logger.error(`Failed to delete the course: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -395,7 +395,7 @@ export class ProviderController {
                 message: "course status changed successfully",
             })
         } catch (err) {
-            this.logger.error(`Failed to change course status`);
+            this.logger.error(`Failed to change course status: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -426,7 +426,7 @@ export class ProviderController {
                 data: feedbackResponse
             })
         } catch (err) {
-            this.logger.error(`Failed to fetch the feedbacks`);
+            this.logger.error(`Failed to fetch the feedbacks: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -457,7 +457,7 @@ export class ProviderController {
           message: "Successfully reset the password.",
         });
       } catch (error) {
-        this.logger.error(`Failed to reset the password.`);
+        this.logger.error(`Failed to reset the password: `,error.message);
   
         const { errorMessage, statusCode } =
           getPrismaErrorStatusAndMessage(error);

@@ -372,7 +372,54 @@ async function main() {
       }]),
         author: "James Franco",
         verificationStatus: CourseVerificationStatus.PENDING,
-    }, {
+    }, 
+    {
+        courseId: "999e4567-e89b-42d3-a456-556642440055",
+        providerId: provider1.id,
+        title: "Architecture",
+        description: "This course covers all the fundamentals needed for building aesthetic architectures",
+        courseLink: "https://udemy.com/courses/jQKsLpm",
+        imageLink: "https://udemy.com/courses/jQKsLpm/images/cover2.jpg",
+        credits: 160,
+        language: ["english", "hindi"],
+        avgRating: 3.5,
+        competency: JSON.stringify([{
+          "id": 1,
+          "name": "Floor Planning and Mapping",
+          "levels": [
+              {
+                  "id": 2,
+                  "levelNumber": 2,
+                  "name": "Level 2"
+              }, {
+                "id": 3,
+                "levelNumber": 3,
+                "name": "Level 3"
+            }
+          ]
+      }, {
+          "id": 3,
+          "name": "Earth core concepts",
+          "levels": [
+              {
+                  "id": 1,
+                  "levelNumber": 1,
+                  "name": "Level 1"
+              }, {
+                  "id": 2,
+                  "levelNumber": 2,
+                  "name": "Level 2"
+              },  {
+                "id": 3,
+                "levelNumber": 3,
+                "name": "Level 3"
+            }
+          ]
+      }]),
+        author: "James Franco",
+        verificationStatus: CourseVerificationStatus.ACCEPTED,
+    },
+    {
         courseId: "123e4567-e89b-42d3-a456-556642440056",
         providerId: provider1.id,
         title: "Introduction to Compiler Engineering",

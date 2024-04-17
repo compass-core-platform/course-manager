@@ -35,7 +35,7 @@ export class CourseController {
                 data: courses
             })
         } catch (err) {
-            this.logger.error(`Failed to retreive the courses' information`);
+            this.logger.error(`Failed to retreive the courses' information: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -66,7 +66,7 @@ export class CourseController {
                 data: courses
             })
         } catch (err) {
-            this.logger.error(`Failed to fetch courses`);
+            this.logger.error(`Failed to fetch courses: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -96,7 +96,7 @@ export class CourseController {
                 data: courses
             })
         } catch (err) {
-            this.logger.error(`Failed to fetch courses`);
+            this.logger.error(`Failed to fetch courses: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -126,7 +126,7 @@ export class CourseController {
                 data: course
             })
         } catch (err) {
-            this.logger.error(`Failed to retreive the course`);
+            this.logger.error(`Failed to retreive the course: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -157,7 +157,7 @@ export class CourseController {
                 data: response
             })
         } catch (err) {
-            this.logger.error(`Failed to record the purchase`);
+            this.logger.error(`Failed to record the purchase: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -188,7 +188,7 @@ export class CourseController {
                 message: "feedback successful"
             })
         } catch (err) {
-            this.logger.error(`Failed to record the feedback`);
+            this.logger.error(`Failed to record the feedback: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -218,7 +218,7 @@ export class CourseController {
                 data: filteredCourses
             });
         } catch (err) {
-            this.logger.error(`Failed to filter the courses`);
+            this.logger.error(`Failed to filter the courses: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({

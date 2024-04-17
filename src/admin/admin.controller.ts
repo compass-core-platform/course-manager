@@ -51,7 +51,7 @@ export class AdminController {
                 }
             });
         } catch (err) {
-            this.logger.error(`Failed to sign up the admin with the given credentials`);
+            this.logger.error(`Failed to sign up the admin with the given credentials: `, err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -85,7 +85,7 @@ export class AdminController {
                 }
             });
         } catch (err) {
-            this.logger.error(`Failed to login the admin with the given credentials`);
+            this.logger.error(`Failed to login the admin with the given credentials: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -111,7 +111,7 @@ export class AdminController {
                 data: providers
             });
         } catch (err) {
-            this.logger.error(`Failed to retreive all the providers' information`);
+            this.logger.error(`Failed to retreive all the providers' information: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -140,7 +140,7 @@ export class AdminController {
                 data: providers
             });
         } catch (err) {
-            this.logger.error(`Failed to retreive all the providers' information for settlement`);
+            this.logger.error(`Failed to retreive all the providers' information for settlement: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -165,7 +165,7 @@ export class AdminController {
                 message: "Settlement done for the provider",
             });
         } catch (err) {
-            this.logger.error(`Failed to retreive all the providers' information for settlement`);
+            this.logger.error(`Failed to retreive all the providers' information for settlement: `,err.message);
 
             const {errorMessage, statusCode} = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -193,7 +193,7 @@ export class AdminController {
                 data: provider
             });
         } catch (err) {
-            this.logger.error(`Failed to retrieve the provider profile information`);
+            this.logger.error(`Failed to retrieve the provider profile information: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -222,7 +222,7 @@ export class AdminController {
                 data: updatedProfile
             });
         } catch (err) {
-            this.logger.error(`Failed to retrieve the provider profile information`);
+            this.logger.error(`Failed to retrieve the provider profile information: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -248,7 +248,7 @@ export class AdminController {
                 data: response.id
             });
         } catch (err) {
-            this.logger.error(`Failed to verify the provider with id ${providerId}`);
+            this.logger.error(`Failed to verify the provider with id ${providerId}: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -277,7 +277,7 @@ export class AdminController {
                 }
             });
         } catch (err) {
-            this.logger.error(`Failed to reject the provider account with id ${providerId}`);
+            this.logger.error(`Failed to reject the provider account with id ${providerId}: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -303,7 +303,7 @@ export class AdminController {
                 data: courses
             });
         } catch (err) {
-            this.logger.error(`Failed to retrieve all courses`);
+            this.logger.error(`Failed to retrieve all courses: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -331,7 +331,7 @@ export class AdminController {
                 data: course
             });
         } catch (err) {
-            this.logger.error(`Failed to retrieve the course for the courseId ${courseId}`);
+            this.logger.error(`Failed to retrieve the course for the courseId ${courseId}: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -360,7 +360,7 @@ export class AdminController {
                 data: course
             });
         } catch (err) {
-            this.logger.error(`Failed to accept the course for the courseId ${courseId}`);
+            this.logger.error(`Failed to accept the course for the courseId ${courseId}: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -388,7 +388,7 @@ export class AdminController {
                 data: course
             });
         } catch (err) {
-            this.logger.error(`Failed to reject the course with the courseId ${courseId}`);
+            this.logger.error(`Failed to reject the course with the courseId ${courseId}: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -416,7 +416,7 @@ export class AdminController {
                 data: course
             });
         } catch (err) {
-            this.logger.error(`Failed to delete the course with the courseId ${courseId}`);
+            this.logger.error(`Failed to delete the course with the courseId ${courseId}: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -444,7 +444,7 @@ export class AdminController {
                 data: transactions
             });
         } catch (err) {
-            this.logger.error(`Failed to fetch the transactions between admin and consumers`);
+            this.logger.error(`Failed to fetch the transactions between admin and consumers: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -474,7 +474,7 @@ export class AdminController {
                 data: provider
             });
         } catch (err) {
-            this.logger.error(`Failed to add credits to the provider`);
+            this.logger.error(`Failed to add credits to the provider: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
@@ -504,7 +504,7 @@ export class AdminController {
                 data: provider
             });
         } catch (err) {
-            this.logger.error(`Failed to remove credits from the provider`);
+            this.logger.error(`Failed to remove credits from the provider: `,err.message);
             
             const { errorMessage, statusCode } = getPrismaErrorStatusAndMessage(err);
             res.status(statusCode).json({
