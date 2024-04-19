@@ -535,17 +535,17 @@ async function main() {
       courseId: "123e4567-e89b-42d3-a456-556642440051",
       status: CourseProgressStatus.COMPLETED,
     }, {
-      userId: "abaa7220-5d2e-4e05-842a-95b2c4ce1876",
+      userId: "890f2839-866f-4524-9eac-bebe0d35d607",
       feedback: "Instructor is very friendly",
       rating: 4,
       status: CourseProgressStatus.COMPLETED,
       courseCompletionScore: 100,
       courseId: "123e4567-e89b-42d3-a456-556642440050"
     }, {
-      userId: "abaa7220-5d2e-4e05-842a-95b2c4ce1876",
+      userId: "890f2839-866f-4524-9eac-bebe0d35d607",
       courseId: "123e4567-e89b-42d3-a456-556642440051"
     }, {
-      userId: "abaa7220-5d2e-4e05-842a-95b2c4ce1876",
+      userId: "890f2839-866f-4524-9eac-bebe0d35d607",
       feedback: "Some more real world applications could be discussed",
       rating: 3,
       status: CourseProgressStatus.COMPLETED,
